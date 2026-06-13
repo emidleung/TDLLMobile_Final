@@ -240,31 +240,6 @@ export default function App() {
       .then(res => handleJsonResponse(res, []))
       .then(setReviews)
       .catch((e) => console.warn('fetch error (reviews)', e));
-
-    if (currentUserId) {
-      // 6. Fetch pending invitations
-      fetch(`/api/invitations/${currentUserId}?t=${Date.now()}`)
-        .then(res => handleJsonResponse(res, []))
-        .then(setInvitations)
-        .catch((e) => console.warn('fetch error (invitations)', e));
-
-      // 7. Fetch active connections
-      fetch(`/api/connections/${currentUserId}?t=${Date.now()}`)
-        .then(res => handleJsonResponse(res, []))
-        .then(data => {
-          setConnections(data);
-          // Set connected partner if active connection exists
-          if (data && data.length > 0) {
-            const firstConn = data[0];
-            setConnectedPartnerId(firstConn.employerID === currentUserId ? firstConn.helperID : firstConn.employerID);
-            // Sync the user's role in the app based on the connection
-            setRole(firstConn.employerID === currentUserId ? 'employer' : 'helper');
-          } else {
-            setConnectedPartnerId(null);
-          }
-        })
-        .catch((e) => console.warn('fetch error (connections)', e));
-    }
   };
 
   // Load favorites and likes from local storage on mount
@@ -309,7 +284,9 @@ export default function App() {
           firestoreInvs.push({
             invitationID: doc.id,
             ...data,
-            createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : data.createTime
+            createTime: data.createTime instanceof Timestamp 
+              ? data.createTime.toDate().toISOString() 
+              : (data.createTime || new Date().toISOString())
           } as Invitation);
         }
       });
@@ -326,7 +303,9 @@ export default function App() {
           firestoreConns.push({
             connectionID: doc.id,
             ...data,
-            createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : data.createTime
+            createTime: data.createTime instanceof Timestamp 
+              ? data.createTime.toDate().toISOString() 
+              : (data.createTime || new Date().toISOString())
           } as Connection);
         }
       });

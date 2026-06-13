@@ -97,7 +97,17 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
         alert("You are already connected with this user.");
         return;
       }
-      
+  const handleSendInvitation = async () => {
+    const trimmedInput = partnerInput.trim();
+    if (!currentUserId) {
+      alert("Error: Your identity is not loaded. Please try logging in again.");
+      return;
+    }
+    if (trimmedInput === currentUserId) {
+      alert("You cannot connect with yourself.");
+      return;
+    }
+    if (trimmedInput) {
       const newInv = {
         senderID: currentUserId,
         receiverID: trimmedInput,
@@ -105,70 +115,46 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
         createTime: serverTimestamp()
       };
 
-      // 1. Firestore send
       try {
         await addDoc(collection(db, "invitations"), newInv);
         alert(`Invitation sent to ${trimmedInput}!`);
         setPartnerInput('');
-      } catch (err) {
-        console.warn("Firestore send invitation failed:", err);
-        
-        // 2. Fallback to API
-        fetch('/api/invitations', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ senderID: currentUserId, receiverID: trimmedInput })
-        })
-        .then(() => {
-          alert(`Invitation sent to ${trimmedInput}!`);
-          setPartnerInput('');
-          onRefreshData && onRefreshData();
-        })
-        .catch(console.error);
+      } catch (err: any) {
+        console.error("Firestore send invitation failed:", err);
+        alert("Failed to send invitation: " + (err.message || "Permission denied"));
       }
     }
   };
 
-  const handleAcceptInvitation = async (invId: string, roleOfSender: 'employer' | 'helper') => {
-    // 1. Firestore accept
+  const handleAcceptInvitation = async (inv: Invitation, roleOfSender: 'employer' | 'helper') => {
     try {
-      const invRef = doc(db, "invitations", invId);
+      // 1. Create connection FIRST (Source of truth)
+      await addDoc(collection(db, "connections"), {
+        employerID: roleOfSender === 'employer' ? inv.senderID : inv.receiverID,
+        helperID: roleOfSender === 'helper' ? inv.senderID : inv.receiverID,
+        createTime: serverTimestamp()
+      });
+
+      // 2. Then update invitation status
+      const invRef = doc(db, "invitations", inv.invitationID);
       await updateDoc(invRef, { status: 'accepted' });
       
-      const inv = invitations.find(i => i.invitationID === invId);
-      if (inv) {
-        await addDoc(collection(db, "connections"), {
-          employerID: roleOfSender === 'employer' ? inv.senderID : inv.receiverID,
-          helperID: roleOfSender === 'helper' ? inv.senderID : inv.receiverID,
-          createTime: serverTimestamp()
-        });
-      }
-    } catch (err) {
-      console.warn("Firestore accept invitation failed:", err);
+      alert("Connection established!");
+    } catch (err: any) {
+      console.error("Firestore accept invitation failed:", err);
+      alert("Failed to accept invitation: " + (err.message || "Unknown error"));
     }
-
-    // 2. Sync with API
-    fetch(`/api/invitations/${invId}/accept`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ roleOfSender })
-    })
-    .then(() => onRefreshData && onRefreshData())
-    .catch(console.error);
   };
 
+
   const handleRejectInvitation = async (invId: string) => {
-    // 1. Firestore reject
     try {
       await updateDoc(doc(db, "invitations", invId), { status: 'rejected' });
-    } catch (err) {
-      console.warn("Firestore reject invitation failed:", err);
+      alert("Invitation rejected.");
+    } catch (err: any) {
+      console.error("Firestore reject invitation failed:", err);
+      alert("Failed to reject: " + (err.message || "Permission denied"));
     }
-
-    // 2. Sync with API
-    fetch(`/api/invitations/${invId}/reject`, { method: 'POST' })
-      .then(() => onRefreshData && onRefreshData())
-      .catch(console.error);
   };
 
   return (
@@ -304,8 +290,8 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
                             <div style={{ fontWeight: "bold", color: "#374151", marginBottom: "8px" }}>User {inv.senderID} wants to connect!</div>
                             <div style={{ fontSize: "14px", color: "#6b7280", marginBottom: "12px" }}>Please select their role before accepting:</div>
                             <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                              <button onClick={() => handleAcceptInvitation(inv.invitationID, 'employer')} style={{ backgroundColor: "#10b981", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", fontSize: "13px" }}>They are my Employer</button>
-                              <button onClick={() => handleAcceptInvitation(inv.invitationID, 'helper')} style={{ backgroundColor: "#3b82f6", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", fontSize: "13px" }}>They are my Helper</button>
+                              <button onClick={() => handleAcceptInvitation(inv, 'employer')} style={{ backgroundColor: "#10b981", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", fontSize: "13px" }}>They are my Employer</button>
+                              <button onClick={() => handleAcceptInvitation(inv, 'helper')} style={{ backgroundColor: "#3b82f6", color: "#fff", border: "none", padding: "8px 12px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", fontSize: "13px" }}>They are my Helper</button>
                               <button onClick={() => handleRejectInvitation(inv.invitationID)} style={{ backgroundColor: "#f3f4f6", color: "#4b5563", border: "none", padding: "8px 12px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer", fontSize: "13px" }}>Reject</button>
                             </div>
                           </>
