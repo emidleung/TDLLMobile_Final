@@ -976,6 +976,7 @@ export default function App() {
                 <RecipeLibraryPage
                   recipes={recipes}
                   lang={lang}
+                  role={role || 'employer'}
                 />
               )}
 

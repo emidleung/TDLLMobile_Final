@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BookOpen, Clock, Heart, Eye, ArrowLeft, CheckCircle, Flame, MessageCircle, Info, Volume2 } from 'lucide-react';
-import { Recipe, Language } from '../types';
+import { Recipe, Language, Role } from '../types';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -10,9 +10,10 @@ gsap.registerPlugin(ScrollTrigger);
 interface RecipeLibraryPageProps {
   recipes: Recipe[];
   lang: Language;
+  role: Role;
 }
 
-export function RecipeLibraryPage({ recipes, lang }: RecipeLibraryPageProps) {
+export function RecipeLibraryPage({ recipes, lang, role }: RecipeLibraryPageProps) {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [activeTab, setActiveTab] = useState<'prep' | 'cook' | 'takeaways'>('prep');
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -309,12 +310,14 @@ export function RecipeLibraryPage({ recipes, lang }: RecipeLibraryPageProps) {
                   src={getRecipeImage(recipe)}
                   referrerPolicy="no-referrer"
                 />
-                <button 
-                  className="absolute top-3 right-3 p-1.5 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/40 transition-colors"
-                  onClick={(e) => { e.stopPropagation(); }}
-                >
-                  <Heart className="w-4 h-4 text-[#1B1B1B] stroke-[1.5px]" />
-                </button>
+                {role === 'employer' && (
+                  <button 
+                    className="absolute top-3 right-3 p-1.5 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/40 transition-colors"
+                    onClick={(e) => { e.stopPropagation(); }}
+                  >
+                    <Heart className="w-4 h-4 text-[#1B1B1B] stroke-[1.5px]" />
+                  </button>
+                )}
               </div>
               
               {/* Layer 2: Brand/Category Style */}

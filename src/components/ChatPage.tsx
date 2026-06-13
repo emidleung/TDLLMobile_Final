@@ -105,6 +105,10 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
         alert("You are already connected with this user.");
         return;
       }
+      if (invitations.some(i => (i.senderID === currentUserId && i.receiverID === trimmedInput) || (i.senderID === trimmedInput && i.receiverID === currentUserId))) {
+        alert("There is already a pending invitation between you and this user. Please wait for them to respond.");
+        return;
+      }
       const newInv = {
         senderID: currentUserId,
         receiverID: trimmedInput,
