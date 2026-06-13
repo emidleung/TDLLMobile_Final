@@ -10,9 +10,11 @@ interface ChatWindowProps {
   role: Role;
   chats?: ChatMessage[];
   onSendMessage?: (msg: string, overrideTaskID?: string) => void;
+  onMarkAsRead?: () => void;
+  onDeleteMessage?: (chatId: string) => void;
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onBack, translationEnabled, currentUserId, role, chats, onSendMessage }) => {
+export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onBack, translationEnabled, currentUserId, role, chats, onSendMessage, onMarkAsRead, onDeleteMessage }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [hasRecordedAudio, setHasRecordedAudio] = useState(false);
@@ -20,6 +22,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioProgress, setAudioProgress] = useState(0);
   const [inputText, setInputText] = useState("");
+
+  useEffect(() => {
+    if (onMarkAsRead) {
+      onMarkAsRead();
+    }
+  }, [chatId, chats?.length, onMarkAsRead]);
 
   const handleSendText = () => {
     if (inputText.trim() && onSendMessage) {
@@ -123,6 +131,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
     }
   };
 
+  const handleMessageClick = (msg: ChatMessage) => {
+    if (!msg.id || !onDeleteMessage) return;
+    if (confirm(translationEnabled ? "Hapus pesan ini?" : "Delete this message?")) {
+      onDeleteMessage(msg.id);
+    }
+  };
+
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
@@ -158,7 +173,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
           {chats?.filter(c => c.taskID === chatId).map((msg, index) => {
             const isMine = msg.senderRole === role;
             return (
-              <div key={index} style={{ display: 'flex', flexDirection: 'column', alignSelf: isMine ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
+              <div 
+                key={index} 
+                onClick={() => handleMessageClick(msg)}
+                style={{ display: 'flex', flexDirection: 'column', alignSelf: isMine ? 'flex-end' : 'flex-start', maxWidth: '80%', cursor: 'pointer' }}
+              >
                 <div style={{ backgroundColor: isMine ? "#fb923c" : "#e5e7eb", color: isMine ? "#fff" : "#1f2937", padding: "12px 16px", borderRadius: isMine ? "16px 16px 0 16px" : "16px 16px 16px 0", lineHeight: "1.4" }}>
                   {msg.message}
                 </div>

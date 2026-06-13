@@ -101,6 +101,7 @@ export interface StepRecord {
 }
 
 export interface ChatMessage {
+  id?: string;
   taskID: string;
   senderRole: Role | string;
   message: string;

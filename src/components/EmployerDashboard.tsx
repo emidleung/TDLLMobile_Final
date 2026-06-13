@@ -477,7 +477,7 @@ export function EmployerDashboard({
                   }
                 }}
                 title="Delete task permanently"
-                className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-600 rounded-full transition-all cursor-pointer active:scale-95"
+                className="p-1.5 hover:text-red-600 bg-gray-100 rounded-[14px] border border-app-border transition-all flex items-center justify-center cursor-pointer active:scale-95 text-gray-400"
                 id="btn-delete-task-v4"
               >
                 <Trash2 className="w-5 h-5" />

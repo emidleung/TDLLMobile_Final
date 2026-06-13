@@ -24,9 +24,10 @@ interface ChatPageProps {
   onRefreshData?: () => void;
   initialTab?: 'chat' | 'settings';
   onMarkChatAsRead?: (taskId: string) => void;
+  onDeleteChatMessage?: (chatId: string) => void;
 }
 
-export function ChatPage({ role, currentUserId, connectedPartnerId, invitations = [], connections = [], chats = [], onSendMessage, onConnect, onRefreshData, initialTab = 'chat', onMarkChatAsRead }: ChatPageProps) {
+export function ChatPage({ role, currentUserId, connectedPartnerId, invitations = [], connections = [], chats = [], onSendMessage, onConnect, onRefreshData, initialTab = 'chat', onMarkChatAsRead, onDeleteChatMessage }: ChatPageProps) {
   const [activeTab, setActiveTab] = useState<'chat' | 'settings'>(initialTab);
   const [partnerInput, setPartnerInput] = useState('');
   const [selectedChat, setSelectedChat] = useState<{ id: string, name: string } | null>(null);
@@ -370,6 +371,8 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
               role={role}
               chats={chats}
               onSendMessage={onSendMessage}
+              onMarkAsRead={() => onMarkChatAsRead && onMarkChatAsRead(selectedChat.id)}
+              onDeleteMessage={onDeleteChatMessage}
             />
           )}
 

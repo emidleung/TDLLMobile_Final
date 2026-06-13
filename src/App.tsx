@@ -239,6 +239,7 @@ export default function App() {
       snapshot.forEach((doc) => {
         const data = doc.data();
         firestoreChats.push({
+          id: doc.id,
           ...data,
           createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : (data.createTime || new Date().toISOString())
         } as ChatMessage);
@@ -736,6 +737,14 @@ export default function App() {
       .catch(console.error);
   };
 
+  const handleDeleteChatMessage = async (chatId: string) => {
+    try {
+      await deleteDoc(doc(db, "chats", chatId));
+    } catch (err) {
+      console.warn("Firestore delete chat failed:", err);
+    }
+  };
+
   const logout = async () => {
     try {
       await signOut(auth);
@@ -1011,6 +1020,7 @@ export default function App() {
                   onRefreshData={loadDatabaseState}
                   initialTab={currentView === 'chat-settings' ? 'settings' : 'chat'}
                   onMarkChatAsRead={handleMarkChatAsRead}
+                  onDeleteChatMessage={handleDeleteChatMessage}
                 />
               )}
 
