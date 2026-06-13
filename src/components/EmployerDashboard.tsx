@@ -90,7 +90,6 @@ export function EmployerDashboard({
   onAddCustomFavorite,
   onDeleteCustomFavorite,
   recipeRemarks,
-  recipeRemarks,
   onUpdateRemark,
   onReviewPrep,
   onReviewDish

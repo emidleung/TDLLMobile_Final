@@ -669,6 +669,7 @@ export default function App() {
       }).catch(console.error);
     }
   };
+  const handleSendMessage = async (text: string, overrideTaskID?: string) => {
     if (!role && !currentUserId) return;
     const taskID = overrideTaskID || activeTask?.taskID || 'task-1';
     
