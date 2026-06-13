@@ -326,11 +326,27 @@ export default function App() {
       setHealthProfiles(firestoreMembers);
     });
 
+    // Reviews Listener
+    const qReviews = query(collection(db, "reviews"));
+    const unsubscribeReviews = onSnapshot(qReviews, (snapshot) => {
+      const firestoreReviews: Review[] = [];
+      snapshot.forEach((doc) => {
+        firestoreReviews.push({
+          id: doc.id,
+          ...doc.data()
+        } as Review);
+      });
+      // Sort reviews newest first
+      firestoreReviews.sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime());
+      setReviews(firestoreReviews);
+    });
+
     return () => {
       unsubscribeInv();
       unsubscribeConn();
       unsubscribeTasks();
       unsubscribeMembers();
+      unsubscribeReviews();
     };
   }, [currentUserId]);
 
@@ -679,17 +695,23 @@ Respond ONLY with a valid JSON object:
 
   // Submit Culinary Satisfaction Scoring reviews
   const handleSubmitReview = async (starRate: number, comment: string) => {
-    if (!activeTask) return;
+    const targetTask = allTasks.find(t => {
+      const hasRated = reviews.some(r => r.taskID === t.taskID && r.role === role);
+      return !hasRated && ['completed', 'ai_checked', 'rated'].includes(t.taskStatus);
+    });
+    if (!targetTask) return;
+
     try {
       await addDoc(collection(db, "reviews"), {
-        taskID: activeTask.taskID,
+        taskID: targetTask.taskID,
         starRate,
         comment,
+        role: role,
         createTime: serverTimestamp()
       });
       
       // Update task status to rated
-      await updateDoc(doc(db, "tasks", activeTask.taskID), { taskStatus: 'rated' });
+      await updateDoc(doc(db, "tasks", targetTask.taskID), { taskStatus: 'rated' });
       setCurrentView('feedback-settings');
     } catch (err) {
       console.error("Submit review failed:", err);
@@ -753,9 +775,20 @@ Respond ONLY with a valid JSON object:
     cookSteps: [],
     materialList: [],
     toolList: [],
-    category: 'Custom',
+    category: 'custom',
+    prepTime: 0,
+    cookTime: 0,
     tags: []
   }) : null;
+
+  const taskToRate = allTasks.find(t => {
+    const hasRated = reviews.some(r => r.taskID === t.taskID && r.role === role);
+    return !hasRated && ['completed', 'ai_checked', 'rated'].includes(t.taskStatus);
+  });
+  const taskToRateRecipe = taskToRate ? (recipes.find(r => r.recipeID === taskToRate.recipeID) || {
+    title: { en: 'Cooking Task', id: 'Tugas Memasak', tg: 'Cooking Task' }
+  }) : null;
+  const latestTaskTitle = taskToRateRecipe ? taskToRateRecipe.title[lang] : null;
 
   // Active state logic for bottom navigations
   const isTabActive = (tab: 'today' | 'recipes' | 'chat' | 'settings') => {
@@ -1007,7 +1040,7 @@ Respond ONLY with a valid JSON object:
                   onSetLang={handleSelectLang}
                   onSubmitReview={handleSubmitReview}
                   reviews={reviews}
-                  latestTaskTitle={activeRecipe ? activeRecipe.title[lang] : null}
+                  latestTaskTitle={latestTaskTitle}
                   role={role}
                   onLogout={logout}
                 />

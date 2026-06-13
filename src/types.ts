@@ -121,5 +121,6 @@ export interface Review {
   taskID: string;
   starRate: number;
   comment: string;
+  role?: string;
   createTime: string;
 }

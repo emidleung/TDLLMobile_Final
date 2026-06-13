@@ -181,15 +181,16 @@ export function FeedbackSettingsPage({
       </section>
 
       {/* Historical feedback reviews scores */}
-      {role !== 'employer' && (
       <section className="bg-white border border-app-border rounded-[14px] p-[28px] flex flex-col gap-4 shadow-sm">
         <h3 className="text-[24px] font-bold text-app-text-title">
-          {lang === 'en' ? 'Historical Self-Evaluation Scores' : 'Riwayat Skor Evaluasi Diri'}
+          {lang === 'en' 
+             ? (role === 'employer' ? 'Historical Evaluation Scores' : 'Historical Self-Evaluation Scores') 
+             : (role === 'employer' ? 'Riwayat Skor Evaluasi' : 'Riwayat Skor Evaluasi Diri')}
         </h3>
         
         <div className="flex flex-col gap-4">
-          {reviews.length > 0 ? (
-            reviews.map((rev, idx) => (
+          {reviews.filter(r => r.role === role).length > 0 ? (
+            reviews.filter(r => r.role === role).map((rev, idx) => (
               <div key={idx} className="bg-[#FCF9F2] p-4 border border-app-border rounded-[14px] flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <div className="flex text-app-orange gap-0.5">
@@ -214,7 +215,6 @@ export function FeedbackSettingsPage({
           )}
         </div>
       </section>
-      )}
 
       {/* Logout button at screen bottom */}
       {onLogout && (
