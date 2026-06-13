@@ -428,12 +428,14 @@ export default function App() {
         console.log("Found existing auth session:", user.uid);
         
         // Attempt to find user by their Firebase UID in Firestore first
-        const userDoc = await getDoc(doc(db, "users", user.uid)).catch(() => null);
-        if (userDoc && userDoc.exists()) {
-          const userData = userDoc.data();
+        const q = query(collection(db, "users"), where("firebaseUid", "==", user.uid));
+        const qSnap = await getDocs(q).catch(() => null);
+        if (qSnap && !qSnap.empty) {
+          const uDoc = qSnap.docs[0];
+          const userData = uDoc.data();
           setUserFullName(userData.fullName);
           setRole(userData.role);
-          setCurrentUserId(user.uid);
+          setCurrentUserId(uDoc.id); // This is the 8-digit ID
           setIsLoggedIn(true);
         } else if (currentUserId) {
           // Fallback to the currentUserId if set (handles mock IDs)

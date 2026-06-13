@@ -219,6 +219,7 @@ export function LoginPage({ onLogin, onBack, lang, onSetLang, initialRole }: Log
           }
         }
       } else {
+        resolvedUserId = userId;
         // FIRST: Check local mock API
         try {
           const localRes = await fetch(`/api/users/${userId}`);

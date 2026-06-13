@@ -380,6 +380,7 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
               onBack={() => setSelectedChat(null)} 
               translationEnabled={translationEnabled}
               currentUserId={currentUserId}
+              role={role}
               chats={chats}
               onSendMessage={onSendMessage}
             />

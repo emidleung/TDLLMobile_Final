@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChatMessage } from '../types';
+import { ChatMessage, Role } from '../types';
 
 interface ChatWindowProps {
   chatId: string;
@@ -7,11 +7,12 @@ interface ChatWindowProps {
   onBack: () => void;
   translationEnabled?: boolean;
   currentUserId?: string | null;
+  role: Role;
   chats?: ChatMessage[];
   onSendMessage?: (msg: string, overrideTaskID?: string) => void;
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onBack, translationEnabled, currentUserId, chats, onSendMessage }) => {
+export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onBack, translationEnabled, currentUserId, role, chats, onSendMessage }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [hasRecordedAudio, setHasRecordedAudio] = useState(false);
@@ -155,7 +156,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
         {/* DEFAULT VIEW */}
         <>
           {chats?.filter(c => c.taskID === chatId).map((msg, index) => {
-            const isMine = msg.senderRole === currentUserId;
+            const isMine = msg.senderRole === role;
             return (
               <div key={index} style={{ display: 'flex', flexDirection: 'column', alignSelf: isMine ? 'flex-end' : 'flex-start', maxWidth: '80%' }}>
                 <div style={{ backgroundColor: isMine ? "#fb923c" : "#e5e7eb", color: isMine ? "#fff" : "#1f2937", padding: "12px 16px", borderRadius: isMine ? "16px 16px 0 16px" : "16px 16px 16px 0", lineHeight: "1.4" }}>

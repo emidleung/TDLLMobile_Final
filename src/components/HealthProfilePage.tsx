@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, UserPlus, Trash2, ShieldAlert, Award, Smile, Plus, Clipboard, UserCheck } from 'lucide-react';
+import { Heart, UserPlus, Trash, ShieldAlert, Award, Smile, Plus, Clipboard, UserCheck } from 'lucide-react';
 import { FamilyMember, Language } from '../types';
 
 interface HealthProfilePageProps {
@@ -179,7 +179,7 @@ export function HealthProfilePage({ members, lang, onAddMember, onDeleteMember }
                 className="absolute top-4 right-4 p-2 text-on-surface-variant hover:text-error hover:bg-error-container/30 rounded-lg transition-colors cursor-pointer"
                 title="Remove profile"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash className="w-4 h-4" />
               </button>
 
               <div className="flex flex-col gap-4">
