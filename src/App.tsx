@@ -39,7 +39,8 @@ import {
   where,
   Timestamp,
   serverTimestamp,
-  getDoc 
+  getDoc,
+  deleteField
 } from "firebase/firestore";
 import { RECIPES } from './recipesData';
 
@@ -138,6 +139,60 @@ export default function App() {
       console.warn("JSON parsing failed, falling back:", err);
       return fallbackValue;
     }
+  };
+
+  // Smart algorithm helper to adjust a recipe based on health profiles (Migrated from server.ts)
+  const adjustRecipeForHealth = (recipeId: string, members: FamilyMember[]) => {
+    const originalRecipe = RECIPES.find(r => r.recipeID === recipeId) || recipes.find(r => r.recipeID === recipeId);
+    if (!originalRecipe) return null;
+
+    let preSteps: RecipeStep[] = JSON.parse(JSON.stringify(originalRecipe.preCookSteps));
+    let cookSteps: RecipeStep[] = JSON.parse(JSON.stringify(originalRecipe.cookSteps));
+
+    const hasDiabetes = members.some(m => m.disease.toLowerCase().includes('diabetes'));
+    const hasHypertension = members.some(m => m.disease.toLowerCase().includes('hyper') || m.disease.toLowerCase().includes('pressure'));
+    const allergies = members.map(m => m.allergy.trim().toLowerCase()).filter(a => a && a !== 'none');
+
+    if (allergies.length > 0 && recipeId !== 'cantonese-steamed-fish') {
+      const allergyListStr = allergies.join(', ');
+      preSteps.unshift({
+        id: 0,
+        text: {
+          en: `[ALLERGY WARNING] Clean and sanitize all workstations. Ensure zero contact with: ${allergyListStr}.`,
+          id: `[PERINGATAN ALERGI] Bersihkan talenan. Pastikan tidak ada kontak dengan: ${allergyListStr}.`,
+          tg: `[BABALA SA ALERHIYA] Linisin ang workstation. Siguraduhing walang contact sa: ${allergyListStr}.`
+        },
+        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTgL9HdVqVTd3rN0858gr-CmnbshY3FPcXbFW0VDaNxi-kzx3o9QJll0A5QG2gHHhUj0gJ91mycpQ-Gm1BQ8C9vF9IF81Aj0_A6tYTQ5GKYsUhev0hIBubciUhOqvHbGKqLKVqZxDbGbaROBnp6iFFGbzQHET6lQMfqPZh2i-FTJamZN8FWyuKhU4AWwn-LifMfbAIuSiVWQe-ZrshNq6eeFK86RoB6epwXGClCOC67kE9qWZzdK_oXFpyoAJleJOZuAWzDxRA6g'
+      });
+    }
+
+    if (hasDiabetes) {
+      preSteps = preSteps.map(step => {
+        const adjustStep = { ...step };
+        (Object.keys(adjustStep.text) as Language[]).forEach(lang => {
+          let val = adjustStep.text[lang];
+          if (val.toLowerCase().includes('sugar') || val.toLowerCase().includes('gula')) {
+            adjustStep.text[lang] = val + ' (Diabetes Option: Substitute with sweetener).';
+          }
+        });
+        return adjustStep;
+      });
+    }
+
+    if (hasHypertension) {
+      cookSteps = cookSteps.map(step => {
+        const adjustStep = { ...step };
+        (Object.keys(adjustStep.text) as Language[]).forEach(lang => {
+          let val = adjustStep.text[lang];
+          if (val.toLowerCase().includes('salt') || val.toLowerCase().includes('soy sauce')) {
+            adjustStep.text[lang] = val + ' (Low-sodium diet: Reduce salt/soy by 50%).';
+          }
+        });
+        return adjustStep;
+      });
+    }
+
+    return { preSteps: preSteps.map((s, idx) => ({ ...s, id: idx + 1 })), cookSteps: cookSteps.map((s, idx) => ({ ...s, id: idx + 1 })) };
   };
 
   // Synchronize master states on load
@@ -245,9 +300,7 @@ export default function App() {
     if (!currentUserId) return;
 
     // Invitations Listener
-    const qInv = query(collection(db, "invitations"), 
-      where("status", "==", "pending")
-    );
+    const qInv = query(collection(db, "invitations"), where("status", "==", "pending"));
     const unsubscribeInv = onSnapshot(qInv, (snapshot) => {
       const firestoreInvs: Invitation[] = [];
       snapshot.forEach((doc) => {
@@ -278,8 +331,6 @@ export default function App() {
         }
       });
       setConnections(firestoreConns);
-      
-      // Sync connected partner and role
       if (firestoreConns.length > 0) {
         const firstConn = firestoreConns[0];
         setConnectedPartnerId(firstConn.employerID === currentUserId ? firstConn.helperID : firstConn.employerID);
@@ -287,9 +338,48 @@ export default function App() {
       }
     });
 
+    // Tasks Listener
+    const qTasks = query(collection(db, "tasks"), orderBy("createTime", "desc"));
+    const unsubscribeTasks = onSnapshot(qTasks, (snapshot) => {
+      const firestoreTasks: Task[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.employerID === currentUserId || data.helperID === currentUserId || !currentUserId) {
+          const adjustment = adjustRecipeForHealth(data.recipeID, healthProfiles);
+          firestoreTasks.push({
+            taskID: doc.id,
+            ...data,
+            adjustedPreSteps: adjustment?.preSteps || [],
+            adjustedCookSteps: adjustment?.cookSteps || [],
+            createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : data.createTime
+          } as Task);
+        }
+      });
+      if (firestoreTasks.length > 0) {
+        setAllTasks(firestoreTasks);
+        const latestActive = firestoreTasks.find(t => t.taskStatus !== 'rated');
+        setActiveTask(latestActive || null);
+      }
+    });
+
+    // Family Members Listener
+    const qMembers = query(collection(db, "family-members"));
+    const unsubscribeMembers = onSnapshot(qMembers, (snapshot) => {
+      const firestoreMembers: FamilyMember[] = [];
+      snapshot.forEach((doc) => {
+        firestoreMembers.push({
+          memberID: doc.id,
+          ...doc.data()
+        } as FamilyMember);
+      });
+      setHealthProfiles(firestoreMembers);
+    });
+
     return () => {
       unsubscribeInv();
       unsubscribeConn();
+      unsubscribeTasks();
+      unsubscribeMembers();
     };
   }, [currentUserId]);
 
@@ -395,36 +485,60 @@ export default function App() {
   };
 
   // Add dynamic family health profile member
-  const handleAddMember = (m: Omit<FamilyMember, 'memberID'>) => {
-    fetch('/api/family-members', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(m)
-    })
-      .then(res => handleJsonResponse(res, null))
-      .then(() => {
-        loadDatabaseState();
+  const handleAddMember = async (m: Omit<FamilyMember, 'memberID'>) => {
+    try {
+      await addDoc(collection(db, "family-members"), m);
+    } catch (err) {
+      console.warn("Firestore add member failed:", err);
+      // Fallback
+      fetch('/api/family-members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(m)
       })
+      .then(res => handleJsonResponse(res, null))
+      .then(() => loadDatabaseState())
       .catch(console.error);
+    }
   };
 
-  const handleDeleteMember = (id: string) => {
-    fetch(`/api/family-members/${id}`, {
-      method: 'DELETE'
-    })
-      .then(() => {
-        loadDatabaseState();
-      })
-      .catch(console.error);
+  const handleDeleteMember = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "family-members", id));
+    } catch (err) {
+      console.warn("Firestore delete member failed:", err);
+      fetch(`/api/family-members/${id}`, { method: 'DELETE' })
+        .then(() => loadDatabaseState())
+        .catch(console.error);
+    }
   };
 
   // Publish task
-  const handlePublishTask = (recipeID: string, customSteps: string[]) => {
-    fetch('/api/tasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ recipeID, customPreSteps: customSteps })
-    })
+  const handlePublishTask = async (recipeID: string, customSteps: string[]) => {
+    const newTask = {
+      recipeID,
+      employerID: currentUserId || 'employer-1',
+      helperID: connectedPartnerId || 'helper-1',
+      customPreSteps: customSteps,
+      taskStatus: 'preparing' as TaskStatus,
+      preCookFinishRate: 0,
+      cookFinishRate: 0,
+      currentPreStepIndex: 0,
+      currentCookStepIndex: 0,
+      createTime: serverTimestamp()
+    };
+
+    try {
+      const docRef = await addDoc(collection(db, "tasks"), newTask);
+      setActiveTask({ taskID: docRef.id, ...newTask, createTime: new Date().toISOString() } as Task);
+      setCurrentView('dashboard');
+    } catch (err) {
+      console.warn("Firestore publish task failed:", err);
+      fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeID, customPreSteps: customSteps })
+      })
       .then(res => handleJsonResponse(res, null))
       .then(task => {
         if (task) {
@@ -433,46 +547,128 @@ export default function App() {
         }
       })
       .catch(console.error);
+    }
   };
 
   // Lock-step confirmation mechanics
-  const handleConfirmStep = (type: 'pre' | 'cook', stepID: number, isFinish: boolean) => {
+  const handleConfirmStep = async (type: 'pre' | 'cook', stepID: number, isFinish: boolean) => {
     if (!activeTask) return;
-    fetch(`/api/tasks/${activeTask.taskID}/step`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, stepID, isFinish })
-    })
-      .then(res => handleJsonResponse(res, null))
-      .then(task => {
-        if (task) {
-          setActiveTask(task);
-        }
+    
+    // Calculate new status and rates (simplified logic from server.ts)
+    let updateData: Partial<Task> = {};
+    const recipe = recipes.find(r => r.recipeID === activeTask.recipeID) || RECIPES.find(r => r.recipeID === activeTask.recipeID);
+    
+    if (type === 'pre') {
+      const totalSteps = (recipe?.preCookSteps?.length || 0) + (activeTask.customPreSteps?.length || 0);
+      const rate = Math.round(((stepID + 1) / totalSteps) * 100);
+      updateData.preCookFinishRate = rate;
+      updateData.currentPreStepIndex = stepID + 1;
+      if (rate >= 100) updateData.taskStatus = 'pre_cook_completed';
+    } else {
+      const totalSteps = recipe?.cookSteps?.length || 0;
+      const rate = Math.round(((stepID + 1) / totalSteps) * 100);
+      updateData.cookFinishRate = rate;
+      updateData.currentCookStepIndex = stepID + 1;
+      if (rate >= 100) updateData.taskStatus = 'completed';
+      else updateData.taskStatus = 'cooking_ongoing';
+    }
+
+    try {
+      await updateDoc(doc(db, "tasks", activeTask.taskID), updateData);
+    } catch (err) {
+      console.warn("Firestore confirm step failed:", err);
+      fetch(`/api/tasks/${activeTask.taskID}/step`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, stepID, isFinish })
       })
+      .then(res => handleJsonResponse(res, null))
+      .then(task => { if (task) setActiveTask(task); })
       .catch(console.error);
+    }
   };
 
   // Reset task back to preparing
-  const handleResetTask = (taskId: string) => {
-    fetch(`/api/tasks/${taskId}/reset`, {
-      method: 'POST'
-    })
-      .then(res => handleJsonResponse(res, null))
-      .then(() => loadDatabaseState())
-      .catch(console.error);
+  const handleResetTask = async (taskId: string) => {
+    try {
+      await updateDoc(doc(db, "tasks", taskId), { taskStatus: 'preparing', preCookFinishRate: 0, currentPreStepIndex: 0 });
+    } catch (err) {
+      fetch(`/api/tasks/${taskId}/reset`, { method: 'POST' })
+        .then(() => loadDatabaseState())
+        .catch(console.error);
+    }
   };
 
-  const handleDeleteTask = (taskId: string) => {
-    fetch(`/api/tasks/${taskId}`, {
-      method: 'DELETE'
-    })
-      .then(res => handleJsonResponse(res, null))
-      .then(() => loadDatabaseState())
-      .catch(console.error);
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      await deleteDoc(doc(db, "tasks", taskId));
+      if (activeTask?.taskID === taskId) setActiveTask(null);
+    } catch (err) {
+      fetch(`/api/tasks/${taskId}`, { method: 'DELETE' })
+        .then(() => loadDatabaseState())
+        .catch(console.error);
+    }
   };
 
-  // Dual-scope chat message deliveries
-  const handleSendMessage = async (text: string, overrideTaskID?: string) => {
+  const handleReviewPrep = async (taskId: string, isApproved: boolean) => {
+    try {
+      if (isApproved) {
+        await updateDoc(doc(db, "tasks", taskId), { taskStatus: 'prep_approved' });
+      } else {
+        await updateDoc(doc(db, "tasks", taskId), { 
+          taskStatus: 'prep_rejected', 
+          preCookFinishRate: 0, 
+          currentPreStepIndex: 0,
+          prepImageUrl: deleteField() as any 
+        });
+      }
+    } catch (err) {
+      fetch(`/api/tasks/${taskId}/review-prep`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isApproved })
+      }).catch(console.error);
+    }
+  };
+
+  const handleReviewDish = async (taskId: string, isApproved: boolean) => {
+    try {
+      if (isApproved) {
+        await updateDoc(doc(db, "tasks", taskId), { taskStatus: 'dish_approved' });
+      } else {
+        await updateDoc(doc(db, "tasks", taskId), { 
+          taskStatus: 'prep_rejected',
+          preCookFinishRate: 0,
+          cookFinishRate: 0,
+          currentPreStepIndex: 0,
+          currentCookStepIndex: 0,
+          prepImageUrl: deleteField() as any,
+          cookImageUrl: deleteField() as any
+        });
+      }
+    } catch (err) {
+      fetch(`/api/tasks/${taskId}/review-dish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isApproved })
+      }).catch(console.error);
+    }
+  };
+
+  const handleUploadPrepPhoto = async (taskId: string, imageUrl: string) => {
+    try {
+      await updateDoc(doc(db, "tasks", taskId), { 
+        prepImageUrl: imageUrl,
+        taskStatus: 'pre_cook_completed'
+      });
+    } catch (err) {
+      fetch(`/api/tasks/${taskId}/upload-prep-photo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl })
+      }).catch(console.error);
+    }
+  };
     if (!role && !currentUserId) return;
     const taskID = overrideTaskID || activeTask?.taskID || 'task-1';
     
@@ -753,6 +949,8 @@ export default function App() {
                   onDeleteCustomFavorite={handleDeleteCustomFavorite}
                   recipeRemarks={recipeRemarks}
                   onUpdateRemark={handleUpdateRemark}
+                  onReviewPrep={handleReviewPrep}
+                  onReviewDish={handleReviewDish}
                 />
               )}
 
@@ -805,6 +1003,7 @@ export default function App() {
                   onConfirmStep={handleConfirmStep}
                   onNavigate={setCurrentView}
                   onRefreshData={loadDatabaseState}
+                  onUploadPrepPhoto={handleUploadPrepPhoto}
                 />
               )}
 

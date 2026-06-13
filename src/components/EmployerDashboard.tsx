@@ -51,6 +51,8 @@ interface EmployerDashboardProps {
   onDeleteCustomFavorite: (id: string) => void;
   recipeRemarks: Record<string, string>;
   onUpdateRemark: (id: string, remark: string) => void;
+  onReviewPrep?: (taskId: string, isApproved: boolean) => void;
+  onReviewDish?: (taskId: string, isApproved: boolean) => void;
 }
 
 // Custom defined favorites stored on client for maximum persistence
@@ -88,7 +90,10 @@ export function EmployerDashboard({
   onAddCustomFavorite,
   onDeleteCustomFavorite,
   recipeRemarks,
-  onUpdateRemark
+  recipeRemarks,
+  onUpdateRemark,
+  onReviewPrep,
+  onReviewDish
 }: EmployerDashboardProps) {
 
   // Initial favorites matching the screenshot exactly
@@ -566,11 +571,15 @@ export function EmployerDashboard({
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
-                        fetch(`/api/tasks/${task.taskID}/review-prep`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ isApproved: true })
-                        }).then(() => onRefreshData());
+                        if (onReviewPrep) {
+                          onReviewPrep(task.taskID, true);
+                        } else {
+                          fetch(`/api/tasks/${task.taskID}/review-prep`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ isApproved: true })
+                          }).then(() => onRefreshData());
+                        }
                       }}
                       className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
@@ -579,11 +588,15 @@ export function EmployerDashboard({
                     </button>
                     <button
                       onClick={() => {
-                        fetch(`/api/tasks/${task.taskID}/review-prep`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ isApproved: false })
-                        }).then(() => onRefreshData());
+                        if (onReviewPrep) {
+                          onReviewPrep(task.taskID, false);
+                        } else {
+                          fetch(`/api/tasks/${task.taskID}/review-prep`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ isApproved: false })
+                          }).then(() => onRefreshData());
+                        }
                       }}
                       className="flex-1 py-2 px-3 bg-gray-200 font-bold text-gray-700 rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer border border-gray-300"
                     >
@@ -624,11 +637,15 @@ export function EmployerDashboard({
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
-                        fetch(`/api/tasks/${task.taskID}/review-dish`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ isApproved: true })
-                        }).then(() => onRefreshData());
+                        if (onReviewDish) {
+                          onReviewDish(task.taskID, true);
+                        } else {
+                          fetch(`/api/tasks/${task.taskID}/review-dish`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ isApproved: true })
+                          }).then(() => onRefreshData());
+                        }
                       }}
                       className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
@@ -638,11 +655,15 @@ export function EmployerDashboard({
                     <button
                       onClick={() => {
                         if (confirm('Are you sure you want to reject this dish? The helper will need to redo it.')) {
-                          fetch(`/api/tasks/${task.taskID}/review-dish`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ isApproved: false })
-                          }).then(() => onRefreshData());
+                          if (onReviewDish) {
+                            onReviewDish(task.taskID, false);
+                          } else {
+                            fetch(`/api/tasks/${task.taskID}/review-dish`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ isApproved: false })
+                            }).then(() => onRefreshData());
+                          }
                         }
                       }}
                       className="flex-1 py-2 px-3 bg-gray-200 font-bold text-gray-700 rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer border border-gray-300"

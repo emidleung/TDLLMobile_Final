@@ -10,6 +10,7 @@ interface TaskExecutionPageProps {
   onConfirmStep: (type: 'pre' | 'cook', stepId: number, isFinish: boolean) => void;
   onNavigate: (view: string) => void;
   onRefreshData: () => void;
+  onUploadPrepPhoto?: (taskId: string, imageUrl: string) => void;
 }
 
 export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmStep, onNavigate, onRefreshData }: TaskExecutionPageProps) {
@@ -292,15 +293,20 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
                       reader.onload = async (event) => {
                         try {
                           const base64 = event.target?.result as string;
-                          const res = await fetch(`/api/tasks/${task.taskID}/upload-prep-photo`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ imageUrl: base64 })
-                          });
-                          if (res.ok) {
+                          if (onUploadPrepPhoto) {
+                            onUploadPrepPhoto(task.taskID, base64);
                             onRefreshData();
                           } else {
-                            alert('Upload failed. Please try again.');
+                            const res = await fetch(`/api/tasks/${task.taskID}/upload-prep-photo`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ imageUrl: base64 })
+                            });
+                            if (res.ok) {
+                              onRefreshData();
+                            } else {
+                              alert('Upload failed. Please try again.');
+                            }
                           }
                         } catch (err) {
                           console.error(err);
