@@ -162,7 +162,7 @@ export default function App() {
           id: `[PERINGATAN ALERGI] Bersihkan dan sanitasi semua area kerja.`,
           tg: `[ALLERGY WARNING] Linisin at i-sanitize ang lahat ng mga workstation.`
         },
-        image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=2070&auto=format&fit=crop'
+        image: '/step1.jpg'
       });
     }
 
@@ -488,13 +488,13 @@ export default function App() {
     if (type === 'pre') {
       const totalSteps = (recipe?.preCookSteps?.length || 0) + (activeTask.customPreSteps?.length || 0);
       const rate = Math.round(((stepID + 1) / totalSteps) * 100);
-      updateData.preCookFinishRate = rate;
+      updateData.preCookFinishRate = Math.min(100, rate);
       updateData.currentPreStepIndex = stepID + 1;
       if (rate >= 100) updateData.taskStatus = 'pre_cook_completed';
     } else {
       const totalSteps = recipe?.cookSteps?.length || 0;
       const rate = Math.round(((stepID + 1) / totalSteps) * 100);
-      updateData.cookFinishRate = rate;
+      updateData.cookFinishRate = Math.min(100, rate);
       updateData.currentCookStepIndex = stepID + 1;
       if (rate >= 100) updateData.taskStatus = 'completed';
       else updateData.taskStatus = 'cooking_ongoing';

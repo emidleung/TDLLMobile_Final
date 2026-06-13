@@ -4,7 +4,7 @@ import { doc, writeBatch } from 'firebase/firestore';
 const initialUsers = [
   { userID: 'employer-1', role: 'employer', fullName: 'User', email: 'employer@mock.com', languagePreference: 'en', createTime: new Date().toISOString() },
   { userID: 'helper-1', role: 'helper', fullName: 'Helper', email: 'helper@mock.com', languagePreference: 'en', createTime: new Date().toISOString() },
-  { userID: '66924319', role: 'employer', fullName: 'User', email: 'hello@example.com', languagePreference: 'en', createTime: new Date().toISOString() }
+  { userID: '66924319', role: 'employer', fullName: 'Emidio', email: 'hello@example.com', languagePreference: 'en', createTime: new Date().toISOString() }
 ];
 
 const familyMembers = [

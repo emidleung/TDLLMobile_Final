@@ -551,20 +551,60 @@ export function EmployerDashboard({
             </div>
 
             {/* Locking validation status message */}
-            <div className="flex items-center justify-start gap-1.5 text-[15px] pt-3 border-t border-app-border text-app-text-muted">
-              {task.taskStatus === 'pre_cook_completed' ? (
-                <div className="w-full flex flex-col gap-3">
+            {/* Locking validation status message */}
+            <div className="flex flex-col w-full text-[15px] pt-3 border-t border-app-border text-app-text-muted">
+              {(task as any).prepImageUrl && (
+                <div className="mb-4">
+                  <p className="text-[11px] font-bold text-gray-500 uppercase mb-2">Preparation Photo</p>
+                  <img 
+                    src={(task as any).prepImageUrl} 
+                    alt="Prep Photo" 
+                    className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer"
+                    onClick={() => {
+                      setModalImage((task as any).prepImageUrl!);
+                      setModalTitle('Preparation Submission');
+                      setShowImageModal(true);
+                    }} 
+                  />
+                </div>
+              )}
+              {(task as any).cookImageUrl && (
+                <div className="mb-4">
+                  <p className="text-[11px] font-bold text-gray-500 uppercase mb-2">Final Dish Photo</p>
+                  <img 
+                    src={(task as any).cookImageUrl} 
+                    alt="Dish Photo" 
+                    className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer" 
+                    onClick={() => {
+                        setModalImage((task as any).cookImageUrl!);
+                        setModalTitle('Final Dish Submission');
+                        setShowImageModal(true);
+                    }} 
+                  />
+                </div>
+              )}
+              {(task as any).aiFeedback && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                   <p className="text-[11px] font-bold text-blue-800 uppercase mb-1">AI Plating Report</p>
+                   <p className="text-xs text-blue-700 italic">"{(task as any).aiFeedback}"</p>
+                </div>
+              )}
+
+              {task.taskStatus === 'preparing' ? (
+                <button
+                  onClick={() => {}}
+                  disabled
+                  className="w-full py-2 px-3 bg-gray-100 font-bold text-gray-400 rounded-[10px] shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <Clock className="w-4 h-4" />
+                  <span>Awaiting Preparation</span>
+                </button>
+              ) : task.taskStatus === 'pre_cook_completed' || (task.preCookFinishRate === 100 && task.cookFinishRate === 0 && !task.prepImageUrl) ? (
+                <div className="flex flex-col gap-3">
                   <div className="flex gap-2 items-center bg-orange-50 p-2 rounded-lg text-app-orange border border-orange-200">
                     <ShieldAlert className="w-5 h-5 shrink-0" />
                     <span className="font-bold text-sm">Action Required: Review Preparation</span>
                   </div>
-                  {task.prepImageUrl && (
-                    <img src={task.prepImageUrl} alt="Prep Photo" className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer" onClick={() => {
-                        setModalImage(task.prepImageUrl!);
-                        setModalTitle('Preparation Submission');
-                        setShowImageModal(true);
-                    }} />
-                  )}
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
@@ -575,7 +615,7 @@ export function EmployerDashboard({
                       className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <CheckSquare className="w-4 h-4" />
-                      <span>Approve (OK)</span>
+                      <span>Approve Prep</span>
                     </button>
                     <button
                       onClick={() => {
@@ -586,29 +626,25 @@ export function EmployerDashboard({
                       className="flex-1 py-2 px-3 bg-gray-200 font-bold text-gray-700 rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer border border-gray-300"
                     >
                       <X className="w-4 h-4" />
-                      <span>Reject (Redo)</span>
+                      <span>Reject</span>
                     </button>
                   </div>
                 </div>
+              ) : task.taskStatus === 'cooking_ongoing' ? (
+                <button
+                  onClick={() => {}}
+                  disabled
+                  className="w-full py-2 px-3 bg-gray-100 font-bold text-gray-400 rounded-[10px] shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <Clock className="w-4 h-4" />
+                  <span>Cooking in Progress</span>
+                </button>
               ) : task.taskStatus === 'completed' || task.taskStatus === 'ai_checked' ? (
-                <div className="w-full flex flex-col gap-3">
+                <div className="flex flex-col gap-3">
                   <div className="flex gap-2 items-center bg-green-50 p-2 rounded-lg text-green-700 border border-green-200">
                     <Sparkles className="w-5 h-5 shrink-0" />
                     <span className="font-bold text-sm">Action Required: Final Dish Review</span>
                   </div>
-                  {(task as any).cookImageUrl && (
-                    <img src={(task as any).cookImageUrl} alt="Dish Photo" className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer" onClick={() => {
-                        setModalImage((task as any).cookImageUrl!);
-                        setModalTitle('Final Dish Submission');
-                        setShowImageModal(true);
-                    }} />
-                  )}
-                  { (task as any).aiFeedback && (
-                    <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                       <p className="text-[11px] font-bold text-blue-800 uppercase mb-1">AI Plating Report</p>
-                       <p className="text-xs text-blue-700 italic">"{(task as any).aiFeedback}"</p>
-                    </div>
-                  )}
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
