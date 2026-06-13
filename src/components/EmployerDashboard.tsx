@@ -121,7 +121,7 @@ export function EmployerDashboard({
       category: 'HK Home Style',
       tag: 'Low Sugar',
       iconType: 'fish',
-      image: '/recipes/cantonese_steamed_fish.png',
+      image: '/recipes/stage7_final_garnish.png',
       materialList: ['1 Fresh Sea Bass', '30g Ginger threads', '3 scallions', '2 tbsp light soy sauce'],
       prepTime: 15,
       cookTime: 15
@@ -378,7 +378,7 @@ export function EmployerDashboard({
       case 'tomato-egg-stir-fry':
         return '/recipes/tomato_egg_main_v4.jpg';
       case 'cantonese-steamed-fish':
-        return '/recipes/cantonese_steamed_fish.png';
+        return '/recipes/stage7_final_garnish.png';
       case 'garlic-bok-choy':
         return '/recipes/garlic_bok_choy.png';
       case 'sweet-and-sour-pork':
@@ -532,9 +532,9 @@ export function EmployerDashboard({
                 <span className="text-[14px] font-bold text-app-text-muted uppercase tracking-wider">Preparation</span>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 bg-[#EEEEEE] h-1.5 rounded-full overflow-hidden">
-                    <div className={`h-full ${task.preCookFinishRate === 100 ? 'bg-green-500' : 'bg-app-orange'}`} style={{ width: `${task.preCookFinishRate}%` }} />
+                    <div className={`h-full ${task.preCookFinishRate >= 100 ? 'bg-green-500' : 'bg-app-orange'}`} style={{ width: `${Math.min(100, task.preCookFinishRate)}%` }} />
                   </div>
-                  <span className={`text-[14px] font-bold font-mono ${task.preCookFinishRate === 100 ? 'text-green-600' : 'text-app-text-title'}`}>{task.preCookFinishRate}%</span>
+                  <span className={`text-[14px] font-bold font-mono ${task.preCookFinishRate >= 100 ? 'text-green-600' : 'text-app-text-title'}`}>{Math.min(100, task.preCookFinishRate)}%</span>
                 </div>
               </div>
 
@@ -542,9 +542,9 @@ export function EmployerDashboard({
                 <span className="text-[14px] font-bold text-app-text-muted uppercase tracking-wider">Cooking</span>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 bg-[#EEEEEE] h-1.5 rounded-full overflow-hidden">
-                    <div className={`h-full ${task.cookFinishRate === 100 ? 'bg-green-500' : 'bg-app-orange'}`} style={{ width: `${task.cookFinishRate}%` }} />
+                    <div className={`h-full ${task.cookFinishRate >= 100 ? 'bg-green-500' : 'bg-app-orange'}`} style={{ width: `${Math.min(100, task.cookFinishRate)}%` }} />
                   </div>
-                  <span className={`text-[14px] font-bold font-mono ${task.cookFinishRate === 100 ? 'text-green-600' : 'text-app-text-title'}`}>{task.cookFinishRate}%</span>
+                  <span className={`text-[14px] font-bold font-mono ${task.cookFinishRate >= 100 ? 'text-green-600' : 'text-app-text-title'}`}>{Math.min(100, task.cookFinishRate)}%</span>
                 </div>
               </div>
 
