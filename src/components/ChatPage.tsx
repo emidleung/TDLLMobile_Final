@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { ChatWindow } from './ChatWindow'; 
 import { ChatMessage, Language, Role, Invitation, Connection } from '../types';
+import { db } from '../firebase';
+import { 
+  collection, 
+  addDoc, 
+  updateDoc, 
+  doc, 
+  deleteDoc, 
+  serverTimestamp 
+} from "firebase/firestore";
 
 interface ChatPageProps {
   chats: ChatMessage[];
@@ -64,55 +73,102 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
     }
   };
 
-  const handleDeleteConnection = (id: string) => {
+  const handleDeleteConnection = async (id: string) => {
     const isConfirmed = window.confirm("Are you sure you want to delete this connection? Once done, it cannot be reversed.");
-    if (isConfirmed && onRefreshData) {
+    if (isConfirmed) {
+      // 1. Delete from Firestore
+      try {
+        await deleteDoc(doc(db, "connections", id));
+      } catch (err) {
+        console.warn("Firestore delete connection failed:", err);
+      }
+
+      // 2. Fallback to API
       fetch(`/api/connections/${id}`, { method: 'DELETE' })
-        .then(() => onRefreshData())
+        .then(() => onRefreshData && onRefreshData())
         .catch(console.error);
     }
   };
 
-  const handleSendInvitation = () => {
+  const handleSendInvitation = async () => {
     const trimmedInput = partnerInput.trim();
-    if (trimmedInput && currentUserId && onRefreshData) {
+    if (trimmedInput && currentUserId) {
       if (connections.some(c => c.employerID === trimmedInput || c.helperID === trimmedInput)) {
         alert("You are already connected with this user.");
         return;
       }
       
-      fetch('/api/invitations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ senderID: currentUserId, receiverID: trimmedInput })
-      })
-      .then(() => {
+      const newInv = {
+        senderID: currentUserId,
+        receiverID: trimmedInput,
+        status: 'pending',
+        createTime: serverTimestamp()
+      };
+
+      // 1. Firestore send
+      try {
+        await addDoc(collection(db, "invitations"), newInv);
         alert(`Invitation sent to ${trimmedInput}!`);
         setPartnerInput('');
-        onRefreshData();
-      })
-      .catch(console.error);
-    }
-  };
-
-  const handleAcceptInvitation = (invId: string, roleOfSender: 'employer' | 'helper') => {
-    if (onRefreshData) {
-      fetch(`/api/invitations/${invId}/accept`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roleOfSender })
-      })
-      .then(() => onRefreshData())
-      .catch(console.error);
-    }
-  };
-
-  const handleRejectInvitation = (invId: string) => {
-    if (onRefreshData) {
-      fetch(`/api/invitations/${invId}/reject`, { method: 'POST' })
-        .then(() => onRefreshData())
+      } catch (err) {
+        console.warn("Firestore send invitation failed:", err);
+        
+        // 2. Fallback to API
+        fetch('/api/invitations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ senderID: currentUserId, receiverID: trimmedInput })
+        })
+        .then(() => {
+          alert(`Invitation sent to ${trimmedInput}!`);
+          setPartnerInput('');
+          onRefreshData && onRefreshData();
+        })
         .catch(console.error);
+      }
     }
+  };
+
+  const handleAcceptInvitation = async (invId: string, roleOfSender: 'employer' | 'helper') => {
+    // 1. Firestore accept
+    try {
+      const invRef = doc(db, "invitations", invId);
+      await updateDoc(invRef, { status: 'accepted' });
+      
+      const inv = invitations.find(i => i.invitationID === invId);
+      if (inv) {
+        await addDoc(collection(db, "connections"), {
+          employerID: roleOfSender === 'employer' ? inv.senderID : inv.receiverID,
+          helperID: roleOfSender === 'helper' ? inv.senderID : inv.receiverID,
+          createTime: serverTimestamp()
+        });
+      }
+    } catch (err) {
+      console.warn("Firestore accept invitation failed:", err);
+    }
+
+    // 2. Sync with API
+    fetch(`/api/invitations/${invId}/accept`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roleOfSender })
+    })
+    .then(() => onRefreshData && onRefreshData())
+    .catch(console.error);
+  };
+
+  const handleRejectInvitation = async (invId: string) => {
+    // 1. Firestore reject
+    try {
+      await updateDoc(doc(db, "invitations", invId), { status: 'rejected' });
+    } catch (err) {
+      console.warn("Firestore reject invitation failed:", err);
+    }
+
+    // 2. Sync with API
+    fetch(`/api/invitations/${invId}/reject`, { method: 'POST' })
+      .then(() => onRefreshData && onRefreshData())
+      .catch(console.error);
   };
 
   return (

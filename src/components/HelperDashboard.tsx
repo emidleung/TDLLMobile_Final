@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChefHat, ShoppingBasket, Lock, Unlock, UtensilsCrossed, ArrowRight, ShieldAlert, Trash } from 'lucide-react';
 import { Task, Language, Recipe } from '../types';
+import { RECIPES } from '../recipesData';
 
 interface HelperDashboardProps {
   task: Task | null;
@@ -103,7 +104,9 @@ function getRecipeDetails(recipeID: string, lang: Language, def: typeof GREETING
   }
 }
 
-export function HelperDashboard({ task, recipes, lang, onNavigate, onConfirmStep, userFullName, onRefreshData, onDeleteTask }: HelperDashboardProps) {
+export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, onConfirmStep, userFullName, onRefreshData, onDeleteTask }: HelperDashboardProps) {
+  // Robustness: fallback to RECIPES constant if prop is empty
+  const recipes = propRecipes && propRecipes.length > 0 ? propRecipes : RECIPES;
   const currentRecipe = task ? recipes.find(r => r.recipeID === task.recipeID) : null;
   const labels = GREETINGS[lang] || GREETINGS.en;
 

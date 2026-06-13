@@ -27,7 +27,20 @@ import { FeedbackSettingsPage } from './components/FeedbackSettingsPage';
 import { LoginPage } from './components/LoginPage';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { 
+  collection, 
+  addDoc, 
+  onSnapshot, 
+  query, 
+  orderBy, 
+  updateDoc, 
+  doc, 
+  getDocs, 
+  where,
+  Timestamp,
+  serverTimestamp,
+  getDoc 
+} from "firebase/firestore";
 import { RECIPES } from './recipesData';
 
 export default function App() {
@@ -209,6 +222,78 @@ export default function App() {
     if (savedRemarks) setRecipeRemarks(JSON.parse(savedRemarks));
   }, []);
 
+  // REAL-TIME FIRESTORE CHAT SYNC
+  useEffect(() => {
+    const q = query(collection(db, "chats"), orderBy("createTime", "asc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const firestoreChats: ChatMessage[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        firestoreChats.push({
+          ...data,
+          createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : data.createTime
+        } as ChatMessage);
+      });
+      if (firestoreChats.length > 0) setChats(firestoreChats);
+    }, (error) => console.warn("Firestore Chat Listener failed:", error));
+
+    return () => unsubscribe();
+  }, []);
+
+  // REAL-TIME FIRESTORE INVITATIONS & CONNECTIONS SYNC
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    // Invitations Listener
+    const qInv = query(collection(db, "invitations"), 
+      where("status", "==", "pending")
+    );
+    const unsubscribeInv = onSnapshot(qInv, (snapshot) => {
+      const firestoreInvs: Invitation[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.senderID === currentUserId || data.receiverID === currentUserId) {
+          firestoreInvs.push({
+            invitationID: doc.id,
+            ...data,
+            createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : data.createTime
+          } as Invitation);
+        }
+      });
+      setInvitations(firestoreInvs);
+    });
+
+    // Connections Listener
+    const qConn = query(collection(db, "connections"));
+    const unsubscribeConn = onSnapshot(qConn, (snapshot) => {
+      const firestoreConns: Connection[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.employerID === currentUserId || data.helperID === currentUserId) {
+          firestoreConns.push({
+            connectionID: doc.id,
+            ...data,
+            createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : data.createTime
+          } as Connection);
+        }
+      });
+      setConnections(firestoreConns);
+      
+      // Sync connected partner and role
+      if (firestoreConns.length > 0) {
+        const firstConn = firestoreConns[0];
+        setConnectedPartnerId(firstConn.employerID === currentUserId ? firstConn.helperID : firstConn.employerID);
+        setRole(firstConn.employerID === currentUserId ? 'employer' : 'helper');
+      }
+    });
+
+    return () => {
+      unsubscribeInv();
+      unsubscribeConn();
+    };
+  }, [currentUserId]);
+
+
   const handleToggleLike = (recipeId: string) => {
     setLikedRecipeIds(prev => {
       const next = prev.includes(recipeId) ? prev.filter(id => id !== recipeId) : [...prev, recipeId];
@@ -387,22 +472,37 @@ export default function App() {
   };
 
   // Dual-scope chat message deliveries
-  const handleSendMessage = (text: string, overrideTaskID?: string) => {
+  const handleSendMessage = async (text: string, overrideTaskID?: string) => {
     if (!role && !currentUserId) return;
-    fetch('/api/chats', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        taskID: overrideTaskID || activeTask?.taskID || 'task-1',
-        senderRole: role || 'unknown',
-        message: text
+    const taskID = overrideTaskID || activeTask?.taskID || 'task-1';
+    
+    const newMessage = {
+      taskID,
+      senderRole: role || 'unknown',
+      message: text,
+      createTime: serverTimestamp(),
+      isRead: false
+    };
+
+    // 1. Write to Firestore (Primary for Vercel/Real-time)
+    try {
+      await addDoc(collection(db, "chats"), newMessage);
+    } catch (err) {
+      console.warn("Firestore send failed, falling back to API:", err);
+      
+      // 2. Fallback to Express API
+      fetch('/api/chats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...newMessage,
+          createTime: new Date().toISOString()
+        })
       })
-    })
       .then(res => handleJsonResponse(res, null))
-      .then(() => {
-        loadDatabaseState();
-      })
+      .then(() => loadDatabaseState())
       .catch(console.error);
+    }
   };
 
   // Gemini visual check
@@ -445,19 +545,30 @@ export default function App() {
       .catch(console.error);
   };
 
-  const handleMarkChatAsRead = (taskID: string) => {
-    if (!role && !currentUserId) return;
+  const handleMarkChatAsRead = async (taskId: string) => {
+    if (!role) return;
+    
+    // 1. Update Firestore (Real-time)
+    try {
+      const q = query(collection(db, "chats"), where("taskID", "==", taskId), where("isRead", "==", false));
+      const snapshot = await getDocs(q);
+      snapshot.forEach(async (d) => {
+        if (d.data().senderRole !== role) {
+          await updateDoc(doc(db, "chats", d.id), { isRead: true });
+        }
+      });
+    } catch (err) {
+      console.warn("Firestore mark read failed:", err);
+    }
+
+    // 2. Sync with Backend
     fetch('/api/chats/read', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        taskID,
-        readerRole: role
-      })
+      body: JSON.stringify({ taskID: taskId, readerRole: role })
     })
-      .then(() => {
-        loadDatabaseState();
-      })
+      .then(res => handleJsonResponse(res, null))
+      .then(() => loadDatabaseState())
       .catch(console.error);
   };
 
