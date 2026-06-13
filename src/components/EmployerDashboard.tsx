@@ -53,6 +53,7 @@ interface EmployerDashboardProps {
   onUpdateRemark: (id: string, remark: string) => void;
   onReviewPrep?: (taskId: string, isApproved: boolean) => void;
   onReviewDish?: (taskId: string, isApproved: boolean) => void;
+  onPublishTask?: (recipeId: string, customSteps: string[]) => void;
 }
 
 // Custom defined favorites stored on client for maximum persistence
@@ -92,7 +93,8 @@ export function EmployerDashboard({
   recipeRemarks,
   onUpdateRemark,
   onReviewPrep,
-  onReviewDish
+  onReviewDish,
+  onPublishTask
 }: EmployerDashboardProps) {
 
   // Initial favorites matching the screenshot exactly
@@ -272,20 +274,26 @@ export function EmployerDashboard({
     }
 
     setActiveDetailRecipe(null);
-    fetch('/api/tasks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        recipeID: recipeId,
-        customPreSteps: [],
-        assignedHelperID: connectedPartnerId
+
+    if (onPublishTask) {
+      onPublishTask(recipeId, []);
+    } else {
+      // Fallback for standalone mode
+      fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipeID: recipeId,
+          customPreSteps: [],
+          assignedHelperID: connectedPartnerId
+        })
       })
-    })
-      .then(res => res.ok && res.headers.get('content-type')?.includes('application/json') ? res.json().catch(() => ({})) : {})
-      .then(() => {
-        onRefreshData();
-      })
-      .catch(console.error);
+        .then(res => res.ok && res.headers.get('content-type')?.includes('application/json') ? res.json().catch(() => ({})) : {})
+        .then(() => {
+          onRefreshData();
+        })
+        .catch(console.error);
+    }
   };
 
   // Determine current greeting and translation according to hour bounds
@@ -1178,7 +1186,7 @@ export function EmployerDashboard({
               className="w-full py-5 bg-[#965020] text-white text-[20px] font-black rounded-[24px] shadow-xl hover:bg-[#804218] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer mt-4"
             >
               <ChefHat className="w-6 h-6" />
-              <span>Assign to {partnerFullName}</span>
+              <span>Assign to Your Helper</span>
             </button>
 
           </div>

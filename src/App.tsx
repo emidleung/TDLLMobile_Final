@@ -934,6 +934,7 @@ export default function App() {
                   onUpdateRemark={handleUpdateRemark}
                   onReviewPrep={handleReviewPrep}
                   onReviewDish={handleReviewDish}
+                  onPublishTask={handlePublishTask}
                 />
               )}
 
