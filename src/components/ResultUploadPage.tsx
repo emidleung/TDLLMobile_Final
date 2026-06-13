@@ -210,7 +210,7 @@ export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmploy
       <div className="pt-4 flex justify-center border-t border-surface-variant mt-2">
         <button
           onClick={() => {
-            onSubmitToEmployer();
+            onSubmitToEmployer(selectedImage || undefined);
             onNavigate('dashboard');
           }}
           disabled={!selectedImage || isUploading}

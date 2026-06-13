@@ -455,12 +455,13 @@ export default function App() {
 
   // Publish task
   const handlePublishTask = async (recipeID: string, customSteps: string[]) => {
-    // Prevent queuing: delete existing active task if one exists
-    if (activeTask) {
+    // Prevent queuing: delete ALL existing unrated tasks so they don't pop up later
+    const oldUnratedTasks = allTasks.filter(t => t.taskStatus !== 'rated');
+    for (const oldTask of oldUnratedTasks) {
       try {
-        await deleteDoc(doc(db, "tasks", activeTask.taskID));
+        await deleteDoc(doc(db, "tasks", oldTask.taskID));
       } catch (err) {
-        console.warn("Failed to delete previous active task:", err);
+        console.warn("Failed to delete old unrated task:", err);
       }
     }
 
@@ -660,11 +661,13 @@ Respond ONLY with a valid JSON object:
     }
   };
 
-  const handleSubmitToEmployer = async (taskId: string) => {
+  const handleSubmitToEmployer = async (taskId: string, cookImageUrl?: string) => {
     try {
-      await updateDoc(doc(db, "tasks", taskId), {
-        taskStatus: 'completed'
-      });
+      const updateData: any = { taskStatus: 'completed' };
+      if (cookImageUrl) {
+        updateData.cookImageUrl = cookImageUrl;
+      }
+      await updateDoc(doc(db, "tasks", taskId), updateData);
     } catch (err) {
       console.error("Submit to employer failed:", err);
     }
@@ -971,7 +974,7 @@ Respond ONLY with a valid JSON object:
                   task={activeTask}
                   lang={lang}
                   onSubmitAICheck={handleSubmitAICheck}
-                onSubmitToEmployer={() => handleSubmitToEmployer(activeTask.taskID)}
+                  onSubmitToEmployer={(cookImageUrl) => handleSubmitToEmployer(activeTask.taskID, cookImageUrl)}
                   onNavigate={setCurrentView}
                 />
               )}
@@ -1068,8 +1071,7 @@ Respond ONLY with a valid JSON object:
                     <div className="relative">
                       <MessageSquare className="w-5 h-5 shrink-0 text-[#444444]" strokeWidth={2.5} />
                       {totalNotifications > 0 && (
-                        <div className="absolute -top-2.5 -right-2.5 bg-[#EF4444] text-white text-[10px] font-bold min-w-[20px] h-[20px] rounded-full flex items-center justify-center px-1 border-2 border-white shadow-md z-50 animate-bounce-once">
-                          {totalNotifications}
+                        <div className="absolute top-0 right-0 bg-[#EF4444] w-3 h-3 rounded-full border border-white shadow-md z-50 animate-bounce-once">
                         </div>
                       )}
                     </div>
@@ -1083,8 +1085,7 @@ Respond ONLY with a valid JSON object:
                     <div className="relative">
                       <MessageSquare className="w-5 h-5 mb-0.5 shrink-0" strokeWidth={1.5} />
                       {totalNotifications > 0 && (
-                        <div className="absolute -top-2.5 -right-2.5 bg-[#EF4444] text-white text-[10px] font-bold min-w-[20px] h-[20px] rounded-full flex items-center justify-center px-1 border-2 border-white shadow-md z-50 animate-bounce-once">
-                          {totalNotifications}
+                        <div className="absolute top-0 right-0 bg-[#EF4444] w-3 h-3 rounded-full border border-white shadow-md z-50 animate-bounce-once">
                         </div>
                       )}
                     </div>
