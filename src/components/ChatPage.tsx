@@ -92,13 +92,6 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
 
   const handleSendInvitation = async () => {
     const trimmedInput = partnerInput.trim();
-    if (trimmedInput && currentUserId) {
-      if (connections.some(c => c.employerID === trimmedInput || c.helperID === trimmedInput)) {
-        alert("You are already connected with this user.");
-        return;
-      }
-  const handleSendInvitation = async () => {
-    const trimmedInput = partnerInput.trim();
     if (!currentUserId) {
       alert("Error: Your identity is not loaded. Please try logging in again.");
       return;
@@ -108,6 +101,10 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
       return;
     }
     if (trimmedInput) {
+      if (connections.some(c => (c.employerID === trimmedInput || c.helperID === trimmedInput))) {
+        alert("You are already connected with this user.");
+        return;
+      }
       const newInv = {
         senderID: currentUserId,
         receiverID: trimmedInput,

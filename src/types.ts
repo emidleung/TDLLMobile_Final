@@ -5,6 +5,7 @@ export interface User {
   userID: string;
   role: Role;
   fullName?: string;
+  email?: string;
   languagePreference: Language;
   createTime: string;
 }

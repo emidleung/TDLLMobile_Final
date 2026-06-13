@@ -13,7 +13,7 @@ import {
   Calendar,
   X
 } from 'lucide-react';
-import { Task, Language, Role, Recipe, RecipeStep, FamilyMember, ChatMessage, Review, Invitation, Connection } from './types';
+import { Task, Language, Role, Recipe, RecipeStep, FamilyMember, ChatMessage, Review, Invitation, Connection, TaskStatus } from './types';
 import { LaunchPage } from './components/LaunchPage';
 import { EmployerDashboard } from './components/EmployerDashboard';
 import { RecipePlanner } from './components/RecipePlanner';
@@ -40,7 +40,8 @@ import {
   Timestamp,
   serverTimestamp,
   getDoc,
-  deleteField
+  deleteField,
+  deleteDoc
 } from "firebase/firestore";
 import { RECIPES } from './recipesData';
 

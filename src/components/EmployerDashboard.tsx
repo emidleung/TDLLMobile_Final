@@ -212,11 +212,6 @@ export function EmployerDashboard({
     }
   }, []);
 
-  // Save favorites helper
-  const saveFavsToDisk = (updatedFavs: FavRecipe[]) => {
-    setFavorites(updatedFavs);
-    localStorage.setItem('belaja_favorites_v3', JSON.stringify(updatedFavs));
-  };
 
   // Toggle dynamic liked icon state
   const toggleLike = (id: string, e: React.MouseEvent) => {
