@@ -451,7 +451,7 @@ export function EmployerDashboard({
         <div className="flex justify-between items-center">
           <span className="text-[18px] font-bold text-app-text-title uppercase tracking-wider flex items-center gap-2">
             Active Task
-            <span className="text-[10px] bg-red-500 text-white px-1 rounded animate-pulse normal-case">V4-RUBBISH-HERE</span>
+            {/* Removed rubbish label */}
           </span>
           {task && (
             <div className="flex items-center gap-1.5 shrink-0">
@@ -790,7 +790,7 @@ export function EmployerDashboard({
                     onClick={(e) => handleDeleteFav(item.id, e)}
                     className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-gray-400 shadow-md focus:outline-none hover:text-red-500 hover:scale-110 duration-200"
                   >
-                    <Trash2 className="w-5 h-5" />
+                    <Trash className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -830,7 +830,7 @@ export function EmployerDashboard({
                     onClick={(e) => handleDeleteFav(item.id, e)}
                     className="text-gray-400 hover:text-red-500 hover:scale-110 duration-150 p-1"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -877,7 +877,7 @@ export function EmployerDashboard({
                     onClick={(e) => handleDeleteFav(item.id, e)}
                     className="text-gray-400 hover:text-red-500 hover:scale-110 duration-150 p-1"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -939,7 +939,7 @@ export function EmployerDashboard({
                   onClick={(e) => handleDeleteFav(item.id, e)}
                   className="text-gray-400 p-1 hover:text-red-500 hover:scale-110 duration-150"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash className="w-4 h-4" />
                 </button>
               </div>
             </div>

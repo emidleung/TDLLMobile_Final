@@ -146,8 +146,8 @@ export default function App() {
     const originalRecipe = RECIPES.find(r => r.recipeID === recipeId) || recipes.find(r => r.recipeID === recipeId);
     if (!originalRecipe) return null;
 
-    let preSteps: RecipeStep[] = JSON.parse(JSON.stringify(originalRecipe.preCookSteps));
-    let cookSteps: RecipeStep[] = JSON.parse(JSON.stringify(originalRecipe.cookSteps));
+    let preSteps: RecipeStep[] = originalRecipe.preCookSteps ? JSON.parse(JSON.stringify(originalRecipe.preCookSteps)) : [];
+    let cookSteps: RecipeStep[] = originalRecipe.cookSteps ? JSON.parse(JSON.stringify(originalRecipe.cookSteps)) : [];
 
     const hasDiabetes = members.some(m => m.disease?.toLowerCase().includes('diabetes'));
     const hasHypertension = members.some(m => m.disease?.toLowerCase().includes('hyper') || m.disease?.toLowerCase().includes('pressure'));
