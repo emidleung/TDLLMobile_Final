@@ -305,8 +305,12 @@ export default function App() {
       firestoreTasks.sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime());
 
       setAllTasks(firestoreTasks);
-      const active = firestoreTasks.find(t => t.taskStatus !== 'rated');
-      setActiveTask(active || null);
+      const latest = firestoreTasks[0];
+      if (latest && latest.taskStatus !== 'rated') {
+        setActiveTask(latest);
+      } else {
+        setActiveTask(null);
+      }
     });
 
     // Family Members Listener
@@ -1070,10 +1074,6 @@ Respond ONLY with a valid JSON object:
                   >
                     <div className="relative">
                       <MessageSquare className="w-5 h-5 shrink-0 text-[#444444]" strokeWidth={2.5} />
-                      {totalNotifications > 0 && (
-                        <div className="absolute top-0 right-0 bg-[#EF4444] w-3 h-3 rounded-full border border-white shadow-md z-50 animate-bounce-once">
-                        </div>
-                      )}
                     </div>
                     <span>Chat</span>
                   </button>
@@ -1084,10 +1084,6 @@ Respond ONLY with a valid JSON object:
                   >
                     <div className="relative">
                       <MessageSquare className="w-5 h-5 mb-0.5 shrink-0" strokeWidth={1.5} />
-                      {totalNotifications > 0 && (
-                        <div className="absolute top-0 right-0 bg-[#EF4444] w-3 h-3 rounded-full border border-white shadow-md z-50 animate-bounce-once">
-                        </div>
-                      )}
                     </div>
                     <span>Chat</span>
                   </button>

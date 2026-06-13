@@ -181,6 +181,7 @@ export function FeedbackSettingsPage({
       </section>
 
       {/* Historical feedback reviews scores */}
+      {role !== 'employer' && (
       <section className="bg-white border border-app-border rounded-[14px] p-[28px] flex flex-col gap-4 shadow-sm">
         <h3 className="text-[24px] font-bold text-app-text-title">
           {lang === 'en' ? 'Historical Self-Evaluation Scores' : 'Riwayat Skor Evaluasi Diri'}
@@ -213,6 +214,7 @@ export function FeedbackSettingsPage({
           )}
         </div>
       </section>
+      )}
 
       {/* Logout button at screen bottom */}
       {onLogout && (

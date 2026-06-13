@@ -162,7 +162,11 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
         setLocalProgress(50);
       } else if (task.taskStatus === 'prep_approved' || task.taskStatus === 'cooking_ongoing') {
         setLocalProgress(50 + Math.round(task.cookFinishRate / 2));
-      } else if (task.taskStatus === 'completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'dish_approved' || task.taskStatus === 'rated') {
+      } else if (task.taskStatus === 'completed') {
+        setLocalProgress(95);
+      } else if (task.taskStatus === 'ai_checked') {
+        setLocalProgress(100);
+      } else if (task.taskStatus === 'dish_approved' || task.taskStatus === 'rated') {
         setLocalProgress(100);
       } else if (task.taskStatus === 'prep_rejected' || task.taskStatus === 'dish_rejected') {
         setLocalProgress(0);
@@ -248,11 +252,13 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
                 <span className="text-[22px] font-normal text-app-text-title">
                   {task.taskStatus === 'pre_cook_completed' 
                     ? (lang === 'en' ? 'Preparation completed and pending for evaluation' : 'Persiapan selesai dan menunggu evaluasi')
-                    : (task.taskStatus === 'completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'rated')
+                    : task.taskStatus === 'completed'
+                    ? (lang === 'en' ? 'Pending for evaluation from the employer' : 'Menunggu evaluasi dari majikan')
+                    : (task.taskStatus === 'ai_checked' || task.taskStatus === 'dish_approved' || task.taskStatus === 'rated')
                     ? (lang === 'en' ? 'Preparation and Cooking Completed' : 'Persiapan dan Memasak Selesai')
                     : labels.progressLabel}
                 </span>
-                <span className={`font-bold text-[28px] font-mono ${(localProgress === 100 || task.taskStatus === 'pre_cook_completed') ? 'text-green-600' : 'text-app-orange'}`}>
+                <span className={`font-bold text-[28px] font-mono ${(localProgress === 100 || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'completed') ? 'text-green-600' : 'text-app-orange'}`}>
                   {localProgress}%
                 </span>
               </div>
@@ -260,7 +266,7 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
             {/* Progress track */}
             <div className="w-full bg-[#EEEEEE] h-[10px] rounded-full overflow-hidden">
               <div
-                className={`h-full transition-all duration-300 rounded-full ${(localProgress === 100 || task.taskStatus === 'pre_cook_completed') ? 'bg-green-500' : 'bg-app-orange'}`}
+                className={`h-full transition-all duration-300 rounded-full ${(localProgress === 100 || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'completed') ? 'bg-green-500' : 'bg-app-orange'}`}
                 style={{ width: `${localProgress}%` }}
               />
             </div>
@@ -271,10 +277,10 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
           {/* START PREPARATION Main Orange Button (88px Height, 28px text) */}
           <button
             onClick={handleStartPreparation}
-            disabled={isPrepping || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked'}
-            className={`w-full h-[88px] transition-all rounded-[14px] flex items-center justify-center gap-3.5 shadow-sm text-[28px] font-bold text-[#444444] cursor-pointer disabled:opacity-80 ${(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked') ? 'bg-gray-200' : 'bg-app-orange hover:bg-orange-400 active:scale-[0.98]'}`}
+            disabled={isPrepping || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed'}
+            className={`w-full h-[88px] transition-all rounded-[14px] flex items-center justify-center gap-3.5 shadow-sm text-[28px] font-bold text-[#444444] cursor-pointer disabled:opacity-80 ${(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? 'bg-gray-200' : 'bg-app-orange hover:bg-orange-400 active:scale-[0.98]'}`}
           >
-            {(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked') ? (
+            {(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? (
               <span>{lang === 'en' ? 'WAITING FOR APPROVAL' : 'MENUNGGU PERSETUJUAN'}</span>
             ) : task.taskStatus === 'dish_approved' || task.taskStatus === 'rated' ? (
               <span className="text-green-700">{lang === 'en' ? 'TASK COMPLETED' : 'TUGAS SELESAI'}</span>
@@ -287,21 +293,6 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
           </button>
 
 
-        </div>
-      ) : task && task.taskStatus === 'completed' && currentRecipe && currentDetails ? (
-        <div className="flex flex-col gap-4 mt-4">
-          <h2 className="text-[24px] font-bold text-app-text-title">{labels.finishedTask}</h2>
-          <div className="bg-white border border-app-border rounded-[14px] pt-[32px] pb-[32px] pl-[28px] pr-[28px] shadow-sm flex flex-col gap-6 opacity-70">
-            <div className="flex justify-between items-center">
-              <span className="bg-green-100 text-green-800 rounded-[14px] px-4 py-1 text-[20px] font-bold">
-                {labels.finished}
-              </span>
-              <UtensilsCrossed className="w-10 h-10 text-app-orange" strokeWidth={1.5} />
-            </div>
-            <h2 className="text-[34px] font-bold text-app-text-title leading-tight line-through">
-              {currentDetails.title}
-            </h2>
-          </div>
         </div>
       ) : (
         /* Empty State */
