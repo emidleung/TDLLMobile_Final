@@ -278,22 +278,6 @@ export function EmployerDashboard({
 
     if (onPublishTask) {
       onPublishTask(recipeId, []);
-    } else {
-      // Fallback for standalone mode
-      fetch('/api/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipeID: recipeId,
-          customPreSteps: [],
-          assignedHelperID: connectedPartnerId
-        })
-      })
-        .then(res => res.ok && res.headers.get('content-type')?.includes('application/json') ? res.json().catch(() => ({})) : {})
-        .then(() => {
-          onRefreshData();
-        })
-        .catch(console.error);
     }
   };
 
@@ -308,19 +292,19 @@ export function EmployerDashboard({
 
     const translationsDict = {
       morning: {
-        en: 'Good Morning, Mrs. Chen',
-        id: 'Selamat Pagi, Ny. Chen',
-        tg: 'Magandang Umaga, Gng. Chen'
+        en: 'Good Morning',
+        id: 'Selamat Pagi',
+        tg: 'Magandang Umaga'
       },
       afternoon: {
-        en: 'Good Afternoon, Mrs. Chen',
-        id: 'Selamat Siang, Ny. Chen',
-        tg: 'Magandang Hapon, Gng. Chen'
+        en: 'Good Afternoon',
+        id: 'Selamat Siang',
+        tg: 'Magandang Hapon'
       },
       evening: {
-        en: 'Good Evening, Mrs. Chen',
-        id: 'Selamat Sore, Ny. Chen',
-        tg: 'Magandang Gabi, Gng. Chen'
+        en: 'Good Evening',
+        id: 'Selamat Sore',
+        tg: 'Magandang Gabi'
       },
       subtitle: {
         en: "Let's plan today's meals.",
@@ -331,7 +315,7 @@ export function EmployerDashboard({
 
     let displayTitle = translationsDict[greetingKey][lang] || translationsDict[greetingKey]['en'];
     if (userFullName) {
-      displayTitle = displayTitle.replace(/Mrs. Chen|Ny. Chen|Gng. Chen/gi, userFullName);
+      displayTitle = `${displayTitle}, ${userFullName}`;
     }
 
     return {
@@ -477,7 +461,7 @@ export function EmployerDashboard({
                   }
                 }}
                 title="Delete task permanently"
-                className="p-1.5 hover:text-red-600 bg-gray-100 rounded-[14px] border border-app-border transition-all flex items-center justify-center cursor-pointer active:scale-95 text-gray-400"
+                className="p-1.5 text-gray-400 hover:text-red-500 bg-white hover:bg-gray-50 rounded-xl border border-gray-200 transition-all flex items-center justify-center cursor-pointer active:scale-95"
                 id="btn-delete-task-v4"
               >
                 <Trash2 className="w-5 h-5" />
@@ -486,7 +470,7 @@ export function EmployerDashboard({
               <button
                 onClick={() => onResetTask(task.taskID)}
                 title="Reset or re-assign meal roadmap"
-                className="p-1.5 hover:text-red-700 bg-gray-100 rounded-[14px] border border-app-border transition-colors flex items-center justify-center cursor-pointer"
+                className="p-1.5 text-gray-400 hover:text-gray-600 bg-white hover:bg-gray-50 rounded-xl border border-gray-200 transition-all flex items-center justify-center cursor-pointer active:scale-95"
                 id="btn-reset-task-state"
               >
                 <RotateCcw className="w-4 h-4 text-app-text-muted" />
@@ -586,12 +570,6 @@ export function EmployerDashboard({
                       onClick={() => {
                         if (onReviewPrep) {
                           onReviewPrep(task.taskID, true);
-                        } else {
-                          fetch(`/api/tasks/${task.taskID}/review-prep`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ isApproved: true })
-                          }).then(() => onRefreshData());
                         }
                       }}
                       className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
@@ -603,12 +581,6 @@ export function EmployerDashboard({
                       onClick={() => {
                         if (onReviewPrep) {
                           onReviewPrep(task.taskID, false);
-                        } else {
-                          fetch(`/api/tasks/${task.taskID}/review-prep`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ isApproved: false })
-                          }).then(() => onRefreshData());
                         }
                       }}
                       className="flex-1 py-2 px-3 bg-gray-200 font-bold text-gray-700 rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer border border-gray-300"
@@ -652,12 +624,6 @@ export function EmployerDashboard({
                       onClick={() => {
                         if (onReviewDish) {
                           onReviewDish(task.taskID, true);
-                        } else {
-                          fetch(`/api/tasks/${task.taskID}/review-dish`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ isApproved: true })
-                          }).then(() => onRefreshData());
                         }
                       }}
                       className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
@@ -670,12 +636,6 @@ export function EmployerDashboard({
                         if (confirm('Are you sure you want to reject this dish? The helper will need to redo it.')) {
                           if (onReviewDish) {
                             onReviewDish(task.taskID, false);
-                          } else {
-                            fetch(`/api/tasks/${task.taskID}/review-dish`, {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ isApproved: false })
-                            }).then(() => onRefreshData());
                           }
                         }
                       }}

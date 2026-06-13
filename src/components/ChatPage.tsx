@@ -83,11 +83,6 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
       } catch (err) {
         console.warn("Firestore delete connection failed:", err);
       }
-
-      // 2. Fallback to API
-      fetch(`/api/connections/${id}`, { method: 'DELETE' })
-        .then(() => onRefreshData && onRefreshData())
-        .catch(console.error);
     }
   };
 

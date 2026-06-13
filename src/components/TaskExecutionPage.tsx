@@ -296,17 +296,6 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
                           if (onUploadPrepPhoto) {
                             onUploadPrepPhoto(task.taskID, base64);
                             onRefreshData();
-                          } else {
-                            const res = await fetch(`/api/tasks/${task.taskID}/upload-prep-photo`, {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ imageUrl: base64 })
-                            });
-                            if (res.ok) {
-                              onRefreshData();
-                            } else {
-                              alert('Upload failed. Please try again.');
-                            }
                           }
                         } catch (err) {
                           console.error(err);
@@ -441,7 +430,7 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
                       <Sparkles className="w-8 h-8 text-primary" />
                     </div>
                     <h1 className="text-2xl font-bold mb-4">{recipe?.title[lang] || 'Recipe Steps'}</h1>
-                    <p className="text-xs text-gray-400 mb-2">Build v1.0.1 - Assets Synced</p>
+                    <p className="text-xs text-gray-400 mb-2">Build v1.0.2 - Parity Synced</p>
                     <p className="text-sm text-on-surface-variant mb-6 max-w-[250px]">
                       Take a photo of the final plated dish to run the AI presentation check.
                     </p>

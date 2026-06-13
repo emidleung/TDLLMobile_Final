@@ -133,9 +133,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
 
   const handleMessageClick = (msg: ChatMessage) => {
     if (!msg.id || !onDeleteMessage) return;
-    if (confirm(translationEnabled ? "Hapus pesan ini?" : "Delete this message?")) {
-      onDeleteMessage(msg.id);
-    }
+    onDeleteMessage(msg.id);
   };
 
   const formatTime = (seconds: number) => {

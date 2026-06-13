@@ -220,28 +220,7 @@ export function LoginPage({ onLogin, onBack, lang, onSetLang, initialRole }: Log
         }
       } else {
         resolvedUserId = userId;
-        // FIRST: Check local mock API
-        try {
-          const localRes = await fetch(`/api/users/${userId}`);
-          if (localRes.ok) {
-            const localUser = await localRes.json();
-            console.log("Found user in local mock DB:", localUser);
-            userEmail = localUser.email || `${userId}@mock.com`;
-            userRole = localUser.role || selectedRole;
-            userFullName = localUser.fullName || null;
-            userAvatar = localUser.avatar || null;
-            
-            // Bypass the need for a real Firebase login for known mock IDs
-            if (userId === 'employer-1' || userId === 'helper-1') {
-              onLogin(userRole, userAvatar, userFullName, userId);
-              return;
-            }
-          }
-        } catch (localErr) {
-          console.warn("Local API check failed, falling back to Firestore:", localErr);
-        }
-
-        // SECOND: Fallback to Firestore
+        // Search Firestore directly for the user
         const docRef = doc(db, "users", userId);
         const docSnap = await getDoc(docRef).catch((err) => {
           return handleFirestoreError(err, OperationType.GET, `users/${userId}`);
@@ -249,7 +228,7 @@ export function LoginPage({ onLogin, onBack, lang, onSetLang, initialRole }: Log
 
         if (docSnap && docSnap.exists()) {
           const userData = docSnap.data();
-          userEmail = userData.email;
+          userEmail = userData.email || `${userId}@mock.com`;
           userRole = userData.role || selectedRole;
           userFullName = userData.fullName || null;
 
@@ -261,11 +240,18 @@ export function LoginPage({ onLogin, onBack, lang, onSetLang, initialRole }: Log
           if (avatarSnap && avatarSnap.exists()) {
             userAvatar = avatarSnap.data().base64Image;
           }
-        } else if (!userEmail) {
-          // If neither local nor Firestore has the user
-          alert(lang === 'en' ? 'Incorrect User ID or Password.' : 'ID Pengguna atau Kata Sandi salah.');
-          setIsSubmitting(false);
-          return;
+        } else {
+          // If not found, check if it's a known mock ID to bypass login (during seeding transition)
+          if (userId === 'employer-1' || userId === 'helper-1') {
+            userEmail = `${userId}@mock.com`;
+            userRole = userId === 'employer-1' ? 'employer' : 'helper';
+            onLogin(userRole, null, null, userId);
+            return;
+          } else {
+            alert(lang === 'en' ? 'Incorrect User ID or Password.' : 'ID Pengguna atau Kata Sandi salah.');
+            setIsSubmitting(false);
+            return;
+          }
         }
       }
 

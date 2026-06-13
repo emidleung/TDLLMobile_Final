@@ -44,6 +44,8 @@ import {
   deleteDoc
 } from "firebase/firestore";
 import { RECIPES } from './recipesData';
+import { seedDatabase } from './seedDatabase';
+import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
 
 export default function App() {
   const [role, setRole] = useState<Role | null>(null);
@@ -58,6 +60,21 @@ export default function App() {
   const [connectedPartnerId, setConnectedPartnerId] = useState<string | null>(null);
   const [partnerFullName, setPartnerFullName] = useState<string>('Your Helper');
   const [currentView, setCurrentView] = useState<string>('dashboard');
+
+  // Initialize AI Logic
+  const ai = getAI(auth.app, { backend: new GoogleAIBackend() });
+  const aiModel = getGenerativeModel(ai, { model: "gemini-2.5-flash-lite" });
+
+  // Trigger one-time seeding for trial experience
+  useEffect(() => {
+    const hasSeeded = localStorage.getItem('hekki_db_seeded_v1');
+    if (!hasSeeded) {
+      seedDatabase().then(() => {
+        localStorage.setItem('hekki_db_seeded_v1', 'true');
+        loadDatabaseState();
+      });
+    }
+  }, []);
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [recipeRemarks, setRecipeRemarks] = useState<Record<string, string>>({});
   const navRef = React.useRef<HTMLElement>(null);
@@ -122,25 +139,7 @@ export default function App() {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
 
-  const handleJsonResponse = async (res: Response, fallbackValue: any = null) => {
-    if (!res.ok) {
-      const text = await res.text();
-      console.warn(`HTTP Error: ${res.status} - ${text}`);
-      return fallbackValue;
-    }
-    const contentType = res.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      const text = await res.text();
-      console.warn(`Expected JSON but got: ${text}`);
-      return fallbackValue;
-    }
-    try {
-      return await res.json();
-    } catch (err) {
-      console.warn("JSON parsing failed, falling back:", err);
-      return fallbackValue;
-    }
-  };
+
 
   // Smart algorithm helper to adjust a recipe based on health profiles (Migrated from server.ts)
   const adjustRecipeForHealth = (recipeId: string, members: FamilyMember[]) => {
@@ -198,27 +197,9 @@ export default function App() {
 
   // Synchronize master states on load
   const loadDatabaseState = () => {
-    // 1. Fetch catalog
-    fetch(`/api/recipes?t=${Date.now()}`)
-      .then(res => handleJsonResponse(res, null))
-      .then(fetchedRecipes => {
-        if (fetchedRecipes && Array.isArray(fetchedRecipes) && fetchedRecipes.length > 0) {
-          setRecipes(fetchedRecipes);
-        }
-      })
-      .catch((e) => console.warn('fetch error (recipes)', e));
-
-    // 2. Fetch profiles
-    fetch('/api/family-members')
-      .then(res => handleJsonResponse(res, []))
-      .then(setHealthProfiles)
-      .catch((e) => console.warn('fetch error (profiles)', e));
-
-    // 3. Fetch reviews list
-    fetch('/api/reviews')
-      .then(res => handleJsonResponse(res, []))
-      .then(setReviews)
-      .catch((e) => console.warn('fetch error (reviews)', e));
+    // 1. Catalog is static from RECIPES, no need to fetch unless using dynamic CMS
+    // 2. Family profiles, reviews, tasks are already handled by onSnapshot listeners
+    console.log("Database state synced via Firestore listeners.");
   };
 
   // Load favorites and likes from local storage on mount
@@ -404,10 +385,11 @@ export default function App() {
           setCurrentUserId(uDoc.id); // This is the 8-digit ID
           setIsLoggedIn(true);
         } else if (currentUserId) {
-          // Fallback to the currentUserId if set (handles mock IDs)
-          const res = await fetch(`/api/users/${currentUserId}`);
-          if (res.ok) {
-            const userData = await res.json();
+          // Fallback to searching by currentUserId (8-digit ID)
+          const docRef = doc(db, "users", currentUserId);
+          const docSnap = await getDoc(docRef).catch(() => null);
+          if (docSnap && docSnap.exists()) {
+            const userData = docSnap.data();
             setUserFullName(userData.fullName);
             setRole(userData.role);
             setIsLoggedIn(true);
@@ -420,20 +402,21 @@ export default function App() {
 
   useEffect(() => {
     loadDatabaseState();
-    // Set periodic polling to make instant communication responsive inside test frame
-    const interval = setInterval(loadDatabaseState, 4000);
-    return () => clearInterval(interval);
+    // Periodic polling removed as Firestore real-time listeners are active.
   }, [currentUserId]);
   useEffect(() => {
     if (connectedPartnerId) {
-      fetch(`/api/users/${connectedPartnerId}`)
-        .then(res => handleJsonResponse(res, null))
-        .then(user => {
-          if (user && user.fullName) {
-            setPartnerFullName(user.fullName);
+      const loadPartner = async () => {
+        const docRef = doc(db, "users", connectedPartnerId);
+        const docSnap = await getDoc(docRef).catch(() => null);
+        if (docSnap && docSnap.exists()) {
+          const userData = docSnap.data();
+          if (userData.fullName) {
+            setPartnerFullName(userData.fullName);
           }
-        })
-        .catch(console.error);
+        }
+      };
+      loadPartner();
     }
   }, [connectedPartnerId]);
   // Set selected preferences
@@ -442,14 +425,15 @@ export default function App() {
     setCurrentView('dashboard');
   };
 
-  const handleSelectLang = (selectedLang: Language) => {
+  const handleSelectLang = async (selectedLang: Language) => {
     setLang(selectedLang);
-    // Persist via api
-    fetch('/api/users/preference', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userID: role === 'employer' ? 'employer-1' : 'helper-1', languagePreference: selectedLang })
-    }).catch(console.error);
+    if (currentUserId) {
+      try {
+        await updateDoc(doc(db, "users", currentUserId), { languagePreference: selectedLang });
+      } catch (err) {
+        console.warn("Firestore update language failed:", err);
+      }
+    }
   };
 
   // Add dynamic family health profile member
@@ -458,15 +442,6 @@ export default function App() {
       await addDoc(collection(db, "family-members"), m);
     } catch (err) {
       console.warn("Firestore add member failed:", err);
-      // Fallback
-      fetch('/api/family-members', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(m)
-      })
-      .then(res => handleJsonResponse(res, null))
-      .then(() => loadDatabaseState())
-      .catch(console.error);
     }
   };
 
@@ -475,9 +450,6 @@ export default function App() {
       await deleteDoc(doc(db, "family-members", id));
     } catch (err) {
       console.warn("Firestore delete member failed:", err);
-      fetch(`/api/family-members/${id}`, { method: 'DELETE' })
-        .then(() => loadDatabaseState())
-        .catch(console.error);
     }
   };
 
@@ -502,19 +474,6 @@ export default function App() {
       setCurrentView('dashboard');
     } catch (err) {
       console.warn("Firestore publish task failed:", err);
-      fetch('/api/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recipeID, customPreSteps: customSteps })
-      })
-      .then(res => handleJsonResponse(res, null))
-      .then(task => {
-        if (task) {
-          setActiveTask(task);
-          setCurrentView('dashboard');
-        }
-      })
-      .catch(console.error);
     }
   };
 
@@ -545,14 +504,6 @@ export default function App() {
       await updateDoc(doc(db, "tasks", activeTask.taskID), updateData);
     } catch (err) {
       console.warn("Firestore confirm step failed:", err);
-      fetch(`/api/tasks/${activeTask.taskID}/step`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, stepID, isFinish })
-      })
-      .then(res => handleJsonResponse(res, null))
-      .then(task => { if (task) setActiveTask(task); })
-      .catch(console.error);
     }
   };
 
@@ -561,9 +512,7 @@ export default function App() {
     try {
       await updateDoc(doc(db, "tasks", taskId), { taskStatus: 'preparing', preCookFinishRate: 0, currentPreStepIndex: 0 });
     } catch (err) {
-      fetch(`/api/tasks/${taskId}/reset`, { method: 'POST' })
-        .then(() => loadDatabaseState())
-        .catch(console.error);
+      console.warn("Firestore reset task failed:", err);
     }
   };
 
@@ -572,9 +521,7 @@ export default function App() {
       await deleteDoc(doc(db, "tasks", taskId));
       if (activeTask?.taskID === taskId) setActiveTask(null);
     } catch (err) {
-      fetch(`/api/tasks/${taskId}`, { method: 'DELETE' })
-        .then(() => loadDatabaseState())
-        .catch(console.error);
+      console.warn("Firestore delete task failed:", err);
     }
   };
 
@@ -591,11 +538,7 @@ export default function App() {
         });
       }
     } catch (err) {
-      fetch(`/api/tasks/${taskId}/review-prep`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isApproved })
-      }).catch(console.error);
+      console.warn("Firestore review prep failed:", err);
     }
   };
 
@@ -615,11 +558,7 @@ export default function App() {
         });
       }
     } catch (err) {
-      fetch(`/api/tasks/${taskId}/review-dish`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isApproved })
-      }).catch(console.error);
+      console.warn("Firestore review dish failed:", err);
     }
   };
 
@@ -630,11 +569,7 @@ export default function App() {
         taskStatus: 'pre_cook_completed'
       });
     } catch (err) {
-      fetch(`/api/tasks/${taskId}/upload-prep-photo`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl })
-      }).catch(console.error);
+      console.warn("Firestore upload prep failed:", err);
     }
   };
   const handleSendMessage = async (text: string, overrideTaskID?: string) => {
@@ -653,20 +588,7 @@ export default function App() {
     try {
       await addDoc(collection(db, "chats"), newMessage);
     } catch (err) {
-      console.warn("Firestore send failed, falling back to API:", err);
-      
-      // 2. Fallback to Express API
-      fetch('/api/chats', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...newMessage,
-          createTime: new Date().toISOString()
-        })
-      })
-      .then(res => handleJsonResponse(res, null))
-      .then(() => loadDatabaseState())
-      .catch(console.error);
+      console.warn("Firestore send failed:", err);
     }
   };
 
@@ -674,40 +596,77 @@ export default function App() {
   const handleSubmitAICheck = async (imageB64: string) => {
     if (!activeTask) return;
     try {
-      const response = await fetch('/api/ai-check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          taskID: activeTask.taskID,
-          imageUrl: imageB64
-        })
-      });
-      const data = await handleJsonResponse(response, null);
-      loadDatabaseState();
-      return data;
+      const recipe = recipes.find(r => r.recipeID === activeTask.recipeID) || RECIPES.find(r => r.recipeID === activeTask.recipeID);
+      const dishTitle = recipe ? recipe.title.en : 'dish';
+
+      const mimeTypeMatch = imageB64.match(/^data:(image\/.+);base64,/);
+      const mimeType = mimeTypeMatch ? mimeTypeMatch[1] : 'image/jpeg';
+      const base64Data = imageB64.replace(/^data:.+;base64,/, '');
+
+      const prompt = `You are a strict Culinary Auditor. Your goal is to detect non-food items, wrong dishes, or poor quality.
+TARGET DISH: "${dishTitle}"
+
+INSTRUCTIONS:
+1. IDENTIFY: What is in this photo?
+2. VALIDATE: Is this exactly the dish "${dishTitle}"?
+3. FAIL IMMEDIATELY IF:
+   - The image is NOT food (e.g., person, doll, drawing, text, room).
+   - The image is the WRONG dish (e.g., if it's chicken but should be fish).
+   - The image is too blurry to see clearly.
+   - There are hands, feet, or random objects obstructing the food.
+4. AUDIT QUALITY: If (and only if) it is the correct dish, check for plate cleanliness (rim spills) and cooking quality.
+
+Respond ONLY with a valid JSON object:
+{
+  "rating": "Pass" or "Fail",
+  "explanation": "State clearly what you see and why it passed or failed."
+}`;
+
+      const result = await aiModel.generateContent([
+        prompt,
+        {
+          inlineData: {
+            mimeType: mimeType,
+            data: base64Data
+          }
+        }
+      ]);
+
+      const response = await result.response;
+      const text = response.text();
+      const aiData = JSON.parse(text.replace(/```json|```/g, ''));
+      
+      const updateData = {
+        taskStatus: aiData.rating === 'Pass' ? 'completed' : 'cooking_ongoing',
+        aiFeedback: aiData.explanation,
+        aiCheckTime: new Date().toISOString()
+      };
+
+      await updateDoc(doc(db, "tasks", activeTask.taskID), updateData);
+      return aiData;
     } catch (err) {
-      console.error("Gemini fetch failed:", err);
+      console.error("Gemini AI check failed:", err);
       return null;
     }
   };
 
   // Submit Culinary Satisfaction Scoring reviews
-  const handleSubmitReview = (starRate: number, comment: string) => {
+  const handleSubmitReview = async (starRate: number, comment: string) => {
     if (!activeTask) return;
-    fetch('/api/reviews', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    try {
+      await addDoc(collection(db, "reviews"), {
         taskID: activeTask.taskID,
         starRate,
-        comment
-      })
-    })
-      .then(() => {
-        loadDatabaseState();
-        setCurrentView('feedback-settings');
-      })
-      .catch(console.error);
+        comment,
+        createTime: serverTimestamp()
+      });
+      
+      // Update task status to rated
+      await updateDoc(doc(db, "tasks", activeTask.taskID), { taskStatus: 'rated' });
+      setCurrentView('feedback-settings');
+    } catch (err) {
+      console.error("Submit review failed:", err);
+    }
   };
 
   const handleMarkChatAsRead = async (taskId: string) => {
@@ -725,16 +684,6 @@ export default function App() {
     } catch (err) {
       console.warn("Firestore mark read failed:", err);
     }
-
-    // 2. Sync with Backend
-    fetch('/api/chats/read', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ taskID: taskId, readerRole: role })
-    })
-      .then(res => handleJsonResponse(res, null))
-      .then(() => loadDatabaseState())
-      .catch(console.error);
   };
 
   const handleDeleteChatMessage = async (chatId: string) => {

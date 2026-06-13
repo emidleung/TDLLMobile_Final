@@ -17,7 +17,7 @@ interface HelperDashboardProps {
 // Translations for Today view elements based on language preferences
 const GREETINGS = {
   en: {
-    greeting: 'Good Morning, Maria',
+    greeting: 'Good Morning',
     subtitle: 'Here is your main task for today.',
     progressLabel: 'Preparation Progress',
     todayMeal: "Today's Meal",
@@ -33,7 +33,7 @@ const GREETINGS = {
     finished: 'Finished',
   },
   id: {
-    greeting: 'Selamat Pagi, Maria',
+    greeting: 'Selamat Pagi',
     subtitle: 'Ini adalah tugas utama Anda hari ini.',
     progressLabel: 'Progres Persiapan',
     todayMeal: 'Sajian Hari Ini',
@@ -49,7 +49,7 @@ const GREETINGS = {
     finished: 'Selesai',
   },
   tg: {
-    greeting: 'Magandang Umaga, Maria',
+    greeting: 'Magandang Umaga',
     subtitle: 'Narito ang iyong pangunahing gawain para sa araw na ito.',
     progressLabel: 'Progres ng Paghahanda',
     todayMeal: 'Ulam Ngayong Araw',
@@ -59,9 +59,9 @@ const GREETINGS = {
     ingredientsReady: 'Handa na ang Sangkap',
     nextStepLocked: 'Susunod Naka-lock',
     nextStepCook: 'Susunod na Hakbang',
-    noTaskTitle: 'Walang nakatalagang ulam ngayon',
-    noTaskDesc: 'Mangyaring maghintay para sa iyong employer upang mag-publish ng meal plan ngayon.',
-    finishedTask: 'Tapos na gawain',
+    noTaskTitle: 'Walang nakatalagang menu ngayon',
+    noTaskDesc: 'Mangyaring maghintay para sa iyong employer na magplano at mag-publish ng roadmap ng pagkain.',
+    finishedTask: 'Tapos na ang gawain',
     finished: 'Tapos na',
   }
 };
@@ -126,25 +126,28 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
     let timeOfDayId = 'Pagi';
     let timeOfDayTg = 'Umaga';
 
-    if (hour >= 12 && hour < 18) {
+    if (hour >= 12 && hour < 17) {
       timeOfDayEn = 'Afternoon';
       timeOfDayId = 'Siang';
       timeOfDayTg = 'Hapon';
-    } else if (hour >= 18) {
+    } else if (hour >= 17 || hour < 5) {
       timeOfDayEn = 'Evening';
-      timeOfDayId = 'Malam';
+      timeOfDayId = 'Sore';
       timeOfDayTg = 'Gabi';
     }
 
-    if (currentLang === 'en') return baseGreeting.replace('Morning', timeOfDayEn);
-    if (currentLang === 'id') return baseGreeting.replace('Pagi', timeOfDayId);
-    if (currentLang === 'tg') return baseGreeting.replace('Umaga', timeOfDayTg);
-    return baseGreeting;
+    let greeting = baseGreeting;
+    if (currentLang === 'en') greeting = baseGreeting.replace('Morning', timeOfDayEn);
+    if (currentLang === 'id') greeting = baseGreeting.replace('Pagi', timeOfDayId);
+    if (currentLang === 'tg') greeting = baseGreeting.replace('Umaga', timeOfDayTg);
+
+    if (userFullName) {
+      return `${greeting}, ${userFullName}`;
+    }
+    return greeting;
   };
 
-  const displayGreeting = userFullName 
-    ? getDynamicGreeting(labels.greeting, lang).replace(/Maria/g, userFullName)
-    : getDynamicGreeting(labels.greeting, lang);
+  const displayGreeting = getDynamicGreeting(labels.greeting, lang);
 
   // Visual local state to track dynamic progress bar changes and Next Step unlocking interaction
   const [localProgress, setLocalProgress] = useState<number>(0);
@@ -227,7 +230,7 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
                     }
                   }}
                   title="Delete task permanently"
-                  className="p-1.5 hover:text-red-600 bg-gray-100 rounded-[14px] border border-app-border transition-all flex items-center justify-center cursor-pointer active:scale-95 text-gray-400"
+                  className="p-1.5 text-gray-400 hover:text-red-500 bg-white hover:bg-gray-50 rounded-xl border border-gray-200 transition-all flex items-center justify-center cursor-pointer active:scale-95"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>

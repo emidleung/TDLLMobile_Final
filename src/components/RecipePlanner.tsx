@@ -91,22 +91,41 @@ export function RecipePlanner({ recipes, healthProfiles, lang, onPublishTask, pa
     }
   };
 
-  // Load smart adjusted recipe previews
+  // Load smart adjusted recipe previews (Client-side simulation)
   useEffect(() => {
     if (!selectedRecipeId) return;
     setIsLoadingAdjust(true);
-    fetch(`/api/recipes/${selectedRecipeId}/adjusted`)
-      .then(res => res.ok && res.headers.get('content-type')?.includes('application/json') ? res.json().catch(() => ({})) : {})
-      .then((data: any) => {
-        if (data && data.preSteps) {
-          setPreStepsPreview(data.preSteps);
-        }
-        setIsLoadingAdjust(false);
-      })
-      .catch(() => {
-        setIsLoadingAdjust(false);
-      });
-  }, [selectedRecipeId, healthProfiles]);
+    
+    // Simulate smart logic previously in server.ts
+    const originalRecipe = recipes.find(r => r.recipeID === selectedRecipeId);
+    if (originalRecipe) {
+      let adjusted = JSON.parse(JSON.stringify(originalRecipe.preCookSteps));
+      const isDiabetic = healthProfiles.some(m => m.disease?.toLowerCase().includes('diabetes'));
+      const isHypertensive = healthProfiles.some(m => m.disease?.toLowerCase().includes('hyper'));
+
+      if (isDiabetic) {
+        adjusted = adjusted.map((s: any) => ({
+          ...s,
+          text: {
+            ...s.text,
+            en: s.text.en.replace(/sugar/gi, 'monkfruit sweetener (health-swap)')
+          }
+        }));
+      }
+      if (isHypertensive) {
+        adjusted = adjusted.map((s: any) => ({
+          ...s,
+          text: {
+            ...s.text,
+            en: s.text.en.replace(/salt|soy sauce/gi, 'low-sodium variant')
+          }
+        }));
+      }
+      setPreStepsPreview(adjusted);
+    }
+    
+    setIsLoadingAdjust(false);
+  }, [selectedRecipeId, healthProfiles, recipes]);
 
   const activeRecipe = recipes.find(r => r.recipeID === selectedRecipeId);
 
