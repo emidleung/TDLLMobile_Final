@@ -416,7 +416,7 @@ export function EmployerDashboard({
       <section className="flex flex-col gap-2 mt-2">
         <h1 className="text-[38px] md:text-[40px] font-bold text-app-text-title leading-tight tracking-tight flex items-baseline gap-2">
           {greeting.title}
-          <span className="text-[12px] bg-red-600 text-white px-2 py-0.5 rounded-full animate-pulse shrink-0">V5-ROBUST</span>
+          {/* Removed debug tag */}
         </h1>
         <p className="text-[20px] font-normal text-app-text-muted leading-relaxed">
           {greeting.subtitle}

@@ -878,7 +878,7 @@ export default function App() {
                 <span className="text-[22px] font-bold text-[#444444] leading-none tracking-tight">
                   Belaja
                 </span>
-                <span className="text-[10px] bg-red-500 text-white px-1 rounded animate-pulse">V-DELETE-ACTIVE</span>
+                {/* Removed debug tag */}
               </div>
             </div>
 
