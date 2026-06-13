@@ -13,7 +13,7 @@ import {
   Calendar,
   X
 } from 'lucide-react';
-import { Task, Language, Role, Recipe, FamilyMember, ChatMessage, Review, Invitation, Connection } from './types';
+import { Task, Language, Role, Recipe, RecipeStep, FamilyMember, ChatMessage, Review, Invitation, Connection } from './types';
 import { LaunchPage } from './components/LaunchPage';
 import { EmployerDashboard } from './components/EmployerDashboard';
 import { RecipePlanner } from './components/RecipePlanner';
@@ -149,9 +149,9 @@ export default function App() {
     let preSteps: RecipeStep[] = JSON.parse(JSON.stringify(originalRecipe.preCookSteps));
     let cookSteps: RecipeStep[] = JSON.parse(JSON.stringify(originalRecipe.cookSteps));
 
-    const hasDiabetes = members.some(m => m.disease.toLowerCase().includes('diabetes'));
-    const hasHypertension = members.some(m => m.disease.toLowerCase().includes('hyper') || m.disease.toLowerCase().includes('pressure'));
-    const allergies = members.map(m => m.allergy.trim().toLowerCase()).filter(a => a && a !== 'none');
+    const hasDiabetes = members.some(m => m.disease?.toLowerCase().includes('diabetes'));
+    const hasHypertension = members.some(m => m.disease?.toLowerCase().includes('hyper') || m.disease?.toLowerCase().includes('pressure'));
+    const allergies = members.map(m => m.allergy?.trim().toLowerCase()).filter(a => a && a !== 'none');
 
     if (allergies.length > 0 && recipeId !== 'cantonese-steamed-fish') {
       const allergyListStr = allergies.join(', ');

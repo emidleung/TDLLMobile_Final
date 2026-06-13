@@ -13,7 +13,7 @@ interface TaskExecutionPageProps {
   onUploadPrepPhoto?: (taskId: string, imageUrl: string) => void;
 }
 
-export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmStep, onNavigate, onRefreshData }: TaskExecutionPageProps) {
+export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmStep, onNavigate, onRefreshData, onUploadPrepPhoto }: TaskExecutionPageProps) {
   // Robustness: find the recipe if not provided as prop
   const recipe = propRecipe || RECIPES.find(r => r.recipeID === task.recipeID);
   
