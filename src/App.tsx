@@ -455,6 +455,15 @@ export default function App() {
 
   // Publish task
   const handlePublishTask = async (recipeID: string, customSteps: string[]) => {
+    // Prevent queuing: delete existing active task if one exists
+    if (activeTask) {
+      try {
+        await deleteDoc(doc(db, "tasks", activeTask.taskID));
+      } catch (err) {
+        console.warn("Failed to delete previous active task:", err);
+      }
+    }
+
     const newTask = {
       recipeID,
       employerID: currentUserId || 'employer-1',
