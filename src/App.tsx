@@ -978,7 +978,7 @@ Respond ONLY with a valid JSON object:
                   task={activeTask}
                   lang={lang}
                   onSubmitAICheck={handleSubmitAICheck}
-                  onSubmitToEmployer={(cookImageUrl) => handleSubmitToEmployer(activeTask.taskID, cookImageUrl)}
+                  onSubmitToEmployer={(cookImageUrl) => { handleSubmitToEmployer(activeTask.taskID, cookImageUrl); }}
                   onNavigate={setCurrentView}
                 />
               )}

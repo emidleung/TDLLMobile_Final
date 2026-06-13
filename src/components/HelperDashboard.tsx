@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChefHat, ShoppingBasket, Lock, Unlock, UtensilsCrossed, ArrowRight, ShieldAlert, Trash, Trash2 } from 'lucide-react';
+import { ChefHat, ShoppingBasket, Lock, Unlock, UtensilsCrossed, ArrowRight, ShieldAlert, Trash, Trash2, CheckCircle } from 'lucide-react';
 import { Task, Language, Recipe } from '../types';
 import { RECIPES } from '../recipesData';
 

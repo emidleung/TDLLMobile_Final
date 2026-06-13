@@ -6,7 +6,7 @@ interface ResultUploadPageProps {
   task: Task;
   lang: Language;
   onSubmitAICheck: (imageUrl: string) => Promise<any>;
-  onSubmitToEmployer: () => void;
+  onSubmitToEmployer: (imageUrl?: string) => void;
   onNavigate: (view: string) => void;
 }
 
@@ -16,7 +16,7 @@ import confetti from 'canvas-confetti';
 export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmployer, onNavigate }: ResultUploadPageProps) {
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [aiReport, setAiReport] = useState<{ aiResult: 'pass' | 'minor_defect'; feedback: string } | null>(null);
+  
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,55 +27,18 @@ export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmploy
     reader.onload = async (event) => {
       const base64 = event.target?.result as string;
       setSelectedImage(base64);
-      
-      try {
-        const report = await onSubmitAICheck(base64);
-        if (report) {
-          const formattedReport = {
-            aiResult: report.rating === 'Pass' ? 'pass' as const : 'minor_defect' as const,
-            feedback: report.explanation
-          };
-          setAiReport(formattedReport);
-          if (formattedReport.aiResult === 'pass') {
-            confetti({
-              particleCount: 150,
-              spread: 100,
-              origin: { y: 0.6 },
-              colors: ['#2E7D32', '#965020', '#F3A562']
-            });
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsUploading(false);
-      }
+      setIsUploading(false);
     };
     reader.readAsDataURL(file);
   };
 
   const handleSelectPreset = async (presetUrl: string) => {
     setSelectedImage(presetUrl);
-    setIsUploading(true);
-    setAiReport(null);
-    try {
-      const report = await onSubmitAICheck(presetUrl);
-      if (report) {
-        setAiReport({
-          aiResult: report.rating === 'Pass' ? 'pass' as const : 'minor_defect' as const,
-          feedback: report.explanation
-        });
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsUploading(false);
-    }
+    setIsUploading(false);
   };
 
   const handleReset = () => {
     setSelectedImage('');
-    setAiReport(null);
   };
 
   return (
@@ -93,12 +56,12 @@ export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmploy
       {/* Header section */}
       <section className="flex flex-col gap-1">
         <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface font-bold">
-          {lang === 'en' ? 'AI Plating Evaluation' : 'Evaluasi Tampilan Piring AI'}
+          {lang === 'en' ? 'Final Dish Submission' : 'Penyerahan Hidangan Akhir'}
         </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant">
           {lang === 'en'
-            ? 'Verify hygiene, plate surface spills, and food quality metrics with Gemini Vision checks instantly.'
-            : 'Uji kebersihan sisa kuah tumpah di piring sebelum dihidangkan ke majikan.'}
+            ? 'Submit the photo for the employer to check and confirm the dish!'
+            : 'Kirimkan foto agar majikan dapat memeriksa dan mengonfirmasi hidangan!'}
         </p>
       </section>
 
@@ -174,37 +137,6 @@ export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmploy
       )}
 
       {/* Gemini response representation check */}
-      {aiReport && (
-        <div className={`p-5 rounded-xl border flex flex-col gap-3.5 shadow-sm ${
-          aiReport.aiResult === 'pass'
-            ? 'bg-secondary-container text-on-secondary-container border-secondary/35'
-            : 'bg-error-container text-on-error-container border-error/35'
-        }`}>
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white ${
-              aiReport.aiResult === 'pass' ? 'bg-secondary' : 'bg-error'
-            }`}>
-              {aiReport.aiResult === 'pass' ? <Check className="w-5 h-5 font-bold" /> : <ShieldAlert className="w-5 h-5" />}
-            </div>
-            
-            <div>
-              <h4 className="font-headline-sm text-base font-bold text-on-surface">
-                {lang === 'en' ? 'AI Evaluation Statement' : 'Hasil Verifikasi AI'}:{' '}
-                <span className={aiReport.aiResult === 'pass' ? 'text-secondary font-bold' : 'text-error font-bold'}>
-                  {aiReport.aiResult === 'pass' ? 'PASS (Bersih & Sesuai)' : 'FLAGGED (Butuh Dilap Rim)'}
-                </span>
-              </h4>
-              <p className="font-mono text-[9px] tracking-wider uppercase text-on-surface-variant mt-0.5">
-                Gemini Vision Kitchen Agent Verification
-              </p>
-            </div>
-          </div>
-          
-          <p className="font-body-md text-xs text-on-surface/90 leading-relaxed bg-surface-container-lowest/50 p-3 rounded-lg border border-outline-variant/20 italic">
-            "{aiReport.feedback}"
-          </p>
-        </div>
-      )}
 
       {/* Form submit lock and navigation */}
       <div className="pt-4 flex justify-center border-t border-surface-variant mt-2">

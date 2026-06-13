@@ -492,7 +492,7 @@ export function EmployerDashboard({
               <span className="text-[20px] font-bold text-app-text-title">
                 {task.taskStatus === 'pre_cook_completed' || (task.preCookFinishRate === 100 && task.cookFinishRate === 100)
                   ? 'Ready for Evaluation' 
-                  : (task.taskStatus === 'cooking_ongoing' ? 'Meal is being cooked now !' : 'Meal is being prepared now !')}
+                  : (['prep_approved', 'cooking_ongoing', 'completed', 'ai_checked', 'dish_approved'].includes(task.taskStatus) ? 'Meal is being cooked now !' : 'Meal is being prepared now !')}
               </span>
             </div>
 
