@@ -319,12 +319,12 @@ export default function App() {
       }
     });
 
-    const qTasks = query(collection(db, "tasks"), orderBy("createTime", "desc"));
+    // Tasks Listener - Sort in client to ensure documents with pending server timestamps are visible
+    const qTasks = query(collection(db, "tasks"));
     const unsubscribeTasks = onSnapshot(qTasks, (snapshot) => {
       const firestoreTasks: Task[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
-        // Crucial: Filter by currentUserId for privacy and correct dashboard display
         if (data.employerID === currentUserId || data.helperID === currentUserId || !currentUserId) {
           const adjustment = adjustRecipeForHealth(data.recipeID, healthProfiles);
           firestoreTasks.push({
@@ -332,7 +332,6 @@ export default function App() {
             ...data,
             adjustedPreSteps: adjustment?.preSteps || [],
             adjustedCookSteps: adjustment?.cookSteps || [],
-            // Handle pending server timestamps (null on local update)
             createTime: data.createTime instanceof Timestamp 
               ? data.createTime.toDate().toISOString() 
               : (data.createTime ? data.createTime : new Date().toISOString())
@@ -340,13 +339,10 @@ export default function App() {
         }
       });
 
-      // Update state for all tasks
-      setAllTasks(firestoreTasks);
+      // Sort by createTime DESC in client
+      firestoreTasks.sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime());
 
-      // Robust Active Task Selection:
-      // We want the most recent task that is NOT fully completed (rated)
-      // Since qTasks is ordered by createTime desc, index 0 is usually the one,
-      // but we filter specifically for the latest non-rated task.
+      setAllTasks(firestoreTasks);
       const active = firestoreTasks.find(t => t.taskStatus !== 'rated');
       setActiveTask(active || null);
     });
