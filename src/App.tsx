@@ -331,9 +331,11 @@ export default function App() {
     const unsubscribeReviews = onSnapshot(qReviews, (snapshot) => {
       const firestoreReviews: Review[] = [];
       snapshot.forEach((doc) => {
+        const data = doc.data();
         firestoreReviews.push({
           id: doc.id,
-          ...doc.data()
+          ...data,
+          createTime: data.createTime?.toDate ? data.createTime.toDate().toISOString() : (data.createTime || new Date().toISOString())
         } as Review);
       });
       // Sort reviews newest first
@@ -1039,7 +1041,14 @@ Respond ONLY with a valid JSON object:
                   lang={lang}
                   onSetLang={handleSelectLang}
                   onSubmitReview={handleSubmitReview}
-                  reviews={reviews}
+                  reviews={reviews.map(r => {
+                    const task = allTasks.find(t => t.taskID === r.taskID);
+                    const recipe = task ? recipes.find(rec => rec.recipeID === task.recipeID) || RECIPES.find(rec => rec.recipeID === task.recipeID) : null;
+                    return {
+                      ...r,
+                      taskTitle: r.taskTitle || (recipe ? recipe.title[lang] : 'Cooking Task')
+                    };
+                  })}
                   latestTaskTitle={latestTaskTitle}
                   role={role}
                   onLogout={logout}

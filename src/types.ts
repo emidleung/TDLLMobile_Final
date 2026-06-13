@@ -122,5 +122,6 @@ export interface Review {
   starRate: number;
   comment: string;
   role?: string;
+  taskTitle?: string;
   createTime: string;
 }

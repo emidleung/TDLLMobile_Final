@@ -189,25 +189,38 @@ export function FeedbackSettingsPage({
         </h3>
         
         <div className="flex flex-col gap-4">
-          {reviews.filter(r => r.role === role).length > 0 ? (
-            reviews.filter(r => r.role === role).map((rev, idx) => (
+          {reviews.length > 0 ? (
+            reviews.map((rev, idx) => {
+              const dt = new Date(rev.createTime);
+              const validDate = !isNaN(dt.getTime());
+              const isEmployerReview = rev.role === 'employer';
+              return (
               <div key={idx} className="bg-[#FCF9F2] p-4 border border-app-border rounded-[14px] flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <div className="flex text-app-orange gap-0.5">
-                    {Array.from({ length: rev.starRate }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current text-app-orange" />
-                    ))}
-                    {Array.from({ length: 5 - rev.starRate }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-gray-300" />
-                    ))}
+                <div className="flex justify-between items-start">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[18px] font-bold text-[#444444]">{rev.taskTitle}</span>
+                      <span className={`px-2 py-0.5 rounded text-[12px] font-bold ${isEmployerReview ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                        {isEmployerReview ? 'Employer Eval' : 'Self-Eval'}
+                      </span>
+                    </div>
+                    <div className="flex text-app-orange gap-0.5">
+                      {Array.from({ length: rev.starRate }).map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-current text-app-orange" />
+                      ))}
+                      {Array.from({ length: 5 - rev.starRate }).map((_, i) => (
+                        <Star key={i} className="w-4 h-4 text-gray-300" />
+                      ))}
+                    </div>
                   </div>
-                  <span className="text-[16px] text-app-text-muted">
-                    {new Date(rev.createTime).toLocaleDateString()}
-                  </span>
+                  <div className="flex flex-col items-end text-[14px] text-app-text-muted">
+                    <span>{validDate ? dt.toLocaleDateString() : ''}</span>
+                    <span>{validDate ? dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+                  </div>
                 </div>
-                <p className="text-[20px] italic text-[#444444]">"{rev.comment}"</p>
+                <p className="text-[20px] italic text-[#444444] mt-2">"{rev.comment}"</p>
               </div>
-            ))
+            )})
           ) : (
             <span className="text-[18px] text-app-text-muted italic">
               No historical scores registered yet.

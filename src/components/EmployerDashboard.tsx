@@ -412,11 +412,11 @@ export function EmployerDashboard({
       
       {/* 1. Header Greeting Banner Segment */}
       <section className="flex flex-col gap-2 mt-2">
-        <h1 className="text-[30px] md:text-[32px] font-bold text-app-text-title leading-tight tracking-tight flex items-baseline gap-2">
+        <h1 className="text-[32px] md:text-[34px] font-bold text-app-text-title leading-tight tracking-tight flex items-baseline gap-2">
           {greeting.title}
           {/* Removed debug tag */}
         </h1>
-        <p className="text-[13px] font-normal text-app-text-muted leading-relaxed">
+        <p className="text-[14px] font-normal text-app-text-muted leading-relaxed">
           {greeting.subtitle}
         </p>
       </section>
@@ -430,10 +430,10 @@ export function EmployerDashboard({
             <Users className="w-5 h-5" />
           </div>
           <div className="flex-1">
-            <p className="text-[13px] font-bold text-app-text-title">
+            <p className="text-[14px] font-bold text-app-text-title">
               {lang === 'en' ? 'Connect to your Helper' : lang === 'id' ? 'Hubungkan ke Asisten' : 'I-konek ang iyong Helper'}
             </p>
-            <p className="text-[13px] text-app-text-muted">
+            <p className="text-[14px] text-app-text-muted">
               {lang === 'en' ? 'Invite your helper to start assigning meals.' : lang === 'id' ? 'Undang asisten para mulai memberikan tugas memasak.' : 'I-invite ang helper para mag-assign ng mga pagkain.'}
             </p>
           </div>
@@ -447,7 +447,7 @@ export function EmployerDashboard({
         
         {/* Module Header Title & Status */}
         <div className="flex justify-between items-center">
-          <span className="text-[15px] font-bold text-app-text-title uppercase tracking-wider flex items-center gap-2">
+          <span className="text-[16px] font-bold text-app-text-title uppercase tracking-wider flex items-center gap-2">
             Active Task
             {/* Removed rubbish label */}
           </span>
@@ -476,7 +476,7 @@ export function EmployerDashboard({
                 <RotateCcw className="w-4 h-4 text-app-text-muted" />
               </button>
 
-              <span className={`py-1 px-3 rounded-[14px] text-[13px] font-bold flex items-center gap-1 ${getStatusBadgeStyles(task.taskStatus).container}`}>
+              <span className={`py-1 px-3 rounded-[14px] text-[14px] font-bold flex items-center gap-1 ${getStatusBadgeStyles(task.taskStatus).container}`}>
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" strokeWidth={2.5} />
                 <span>{getStatusBadgeStyles(task.taskStatus).label}</span>
               </span>
@@ -489,7 +489,7 @@ export function EmployerDashboard({
           <div className="bg-white border border-app-border rounded-[14px] p-6 shadow-sm flex flex-col gap-5 relative overflow-hidden">
             
             <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="text-[13px] font-bold text-app-text-title">
+              <span className="text-[14px] font-bold text-app-text-title">
                 {task.taskStatus === 'pre_cook_completed' || (task.preCookFinishRate === 100 && task.cookFinishRate === 100)
                   ? 'Ready for Evaluation' 
                   : (['prep_approved', 'cooking_ongoing', 'completed', 'ai_checked', 'dish_approved'].includes(task.taskStatus) ? 'Meal is being cooked now !' : 'Meal is being prepared now !')}
@@ -519,7 +519,7 @@ export function EmployerDashboard({
               </div>
 
               <div className="flex-1">
-                <h4 className="text-[13px] font-bold text-app-text-title leading-snug">
+                <h4 className="text-[14px] font-bold text-app-text-title leading-snug">
                   {currentRecipe.title[lang]}
                 </h4>
               </div>
@@ -529,22 +529,22 @@ export function EmployerDashboard({
             <div className="grid grid-cols-2 gap-4 pt-1">
               
               <div className="flex flex-col gap-1">
-                <span className="text-[13px] font-bold text-app-text-muted uppercase tracking-wider">Preparation</span>
+                <span className="text-[14px] font-bold text-app-text-muted uppercase tracking-wider">Preparation</span>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 bg-[#EEEEEE] h-1.5 rounded-full overflow-hidden">
                     <div className={`h-full ${task.preCookFinishRate >= 100 ? 'bg-green-500' : 'bg-app-orange'}`} style={{ width: `${Math.min(100, task.preCookFinishRate)}%` }} />
                   </div>
-                  <span className={`text-[13px] font-bold font-mono ${task.preCookFinishRate >= 100 ? 'text-green-600' : 'text-app-text-title'}`}>{Math.min(100, task.preCookFinishRate)}%</span>
+                  <span className={`text-[14px] font-bold font-mono ${task.preCookFinishRate >= 100 ? 'text-green-600' : 'text-app-text-title'}`}>{Math.min(100, task.preCookFinishRate)}%</span>
                 </div>
               </div>
 
               <div className="flex flex-col gap-1">
-                <span className="text-[13px] font-bold text-app-text-muted uppercase tracking-wider">Cooking</span>
+                <span className="text-[14px] font-bold text-app-text-muted uppercase tracking-wider">Cooking</span>
                 <div className="flex items-center gap-2">
                   <div className="flex-1 bg-[#EEEEEE] h-1.5 rounded-full overflow-hidden">
                     <div className={`h-full ${task.cookFinishRate >= 100 ? 'bg-green-500' : 'bg-app-orange'}`} style={{ width: `${Math.min(100, task.cookFinishRate)}%` }} />
                   </div>
-                  <span className={`text-[13px] font-bold font-mono ${task.cookFinishRate >= 100 ? 'text-green-600' : 'text-app-text-title'}`}>{Math.min(100, task.cookFinishRate)}%</span>
+                  <span className={`text-[14px] font-bold font-mono ${task.cookFinishRate >= 100 ? 'text-green-600' : 'text-app-text-title'}`}>{Math.min(100, task.cookFinishRate)}%</span>
                 </div>
               </div>
 
@@ -552,10 +552,10 @@ export function EmployerDashboard({
 
             {/* Locking validation status message */}
             {/* Locking validation status message */}
-            <div className="flex flex-col w-full text-[15px] pt-3 border-t border-app-border text-app-text-muted">
+            <div className="flex flex-col w-full text-[16px] pt-3 border-t border-app-border text-app-text-muted">
               {(task as any).prepImageUrl && (
                 <div className="mb-4">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase mb-2">Preparation Photo</p>
+                  <p className="text-[11px] font-bold text-gray-500 uppercase mb-2">Preparation Photo</p>
                   <img 
                     src={(task as any).prepImageUrl} 
                     alt="Prep Photo" 
@@ -570,7 +570,7 @@ export function EmployerDashboard({
               )}
               {(task as any).cookImageUrl && (
                 <div className="mb-4">
-                  <p className="text-[10px] font-bold text-gray-500 uppercase mb-2">Final Dish Photo</p>
+                  <p className="text-[11px] font-bold text-gray-500 uppercase mb-2">Final Dish Photo</p>
                   <img 
                     src={(task as any).cookImageUrl} 
                     alt="Dish Photo" 
@@ -585,7 +585,7 @@ export function EmployerDashboard({
               )}
               {(task as any).aiFeedback && (
                 <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                   <p className="text-[10px] font-bold text-blue-800 uppercase mb-1">AI Plating Report</p>
+                   <p className="text-[11px] font-bold text-blue-800 uppercase mb-1">AI Plating Report</p>
                    <p className="text-xs text-blue-700 italic">"{(task as any).aiFeedback}"</p>
                 </div>
               )}
@@ -677,7 +677,7 @@ export function EmployerDashboard({
         ) : (
           /* Placeholder Blank State (二.4.1 空白占位) */
           <div className="bg-white border border-app-border rounded-[14px] py-10 px-6 text-center flex flex-col items-center gap-3">
-            <p className="text-[15px] font-bold text-app-text-title leading-snug">
+            <p className="text-[16px] font-bold text-app-text-title leading-snug">
               No ongoing cooking task
             </p>
           </div>
@@ -689,7 +689,7 @@ export function EmployerDashboard({
       {allTasks.filter(t => t.taskStatus === 'rated').length > 0 && (
         <section className="flex flex-col gap-3">
           <div className="flex justify-between items-center">
-            <span className="text-[15px] font-bold text-app-text-title uppercase tracking-wider">
+            <span className="text-[16px] font-bold text-app-text-title uppercase tracking-wider">
               Finished Task
             </span>
           </div>
@@ -709,14 +709,14 @@ export function EmployerDashboard({
                   </div>
                   <div className="flex flex-col flex-1">
                     <div className="flex justify-between items-start mb-1">
-                      <h3 className="text-[15px] font-bold text-gray-600 leading-tight line-clamp-1">
+                      <h3 className="text-[16px] font-bold text-gray-600 leading-tight line-clamp-1">
                         {fRecipe.title[lang] || fRecipe.title['en']}
                       </h3>
-                      <span className="bg-[#E2DDD5] text-[#444444] py-0.5 px-2 rounded-md text-[10px] font-bold shrink-0 shadow-sm border border-[#D5CDC4]">
+                      <span className="bg-[#E2DDD5] text-[#444444] py-0.5 px-2 rounded-md text-[11px] font-bold shrink-0 shadow-sm border border-[#D5CDC4]">
                         Finished
                       </span>
                     </div>
-                    <p className="text-[13px] text-gray-500">
+                    <p className="text-[14px] text-gray-500">
                       {fRecipe.subtitle?.[lang] || fRecipe.subtitle?.['en'] || fRecipe.description?.[lang] || fRecipe.description?.['en']}
                     </p>
                   </div>
@@ -732,12 +732,12 @@ export function EmployerDashboard({
         
         {/* Row Title */}
         <div className="flex justify-between items-baseline">
-          <h2 className="text-[15px] font-bold text-app-text-title">
+          <h2 className="text-[16px] font-bold text-app-text-title">
             Family Favorites
           </h2>
           <button
             onClick={() => onNavigate('recipe-planner')}
-            className="text-[13px] font-bold text-[#965020] hover:underline cursor-pointer"
+            className="text-[14px] font-bold text-[#965020] hover:underline cursor-pointer"
           >
             View All
           </button>
@@ -781,10 +781,10 @@ export function EmployerDashboard({
               </div>
 
               <div className="p-5 flex flex-col gap-1">
-                <h3 className="text-[15px] font-bold text-app-text-title">
+                <h3 className="text-[16px] font-bold text-app-text-title">
                   {item.title[lang] || item.title['en']}
                 </h3>
-                <p className="text-[13px] text-app-text-muted">
+                <p className="text-[14px] text-app-text-muted">
                   {recipeRemarks[item.id] || getDisplaySubtitle(item)}
                 </p>
               </div>
@@ -825,15 +825,15 @@ export function EmployerDashboard({
                 </div>
 
                 <div className="mt-4 flex flex-col gap-2">
-                  <h3 className="text-[13px] font-bold text-app-text-title leading-tight">
+                  <h3 className="text-[14px] font-bold text-app-text-title leading-tight">
                     {item.title[lang] || item.title['en']}
                   </h3>
-                  <p className="text-[13px] text-app-text-muted line-clamp-1">
+                  <p className="text-[14px] text-app-text-muted line-clamp-1">
                     {getDisplaySubtitle(item)}
                   </p>
                   
                   <div>
-                    <span className="bg-[#FAF8F5] text-[13px] text-app-text-muted py-1 px-2.5 rounded-[6px] border border-app-border">
+                    <span className="bg-[#FAF8F5] text-[14px] text-app-text-muted py-1 px-2.5 rounded-[6px] border border-app-border">
                       {item.tag}
                     </span>
                   </div>
@@ -872,15 +872,15 @@ export function EmployerDashboard({
                 </div>
 
                 <div className="mt-4 flex flex-col gap-2">
-                  <h3 className="text-[13px] font-bold text-app-text-title leading-tight">
+                  <h3 className="text-[14px] font-bold text-app-text-title leading-tight">
                     {item.title[lang] || item.title['en']}
                   </h3>
-                  <p className="text-[13px] text-app-text-muted line-clamp-1">
+                  <p className="text-[14px] text-app-text-muted line-clamp-1">
                     {getDisplaySubtitle(item)}
                   </p>
                   
                   <div>
-                    <span className="bg-[#FAF8F5] text-[13px] text-app-text-muted py-1 px-2.5 rounded-[6px] border border-app-border">
+                    <span className="bg-[#FAF8F5] text-[14px] text-app-text-muted py-1 px-2.5 rounded-[6px] border border-app-border">
                       {item.tag}
                     </span>
                   </div>
@@ -902,10 +902,10 @@ export function EmployerDashboard({
                   <ChefHat className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-[15px] font-bold text-app-text-title">
+                  <h3 className="text-[16px] font-bold text-app-text-title">
                     {item.title[lang] || item.title['en']}
                   </h3>
-                  <p className="text-[13px] text-app-text-muted">
+                  <p className="text-[14px] text-app-text-muted">
                     {getDisplaySubtitle(item)}
                   </p>
                 </div>
@@ -935,7 +935,7 @@ export function EmployerDashboard({
         {/* 5. Dotted/Dashed Button to Add New Favorite (Add New Favorite) */}
         <button
           onClick={() => setIsAddFavOpen(true)}
-          className="w-full h-16 border-2 border-dashed border-[#D2C8B5] hover:border-app-orange rounded-[14px] flex items-center justify-center gap-2 text-app-text-muted hover:text-black transition-all cursor-pointer font-bold font-sans text-[15px] mt-2 bg-white/50"
+          className="w-full h-16 border-2 border-dashed border-[#D2C8B5] hover:border-app-orange rounded-[14px] flex items-center justify-center gap-2 text-app-text-muted hover:text-black transition-all cursor-pointer font-bold font-sans text-[16px] mt-2 bg-white/50"
           id="btn-add-new-favorite"
         >
           <Plus className="w-5 h-5 text-app-text-muted" strokeWidth={2.5} />
@@ -982,7 +982,7 @@ export function EmployerDashboard({
                   {/* Editable Remark Field */}
                   <div className="mt-3 group">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-bold text-[#965020] uppercase tracking-wider flex items-center gap-1">
+                      <span className="text-[11px] font-bold text-[#965020] uppercase tracking-wider flex items-center gap-1">
                         <PenLine className="w-3 h-3" />
                         {lang === 'en' ? "Family's Remark / Note" : "Catatan Keluarga"}
                       </span>
@@ -992,7 +992,7 @@ export function EmployerDashboard({
                       value={recipeRemarks[activeDetailRecipe.id] || ''}
                       onChange={(e) => onUpdateRemark(activeDetailRecipe.id, e.target.value)}
                       placeholder={lang === 'en' ? "e.g. Kids love this, less salt..." : "misal: Suka anak-anak, kurangi garam..."}
-                      className="w-full bg-[#FCF9F2] border border-[#E6E1DC] rounded-[10px] py-2 px-3 text-[15px] text-[#444444] font-medium focus:outline-none focus:border-app-orange transition-all"
+                      className="w-full bg-[#FCF9F2] border border-[#E6E1DC] rounded-[10px] py-2 px-3 text-[16px] text-[#444444] font-medium focus:outline-none focus:border-app-orange transition-all"
                     />
                   </div>
                 </div>
@@ -1011,7 +1011,7 @@ export function EmployerDashboard({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-[#E6E1DC] mt-2 text-xs">
                   
                   <div className="flex flex-col gap-2">
-                    <span className="font-black uppercase tracking-widest text-[#965020] text-[10px] flex items-center gap-1.5">
+                    <span className="font-black uppercase tracking-widest text-[#965020] text-[11px] flex items-center gap-1.5">
                       <Info className="w-3.5 h-3.5" />
                       {lang === 'en' ? 'Ingredients List' : 'Kebutuhan Bahan'}
                     </span>
@@ -1023,7 +1023,7 @@ export function EmployerDashboard({
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <span className="font-black uppercase tracking-widest text-[#475569] text-[10px] flex items-center gap-1.5">
+                    <span className="font-black uppercase tracking-widest text-[#475569] text-[11px] flex items-center gap-1.5">
                       <Info className="w-3.5 h-3.5" />
                       {lang === 'en' ? 'Utensils List' : 'Peralatan Masak'}
                     </span>
@@ -1051,8 +1051,8 @@ export function EmployerDashboard({
               
               if (isDiabetic || isHypertensive || allergyList.length > 0) {
                 return (
-                  <div className="bg-[#FFF4E5] border border-orange-200 rounded-[24px] p-5 text-[15px] text-[#5C4D43] flex flex-col gap-3 shadow-sm shadow-orange-100">
-                    <div className="font-black flex items-center gap-2 text-[#965020] uppercase tracking-wider text-[10px]">
+                  <div className="bg-[#FFF4E5] border border-orange-200 rounded-[24px] p-5 text-[16px] text-[#5C4D43] flex flex-col gap-3 shadow-sm shadow-orange-100">
+                    <div className="font-black flex items-center gap-2 text-[#965020] uppercase tracking-wider text-[11px]">
                       <ShieldAlert className="w-4 h-4 shrink-0" />
                       <span>Smart Nutritional Adaptation</span>
                     </div>
@@ -1072,7 +1072,7 @@ export function EmployerDashboard({
               <div className="flex p-1 bg-[#E8E3DF]/60 backdrop-blur-md rounded-[18px] border border-[#D6CDC4] shadow-inner">
                 <button
                   onClick={() => setModalActiveTab('prep')}
-                  className={`flex-1 py-3 text-[10px] font-extrabold rounded-[14px] transition-all cursor-pointer ${
+                  className={`flex-1 py-3 text-[11px] font-extrabold rounded-[14px] transition-all cursor-pointer ${
                     modalActiveTab === 'prep' ? 'bg-[#965020] text-white shadow-lg' : 'text-[#5C4D43] hover:bg-black/5'
                   }`}
                 >
@@ -1080,7 +1080,7 @@ export function EmployerDashboard({
                 </button>
                 <button
                   onClick={() => setModalActiveTab('cook')}
-                  className={`flex-1 py-3 text-[10px] font-extrabold rounded-[14px] transition-all cursor-pointer ${
+                  className={`flex-1 py-3 text-[11px] font-extrabold rounded-[14px] transition-all cursor-pointer ${
                     modalActiveTab === 'cook' ? 'bg-[#965020] text-white shadow-lg' : 'text-[#5C4D43] hover:bg-black/5'
                   }`}
                 >
@@ -1088,7 +1088,7 @@ export function EmployerDashboard({
                 </button>
                 <button
                   onClick={() => setModalActiveTab('takeaways')}
-                  className={`flex-1 py-3 text-[10px] font-extrabold rounded-[14px] transition-all cursor-pointer ${
+                  className={`flex-1 py-3 text-[11px] font-extrabold rounded-[14px] transition-all cursor-pointer ${
                     modalActiveTab === 'takeaways' ? 'bg-[#965020] text-white shadow-lg' : 'text-[#5C4D43] hover:bg-black/5'
                   }`}
                 >
@@ -1114,7 +1114,7 @@ export function EmployerDashboard({
                     modalActiveTab === 'takeaways' ? (
                       <div key={idx} className="bg-white p-5 rounded-[22px] border border-[#E6E1DC] shadow-sm flex flex-col gap-2 relative">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-black text-[#965020] uppercase tracking-[0.15em] opacity-80">
+                          <span className="text-[11px] font-black text-[#965020] uppercase tracking-[0.15em] opacity-80">
                             {lang === 'en' ? "Chef's Secret Note" : lang === 'id' ? "Tips Rahasia Chef" : "Chef's Secret Note"} #{idx + 1}
                           </span>
                           <button
@@ -1124,7 +1124,7 @@ export function EmployerDashboard({
                             <Volume2 className="w-4 h-4 fill-current" />
                           </button>
                         </div>
-                        <p className="text-[15px] text-[#1E293B] leading-[1.6] font-medium font-sans">
+                        <p className="text-[16px] text-[#1E293B] leading-[1.6] font-medium font-sans">
                           {step.text[lang] || step.text['en']}
                         </p>
                       </div>
@@ -1136,7 +1136,7 @@ export function EmployerDashboard({
                             className="w-full h-full object-cover"
                             src={step.image || 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1280'}
                           />
-                          <div className="absolute top-3 left-3 bg-white w-10 h-10 rounded-lg shadow-sm flex items-center justify-center text-[15px] font-extrabold text-[#965020] leading-none">
+                          <div className="absolute top-3 left-3 bg-white w-10 h-10 rounded-lg shadow-sm flex items-center justify-center text-[16px] font-extrabold text-[#965020] leading-none">
                             {idx + 1}
                           </div>
                         </div>
@@ -1165,7 +1165,7 @@ export function EmployerDashboard({
             {/* Quick Assign Action Button */}
             <button
               onClick={() => handleQuickAssign(activeDetailRecipe.id)}
-              className="w-full py-5 bg-[#965020] text-white text-[13px] font-black rounded-[24px] shadow-xl hover:bg-[#804218] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer mt-4"
+              className="w-full py-5 bg-[#965020] text-white text-[14px] font-black rounded-[24px] shadow-xl hover:bg-[#804218] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer mt-4"
             >
               <ChefHat className="w-6 h-6" />
               <span>Assign to Your Helper</span>
@@ -1182,11 +1182,11 @@ export function EmployerDashboard({
             
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-[15px] font-bold text-[#965020] flex items-center gap-1.5">
+                <h3 className="text-[16px] font-bold text-[#965020] flex items-center gap-1.5">
                   <PlusCircle className="w-5 h-5 text-app-orange" />
                   <span>Add Custom Favorite</span>
                 </h3>
-                <p className="text-[13px] text-app-text-muted mt-0.5">
+                <p className="text-[14px] text-app-text-muted mt-0.5">
                   Save a personalized recipe for family member nutritional preferences.
                 </p>
               </div>
@@ -1203,49 +1203,49 @@ export function EmployerDashboard({
               
               {/* Recipe Title input */}
               <div className="flex flex-col gap-1">
-                <label className="text-[13px] font-bold text-app-text-muted uppercase">Recipe Name *</label>
+                <label className="text-[14px] font-bold text-app-text-muted uppercase">Recipe Name *</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Grandma's Braised Tofu"
-                  className="w-full bg-white border border-app-border p-3 rounded-[10px] text-[13px] text-app-text-title focus:outline-none focus:border-app-orange"
+                  className="w-full bg-white border border-app-border p-3 rounded-[10px] text-[14px] text-app-text-title focus:outline-none focus:border-app-orange"
                 />
               </div>
 
               {/* Subtitle / Note */}
               <div className="flex flex-col gap-1">
-                <label className="text-[13px] font-bold text-app-text-muted uppercase">Short description / description</label>
+                <label className="text-[14px] font-bold text-app-text-muted uppercase">Short description / description</label>
                 <input
                   type="text"
                   value={newSubtitle}
                   onChange={(e) => setNewSubtitle(e.target.value)}
                   placeholder="e.g. Super soft, diabetic-friendly low sodium item"
-                  className="w-full bg-white border border-app-border p-3 rounded-[10px] text-[13px] text-app-text-title focus:outline-none focus:border-app-orange"
+                  className="w-full bg-white border border-app-border p-3 rounded-[10px] text-[14px] text-app-text-title focus:outline-none focus:border-app-orange"
                 />
               </div>
 
               {/* Specific custom image URL input */}
               <div className="flex flex-col gap-1">
-                <label className="text-[13px] font-bold text-app-text-muted uppercase">Recipe Image URL (Optional)</label>
+                <label className="text-[14px] font-bold text-app-text-muted uppercase">Recipe Image URL (Optional)</label>
                 <input
                   type="text"
                   value={newImage}
                   onChange={(e) => setNewImage(e.target.value)}
                   placeholder="Paste Unsplash URL or leave empty for default cooking board"
-                  className="w-full bg-white border border-app-border p-3 rounded-[10px] text-[13px] text-app-text-title focus:outline-none focus:border-app-orange"
+                  className="w-full bg-white border border-app-border p-3 rounded-[10px] text-[14px] text-app-text-title focus:outline-none focus:border-app-orange"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 {/* Category */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-bold text-app-text-muted uppercase font-sans">Category</label>
+                  <label className="text-[14px] font-bold text-app-text-muted uppercase font-sans">Category</label>
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-full bg-white border border-app-border p-2.5 rounded-[10px] text-[15px] text-app-text-title focus:outline-none focus:border-app-orange"
+                    className="w-full bg-white border border-app-border p-2.5 rounded-[10px] text-[16px] text-app-text-title focus:outline-none focus:border-app-orange"
                   >
                     <option value="HK Home Style">HK Style</option>
                     <option value="Soups">Soups</option>
@@ -1255,11 +1255,11 @@ export function EmployerDashboard({
 
                 {/* Tag */}
                 <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-bold text-app-text-muted uppercase font-sans">Tag / Preference</label>
+                  <label className="text-[14px] font-bold text-app-text-muted uppercase font-sans">Tag / Preference</label>
                   <select
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
-                    className="w-full bg-white border border-app-border p-2.5 rounded-[10px] text-[15px] text-app-text-title focus:outline-none focus:border-app-orange"
+                    className="w-full bg-white border border-app-border p-2.5 rounded-[10px] text-[16px] text-app-text-title focus:outline-none focus:border-app-orange"
                   >
                     <option value="Low Sugar">Low Sugar</option>
                     <option value="Low Sodium">Low Sodium</option>
@@ -1271,29 +1271,29 @@ export function EmployerDashboard({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-bold text-app-text-muted uppercase font-sans">Estimated Calories</label>
+                  <label className="text-[14px] font-bold text-app-text-muted uppercase font-sans">Estimated Calories</label>
                   <input
                     type="number"
                     value={newCals}
                     onChange={(e) => setNewCals(e.target.value)}
                     placeholder="250"
-                    className="w-full bg-white border border-app-border p-2.5 rounded-[10px] text-[15px] focus:outline-none focus:border-app-orange"
+                    className="w-full bg-white border border-app-border p-2.5 rounded-[10px] text-[16px] focus:outline-none focus:border-app-orange"
                   />
                 </div>
-                <div className="flex flex-col gap-1 justify-end pb-1 text-[13px] text-app-text-muted">
+                <div className="flex flex-col gap-1 justify-end pb-1 text-[14px] text-app-text-muted">
                   <span>Optional. Displayed as a nutritional reference metric.</span>
                 </div>
               </div>
 
               {/* Ingredients list */}
               <div className="flex flex-col gap-1">
-                <label className="text-[13px] font-bold text-app-text-muted uppercase">Ingredients (comma separated)</label>
+                <label className="text-[14px] font-bold text-app-text-muted uppercase">Ingredients (comma separated)</label>
                 <textarea
                   value={newIngs}
                   onChange={(e) => setNewIngs(e.target.value)}
                   placeholder="300g Silken Tofu, 2 garlic cloves, 1 tbsp light soy sauce, green onions"
                   rows={2}
-                  className="w-full bg-white border border-app-border p-3 rounded-[10px] text-[15px] focus:outline-none focus:border-app-orange"
+                  className="w-full bg-white border border-app-border p-3 rounded-[10px] text-[16px] focus:outline-none focus:border-app-orange"
                 />
               </div>
 
@@ -1324,7 +1324,7 @@ export function EmployerDashboard({
           </div>
           
           <div className="max-w-4xl w-full flex flex-col gap-4">
-            <h3 className="text-white text-[13px] font-bold text-center mb-2">{modalTitle}</h3>
+            <h3 className="text-white text-[14px] font-bold text-center mb-2">{modalTitle}</h3>
             <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
               <img 
                 src={modalImage} 

@@ -189,11 +189,11 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
       
       {/* Greetings Title Segment (Double line, 8px gap) */}
       <section className="flex flex-col gap-2 mt-2">
-        <h1 className="text-[30px] md:text-[32px] font-bold text-app-text-title leading-tight tracking-tight flex items-baseline gap-2">
+        <h1 className="text-[32px] md:text-[34px] font-bold text-app-text-title leading-tight tracking-tight flex items-baseline gap-2">
           {displayGreeting}
           {/* Removed debug tag */}
         </h1>
-        <p className="text-[13px] font-normal text-app-text-muted leading-relaxed">
+        <p className="text-[14px] font-normal text-app-text-muted leading-relaxed">
           {labels.subtitle}
         </p>
       </section>
@@ -205,7 +205,7 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
             <ShieldAlert className="w-5 h-5" />
             <span>{lang === 'en' ? 'Task Rejected' : 'Tugas Ditolak'}</span>
           </div>
-          <p className="text-red-700 text-[13px]">
+          <p className="text-red-700 text-[14px]">
             {lang === 'en' 
               ? 'The employer has rejected the current progress. Please restart the preparation and cooking stages as requested.' 
               : 'Majikan telah menolak progres saat ini. Silakan ulangi tahap persiapan dan memasak sesuai permintaan.'}
@@ -222,7 +222,7 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
             
             {/* Top row: tags and tableware */}
             <div className="flex justify-between items-center">
-              <span className="bg-app-tag-blue text-[#444444] rounded-[14px] px-4 py-1 text-[13px] font-normal">
+              <span className="bg-app-tag-blue text-[#444444] rounded-[14px] px-4 py-1 text-[14px] font-normal">
                 {labels.todayMeal}
               </span>
               <div className="flex items-center gap-2">
@@ -242,14 +242,14 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
             </div>
 
             {/* Dish Title (34px Bold) */}
-            <h2 className="text-[26px] font-bold text-app-text-title leading-tight">
+            <h2 className="text-[28px] font-bold text-app-text-title leading-tight">
               {currentDetails.title}
             </h2>
 
             {/* Progress Row Container */}
             <div className="flex flex-col gap-2.5">
               <div className="flex justify-between items-baseline">
-                <span className="text-[15px] font-normal text-app-text-title">
+                <span className="text-[16px] font-normal text-app-text-title">
                   {task.taskStatus === 'pre_cook_completed' 
                     ? (lang === 'en' ? 'Preparation completed and pending for evaluation' : 'Persiapan selesai dan menunggu evaluasi')
                     : task.taskStatus === 'completed'
@@ -258,7 +258,7 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
                     ? (lang === 'en' ? 'Preparation and Cooking Completed' : 'Persiapan dan Memasak Selesai')
                     : labels.progressLabel}
                 </span>
-                <span className={`font-bold text-[15px] font-mono ${(localProgress === 100 || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'completed') ? 'text-green-600' : 'text-app-orange'}`}>
+                <span className={`font-bold text-[16px] font-mono ${(localProgress === 100 || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'completed') ? 'text-green-600' : 'text-app-orange'}`}>
                   {localProgress}%
                 </span>
               </div>
@@ -286,7 +286,7 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
               }
             }}
             disabled={isPrepping || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed'}
-            className={`w-full h-[88px] transition-all rounded-[14px] flex items-center justify-center gap-3.5 shadow-sm text-[15px] font-bold text-[#444444] cursor-pointer disabled:opacity-80 ${(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? 'bg-gray-200' : 'bg-app-orange hover:bg-orange-400 active:scale-[0.98]'}`}
+            className={`w-full h-[88px] transition-all rounded-[14px] flex items-center justify-center gap-3.5 shadow-sm text-[16px] font-bold text-[#444444] cursor-pointer disabled:opacity-80 ${(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? 'bg-gray-200' : 'bg-app-orange hover:bg-orange-400 active:scale-[0.98]'}`}
           >
             {(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? (
               <span>{lang === 'en' ? 'WAITING FOR APPROVAL' : 'MENUNGGU PERSETUJUAN'}</span>
@@ -309,10 +309,10 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
         /* Empty State */
         <div className="bg-white border border-app-border rounded-[14px] py-12 px-6 text-center flex flex-col items-center justify-center gap-4 mt-[50px] shadow-sm">
           <ChefHat className="w-16 h-16 text-gray-300 stroke-1" />
-          <h2 className="text-[13px] font-bold text-app-text-title leading-snug">
+          <h2 className="text-[14px] font-bold text-app-text-title leading-snug">
             {labels.noTaskTitle}
           </h2>
-          <p className="text-[15px] text-app-text-muted leading-relaxed max-w-[280px]">
+          <p className="text-[16px] text-app-text-muted leading-relaxed max-w-[280px]">
             {labels.noTaskDesc}
           </p>
         </div>

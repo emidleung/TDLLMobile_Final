@@ -59,9 +59,9 @@ export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmploy
           {lang === 'en' ? 'Final Dish Submission' : 'Penyerahan Hidangan Akhir'}
         </h1>
         <p className="font-body-lg text-body-lg text-on-surface-variant">
-          {lang === 'en'
-            ? 'Submit the photo for the employer to check and confirm the dish!'
-            : 'Kirimkan foto agar majikan dapat memeriksa dan mengonfirmasi hidangan!'}
+          {lang === 'en' 
+            ? 'Submit the photo for employer\'s checking.' 
+            : 'Kirimkan foto untuk diperiksa oleh atasan.'}
         </p>
       </section>
 
