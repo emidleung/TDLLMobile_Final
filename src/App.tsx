@@ -63,7 +63,7 @@ export default function App() {
 
   // Initialize AI Logic
   const ai = getAI(auth.app, { backend: new GoogleAIBackend() });
-  const aiModel = getGenerativeModel(ai, { model: "gemini-2.5-flash-lite" });
+  const aiModel = getGenerativeModel(ai, { model: "gemini-1.5-flash" });
 
   // Trigger one-time seeding for trial experience
   useEffect(() => {
@@ -158,11 +158,11 @@ export default function App() {
       preSteps.unshift({
         id: 0,
         text: {
-          en: `[ALLERGY WARNING] Clean and sanitize all workstations. Ensure zero contact with: ${allergyListStr}.`,
-          id: `[PERINGATAN ALERGI] Bersihkan talenan. Pastikan tidak ada kontak dengan: ${allergyListStr}.`,
-          tg: `[BABALA SA ALERHIYA] Linisin ang workstation. Siguraduhing walang contact sa: ${allergyListStr}.`
+          en: `[ALLERGY WARNING] Clean and sanitize all workstations.`,
+          id: `[PERINGATAN ALERGI] Bersihkan dan sanitasi semua area kerja.`,
+          tg: `[ALLERGY WARNING] Linisin at i-sanitize ang lahat ng mga workstation.`
         },
-        image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTgL9HdVqVTd3rN0858gr-CmnbshY3FPcXbFW0VDaNxi-kzx3o9QJll0A5QG2gHHhUj0gJ91mycpQ-Gm1BQ8C9vF9IF81Aj0_A6tYTQ5GKYsUhev0hIBubciUhOqvHbGKqLKVqZxDbGbaROBnp6iFFGbzQHET6lQMfqPZh2i-FTJamZN8FWyuKhU4AWwn-LifMfbAIuSiVWQe-ZrshNq6eeFK86RoB6epwXGClCOC67kE9qWZzdK_oXFpyoAJleJOZuAWzDxRA6g'
+        image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=2070&auto=format&fit=crop'
       });
     }
 
@@ -637,8 +637,9 @@ Respond ONLY with a valid JSON object:
       const aiData = JSON.parse(text.replace(/```json|```/g, ''));
       
       const updateData = {
-        taskStatus: aiData.rating === 'Pass' ? 'completed' : 'cooking_ongoing',
+        aiResult: aiData.rating,
         aiFeedback: aiData.explanation,
+        taskStatus: aiData.rating === 'Pass' ? 'ai_checked' : 'cooking_ongoing',
         aiCheckTime: new Date().toISOString()
       };
 
@@ -647,6 +648,16 @@ Respond ONLY with a valid JSON object:
     } catch (err) {
       console.error("Gemini AI check failed:", err);
       return null;
+    }
+  };
+
+  const handleSubmitToEmployer = async (taskId: string) => {
+    try {
+      await updateDoc(doc(db, "tasks", taskId), {
+        taskStatus: 'completed'
+      });
+    } catch (err) {
+      console.error("Submit to employer failed:", err);
     }
   };
 
@@ -951,6 +962,7 @@ Respond ONLY with a valid JSON object:
                   task={activeTask}
                   lang={lang}
                   onSubmitAICheck={handleSubmitAICheck}
+                onSubmitToEmployer={() => handleSubmitToEmployer(activeTask.taskID)}
                   onNavigate={setCurrentView}
                 />
               )}

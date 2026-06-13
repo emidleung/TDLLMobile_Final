@@ -590,33 +590,23 @@ export function EmployerDashboard({
                     </button>
                   </div>
                 </div>
-              ) : task.taskStatus === 'completed' ? (
-                <button
-                  onClick={() => onNavigate('upload-check')}
-                  className="w-full py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <Sparkles className="w-4 h-4 fill-current text-[#444444]" />
-                  <span>Execute AI Verification</span>
-                </button>
-              ) : task.taskStatus === 'ai_checked' ? (
-                <div className="flex flex-col gap-3 w-full">
-                  <div className="bg-[#98E89C]/20 border border-[#98E89C] rounded-[10px] p-2 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-green-700" />
-                    <span className="text-sm font-bold text-green-800">Action Required: Review Final Dish</span>
+              ) : task.taskStatus === 'completed' || task.taskStatus === 'ai_checked' ? (
+                <div className="w-full flex flex-col gap-3">
+                  <div className="flex gap-2 items-center bg-green-50 p-2 rounded-lg text-green-700 border border-green-200">
+                    <Sparkles className="w-5 h-5 shrink-0" />
+                    <span className="font-bold text-sm">Action Required: Final Dish Review</span>
                   </div>
-                  {task.cookImageUrl && (
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[12px] font-bold text-app-text-muted uppercase">Final Dish Snapshot:</span>
-                      <img 
-                        src={task.cookImageUrl} 
-                        alt="Final Dish" 
-                        className="w-full h-40 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90" 
-                        onClick={() => {
-                          setModalImage(task.cookImageUrl!);
-                          setModalTitle('Final Dish Submission');
-                          setShowImageModal(true);
-                        }}
-                      />
+                  {(task as any).cookImageUrl && (
+                    <img src={(task as any).cookImageUrl} alt="Dish Photo" className="w-full h-32 object-cover rounded-lg border border-gray-200 cursor-pointer" onClick={() => {
+                        setModalImage((task as any).cookImageUrl!);
+                        setModalTitle('Final Dish Submission');
+                        setShowImageModal(true);
+                    }} />
+                  )}
+                  { (task as any).aiFeedback && (
+                    <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                       <p className="text-[11px] font-bold text-blue-800 uppercase mb-1">AI Plating Report</p>
+                       <p className="text-xs text-blue-700 italic">"{(task as any).aiFeedback}"</p>
                     </div>
                   )}
                   <div className="flex gap-2">
@@ -629,20 +619,18 @@ export function EmployerDashboard({
                       className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <CheckSquare className="w-4 h-4" />
-                      <span>Approve (OK)</span>
+                      <span>Approve Dish</span>
                     </button>
                     <button
                       onClick={() => {
-                        if (confirm('Are you sure you want to reject this dish? The helper will need to redo it.')) {
-                          if (onReviewDish) {
-                            onReviewDish(task.taskID, false);
-                          }
+                        if (onReviewDish) {
+                          onReviewDish(task.taskID, false);
                         }
                       }}
                       className="flex-1 py-2 px-3 bg-gray-200 font-bold text-gray-700 rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer border border-gray-300"
                     >
                       <X className="w-4 h-4" />
-                      <span>Reject (Redo)</span>
+                      <span>Reject</span>
                     </button>
                   </div>
                 </div>

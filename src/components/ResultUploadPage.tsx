@@ -6,13 +6,14 @@ interface ResultUploadPageProps {
   task: Task;
   lang: Language;
   onSubmitAICheck: (imageUrl: string) => Promise<any>;
+  onSubmitToEmployer: () => void;
   onNavigate: (view: string) => void;
 }
 
 import confetti from 'canvas-confetti';
 
 
-export function ResultUploadPage({ task, lang, onSubmitAICheck, onNavigate }: ResultUploadPageProps) {
+export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmployer, onNavigate }: ResultUploadPageProps) {
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [aiReport, setAiReport] = useState<{ aiResult: 'pass' | 'minor_defect'; feedback: string } | null>(null);
@@ -197,9 +198,12 @@ export function ResultUploadPage({ task, lang, onSubmitAICheck, onNavigate }: Re
       {/* Form submit lock and navigation */}
       <div className="pt-4 flex justify-center border-t border-surface-variant mt-2">
         <button
-          onClick={() => onNavigate('dashboard')}
-          disabled={!aiReport}
-          className="w-full max-w-md h-[56px] bg-primary text-on-primary font-headline-sm rounded-xl py-3.5 font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer disabled:bg-surface-variant/40 disabled:text-on-surface-variant/40 disabled:cursor-not-allowed"
+          onClick={() => {
+            onSubmitToEmployer();
+            onNavigate('dashboard');
+          }}
+          disabled={!aiReport || aiReport.aiResult !== 'pass'}
+          className="w-full max-w-md h-[56px] bg-[#965020] text-white font-headline-sm rounded-xl py-3.5 font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
         >
           <Send className="w-5 h-5" />
           <span>{lang === 'en' ? 'Submit to Employer' : 'Kirim Laporan Selesai'}</span>

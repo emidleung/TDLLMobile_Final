@@ -312,7 +312,7 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
             ) : task.taskStatus === 'pre_cook_completed' && task.prepImageUrl ? (
               <div className="bg-[#F8F6F4] rounded-xl border border-[#E6E1DC] p-8 flex flex-col items-center justify-center text-center gap-2 shadow-inner mt-2">
                 <Clock className="w-10 h-10 text-[#C4B5A5] mb-1" strokeWidth={2.5} />
-                <h3 className="text-[20px] font-bold text-[#8C7D70]">Waiting for Approval</h3>
+                <h3 className="text-[20px] font-bold text-[#8C7D70]">Awaiting Prep Approval</h3>
                 <p className="text-[14px] text-[#A89885] max-w-[220px] leading-relaxed mt-1">
                   Waiting for employer to approve the preparation.
                 </p>
@@ -453,7 +453,7 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
         {/* Global Return to Dashboard Button */}
         <button
           onClick={() => onNavigate('dashboard')}
-          className="w-full py-6 bg-pink-500 text-white font-black rounded-2xl shadow-2xl hover:bg-pink-600 flex items-center justify-center gap-2 transition-all cursor-pointer border-4 border-white"
+          className="w-full py-4 mt-6 bg-[#965020] text-white rounded-2xl font-bold text-[17px] shadow-lg flex items-center justify-center gap-2 hover:bg-[#7a4018] transition-all cursor-pointer active:scale-95 border-b-4 border-[#5c3114]"
         >
           <ArrowLeft className="w-6 h-6" />
           {lang === 'en' ? 'Return to Dashboard' : lang === 'id' ? 'Kembali ke Beranda' : 'Bumalik sa Dashboard'}
