@@ -162,7 +162,7 @@ export default function App() {
           id: `[PERINGATAN ALERGI] Bersihkan dan sanitasi semua area kerja.`,
           tg: `[ALLERGY WARNING] Linisin at i-sanitize ang lahat ng mga workstation.`
         },
-        image: '/step1.jpg'
+        image: '/step1.png'
       });
     }
 
