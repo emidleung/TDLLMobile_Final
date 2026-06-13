@@ -339,7 +339,17 @@ export function EmployerDashboard({
     };
   };
 
-  const currentRecipe = task ? recipes.find(r => r.recipeID === task.recipeID) : null;
+  const currentRecipe = task ? (recipes.find(r => r.recipeID === task.recipeID) || {
+    recipeID: task.recipeID,
+    title: { en: 'Active Cooking Task', id: 'Tugas Memasak Aktif', tg: 'Active Cooking Task' },
+    description: { en: 'Custom assigned meal', id: 'Masakan yang ditugaskan', tg: 'Custom assigned meal' },
+    preCookSteps: [],
+    cookSteps: [],
+    materialList: [],
+    toolList: [],
+    category: 'Custom',
+    tags: []
+  }) : null;
   const greeting = getGreetingData();
 
   // Highlight specific badge matching taskStatus

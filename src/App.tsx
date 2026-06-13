@@ -311,19 +311,20 @@ export default function App() {
         }
       });
       setConnections(firestoreConns);
-      if (firestoreConns.length > 0) {
+      if (firestoreConns.length > 0 && currentUserId) {
         const firstConn = firestoreConns[0];
-        setConnectedPartnerId(firstConn.employerID === currentUserId ? firstConn.helperID : firstConn.employerID);
-        setRole(firstConn.employerID === currentUserId ? 'employer' : 'helper');
+        const isEmployer = firstConn.employerID === currentUserId;
+        setConnectedPartnerId(isEmployer ? firstConn.helperID : firstConn.employerID);
+        setRole(isEmployer ? 'employer' : 'helper');
       }
     });
 
-    // Tasks Listener
     const qTasks = query(collection(db, "tasks"), orderBy("createTime", "desc"));
     const unsubscribeTasks = onSnapshot(qTasks, (snapshot) => {
       const firestoreTasks: Task[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
+        // Crucial: Filter by currentUserId for privacy and correct dashboard display
         if (data.employerID === currentUserId || data.helperID === currentUserId || !currentUserId) {
           const adjustment = adjustRecipeForHealth(data.recipeID, healthProfiles);
           firestoreTasks.push({
@@ -331,15 +332,23 @@ export default function App() {
             ...data,
             adjustedPreSteps: adjustment?.preSteps || [],
             adjustedCookSteps: adjustment?.cookSteps || [],
-            createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : data.createTime
+            // Handle pending server timestamps (null on local update)
+            createTime: data.createTime instanceof Timestamp 
+              ? data.createTime.toDate().toISOString() 
+              : (data.createTime ? data.createTime : new Date().toISOString())
           } as Task);
         }
       });
-      if (firestoreTasks.length > 0) {
-        setAllTasks(firestoreTasks);
-        const latestActive = firestoreTasks.find(t => t.taskStatus !== 'rated');
-        setActiveTask(latestActive || null);
-      }
+
+      // Update state for all tasks
+      setAllTasks(firestoreTasks);
+
+      // Robust Active Task Selection:
+      // We want the most recent task that is NOT fully completed (rated)
+      // Since qTasks is ordered by createTime desc, index 0 is usually the one,
+      // but we filter specifically for the latest non-rated task.
+      const active = firestoreTasks.find(t => t.taskStatus !== 'rated');
+      setActiveTask(active || null);
     });
 
     // Family Members Listener
@@ -774,7 +783,18 @@ export default function App() {
     handleSelectLang(sequence[nextIdx]);
   };
 
-  const activeRecipe = activeTask ? recipes.find(r => r.recipeID === activeTask.recipeID) : null;
+  // Safe recipe lookup that handles missing or custom recipes gracefully
+  const activeRecipe = activeTask ? (recipes.find(r => r.recipeID === activeTask.recipeID) || {
+    recipeID: activeTask.recipeID,
+    title: { en: 'Active Cooking Task', id: 'Tugas Memasak Aktif', tg: 'Active Cooking Task' },
+    description: { en: 'Custom assigned meal', id: 'Masakan yang ditugaskan', tg: 'Custom assigned meal' },
+    preCookSteps: [],
+    cookSteps: [],
+    materialList: [],
+    toolList: [],
+    category: 'Custom',
+    tags: []
+  }) : null;
 
   // Active state logic for bottom navigations
   const isTabActive = (tab: 'today' | 'recipes' | 'chat' | 'settings') => {
