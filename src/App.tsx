@@ -214,29 +214,7 @@ export default function App() {
       .then(setHealthProfiles)
       .catch((e) => console.warn('fetch error (profiles)', e));
 
-    // 3. Fetch active cooking tasks
-    fetch('/api/tasks')
-      .then(res => handleJsonResponse(res, []))
-      .then(data => {
-        if (data && data.length > 0) {
-          setAllTasks(data);
-          // Active task is the latest task that is not 'rated'
-          const latestActive = [...data].reverse().find(t => t.taskStatus !== 'rated');
-          setActiveTask(latestActive || null);
-        } else {
-          setAllTasks([]);
-          setActiveTask(null);
-        }
-      })
-      .catch((e) => console.warn('fetch error (tasks)', e));
-
-    // 4. Fetch chats
-    fetch('/api/chats')
-      .then(res => handleJsonResponse(res, []))
-      .then(setChats)
-      .catch((e) => console.warn('fetch error (chats)', e));
-
-    // 5. Fetch reviews list
+    // 3. Fetch reviews list
     fetch('/api/reviews')
       .then(res => handleJsonResponse(res, []))
       .then(setReviews)
@@ -255,17 +233,19 @@ export default function App() {
 
   // REAL-TIME FIRESTORE CHAT SYNC
   useEffect(() => {
-    const q = query(collection(db, "chats"), orderBy("createTime", "asc"));
+    const q = query(collection(db, "chats"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const firestoreChats: ChatMessage[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
         firestoreChats.push({
           ...data,
-          createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : data.createTime
+          createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : (data.createTime || new Date().toISOString())
         } as ChatMessage);
       });
-      if (firestoreChats.length > 0) setChats(firestoreChats);
+      // Sort in client to handle pending timestamps correctly
+      firestoreChats.sort((a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime());
+      setChats(firestoreChats);
     }, (error) => console.warn("Firestore Chat Listener failed:", error));
 
     return () => unsubscribe();

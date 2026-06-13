@@ -28,7 +28,7 @@ const GREETINGS = {
     nextStepLocked: 'Next Step Locked',
     nextStepCook: 'Next Step: Cook',
     noTaskTitle: 'No assigned menu today',
-    noTaskDesc: 'Please wait for your employer Sarah to plan and publish of meal roadmap.',
+    noTaskDesc: 'Please wait for your employer to plan and publish meal roadmap.',
     finishedTask: 'Finished task',
     finished: 'Finished',
   },
