@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Play, ArrowLeft, ArrowRight, Lock, Sparkles, MessageSquare, Volume2, Mic, CheckCircle, Clock, UtensilsCrossed, Check, CloudUpload } from 'lucide-react';
 import { Task, Language, RecipeStep, Recipe } from '../types';
+import { RECIPES } from '../recipesData';
 
 interface TaskExecutionPageProps {
   task: Task;
@@ -11,7 +12,10 @@ interface TaskExecutionPageProps {
   onRefreshData: () => void;
 }
 
-export function TaskExecutionPage({ task, recipe, lang, onConfirmStep, onNavigate, onRefreshData }: TaskExecutionPageProps) {
+export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmStep, onNavigate, onRefreshData }: TaskExecutionPageProps) {
+  // Robustness: find the recipe if not provided as prop
+  const recipe = propRecipe || RECIPES.find(r => r.recipeID === task.recipeID);
+  
   const [activeTab, setActiveTab] = useState<'pre' | 'cook'>('pre');
   const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
   const [showOverview, setShowOverview] = useState<boolean>(task.currentPreStepIndex === 0 && task.preCookFinishRate === 0);
@@ -449,14 +453,20 @@ export function TaskExecutionPage({ task, recipe, lang, onConfirmStep, onNavigat
         )}
       </div>
 
-      <div className="px-4">
+      {/* MASSIVE spacer to force it down */}
+      <div className="h-64 bg-red-100 flex items-center justify-center text-red-500 font-bold">
+        SPACE ENFORCER (h-64)
+      </div>
+
+      <div className="px-4 mb-20">
         {/* Global Return to Dashboard Button */}
         <button
           onClick={() => onNavigate('dashboard')}
-          className="w-full py-3 bg-white border border-[#D6CDC4] text-[#5C4D43] font-bold rounded-xl shadow-sm hover:bg-[#F0EBE6] flex items-center justify-center gap-2 transition-all cursor-pointer"
+          className="w-full py-6 bg-pink-500 text-white font-black rounded-2xl shadow-2xl hover:bg-pink-600 flex items-center justify-center gap-2 transition-all cursor-pointer border-4 border-white"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-6 h-6" />
           {lang === 'en' ? 'Return to Dashboard' : lang === 'id' ? 'Kembali ke Beranda' : 'Bumalik sa Dashboard'}
+          <span className="bg-white text-pink-500 px-2 py-0.5 rounded text-[10px] ml-2">V3-PINK-LOWER</span>
         </button>
       </div>
 

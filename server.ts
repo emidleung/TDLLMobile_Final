@@ -51,28 +51,28 @@ let chats: ChatMessage[] = [
     senderRole: 'helper',
     message: "I have just uploaded the photo of the prepped sea bass. Please take a look when you have a moment!",
     createTime: new Date(Date.now() - 600000).toISOString(), // 10m ago
-    isRead: false
+    isRead: true
   },
   {
     taskID: 'task-1',
     senderRole: 'employer',
     message: "Hi helper, check this message too.",
     createTime: new Date(Date.now() - 300000).toISOString(),
-    isRead: false
+    isRead: true
   },
   {
     taskID: 'chat_employer-1',
     senderRole: 'helper',
     message: "Master, I have prepped the ingredients as requested.",
     createTime: new Date(Date.now() - 400000).toISOString(),
-    isRead: false
+    isRead: true
   },
   {
     taskID: 'chat_66924319',
     senderRole: 'helper',
     message: "Ready to cook!",
     createTime: new Date(Date.now() - 500000).toISOString(),
-    isRead: false
+    isRead: true
   }
 ];
 
@@ -85,30 +85,7 @@ let reviews: Review[] = [
     createTime: new Date(Date.now() - 86400000).toISOString() // 1 day ago
   }
 ];
-
-let invitations: Invitation[] = [
-  {
-    invitationID: 'inv-1',
-    senderID: 'helper-2',
-    receiverID: 'employer-1',
-    status: 'pending',
-    createTime: new Date().toISOString()
-  },
-  {
-    invitationID: 'inv-2',
-    senderID: 'helper-2',
-    receiverID: '66924319',
-    status: 'pending',
-    createTime: new Date().toISOString()
-  },
-  {
-    invitationID: 'inv-3',
-    senderID: 'employer-1',
-    receiverID: 'helper-1',
-    status: 'pending',
-    createTime: new Date().toISOString()
-  }
-];
+let invitations: Invitation[] = [];
 let connections: Connection[] = [
   { connectionID: 'conn-1', employerID: 'employer-1', helperID: 'helper-1', createTime: new Date().toISOString() }
 ];
@@ -360,6 +337,30 @@ async function startServer() {
     res.json(task);
   });
 
+  // Employer reviews the final dish
+  app.post('/api/tasks/:id/review-dish', (req, res) => {
+    const task = tasks.find(t => t.taskID === req.params.id);
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+
+    const { isApproved } = req.body;
+    if (isApproved) {
+      task.taskStatus = 'dish_approved';
+    } else {
+      task.taskStatus = 'dish_rejected';
+      // Reset everything for full redo
+      task.taskStatus = 'prep_rejected'; 
+      task.preCookFinishRate = 0;
+      task.cookFinishRate = 0;
+      task.currentPreStepIndex = 0;
+      task.currentCookStepIndex = 0;
+      task.prepImageUrl = undefined;
+      task.cookImageUrl = undefined;
+      aiResults = aiResults.filter(r => r.taskID !== task.taskID);
+    }
+    
+    res.json(task);
+  });
+
   // Final dish rejection (after AI check)
   app.post('/api/tasks/:id/reject-dish', (req, res) => {
     const task = tasks.find(t => t.taskID === req.params.id);
@@ -446,6 +447,14 @@ async function startServer() {
     task.currentCookStepIndex = 0;
     aiResults = aiResults.filter(r => r.taskID !== task.taskID);
     res.json(task);
+  });
+
+  // Delete Task
+  app.delete('/api/tasks/:id', (req, res) => {
+    const taskId = req.params.id;
+    tasks = tasks.filter(t => t.taskID !== taskId);
+    aiResults = aiResults.filter(r => r.taskID !== taskId);
+    res.json({ success: true });
   });
 
   // API 5: Chats with task scoping

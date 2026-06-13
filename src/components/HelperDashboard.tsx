@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChefHat, ShoppingBasket, Lock, Unlock, UtensilsCrossed, ArrowRight, ShieldAlert } from 'lucide-react';
+import { ChefHat, ShoppingBasket, Lock, Unlock, UtensilsCrossed, ArrowRight, ShieldAlert, Trash } from 'lucide-react';
 import { Task, Language, Recipe } from '../types';
 
 interface HelperDashboardProps {
@@ -10,6 +10,7 @@ interface HelperDashboardProps {
   onConfirmStep?: (type: 'pre' | 'cook', stepID: number, isFinish: boolean) => void;
   userFullName?: string | null;
   onRefreshData: () => void;
+  onDeleteTask: (taskId: string) => void;
 }
 
 // Translations for Today view elements based on language preferences
@@ -102,7 +103,7 @@ function getRecipeDetails(recipeID: string, lang: Language, def: typeof GREETING
   }
 }
 
-export function HelperDashboard({ task, recipes, lang, onNavigate, onConfirmStep, userFullName, onRefreshData }: HelperDashboardProps) {
+export function HelperDashboard({ task, recipes, lang, onNavigate, onConfirmStep, userFullName, onRefreshData, onDeleteTask }: HelperDashboardProps) {
   const currentRecipe = task ? recipes.find(r => r.recipeID === task.recipeID) : null;
   const labels = GREETINGS[lang] || GREETINGS.en;
 
@@ -145,9 +146,9 @@ export function HelperDashboard({ task, recipes, lang, onNavigate, onConfirmStep
         setLocalProgress(50);
       } else if (task.taskStatus === 'prep_approved' || task.taskStatus === 'cooking_ongoing') {
         setLocalProgress(50 + Math.round(task.cookFinishRate / 2));
-      } else if (task.taskStatus === 'completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'rated') {
+      } else if (task.taskStatus === 'completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'dish_approved' || task.taskStatus === 'rated') {
         setLocalProgress(100);
-      } else if (task.taskStatus === 'prep_rejected') {
+      } else if (task.taskStatus === 'prep_rejected' || task.taskStatus === 'dish_rejected') {
         setLocalProgress(0);
       }
     }
@@ -168,8 +169,9 @@ export function HelperDashboard({ task, recipes, lang, onNavigate, onConfirmStep
       
       {/* Greetings Title Segment (Double line, 8px gap) */}
       <section className="flex flex-col gap-2 mt-2">
-        <h1 className="text-[38px] md:text-[40px] font-bold text-app-text-title leading-tight tracking-tight">
+        <h1 className="text-[38px] md:text-[40px] font-bold text-app-text-title leading-tight tracking-tight flex items-baseline gap-2">
           {displayGreeting}
+          <span className="text-[12px] bg-red-600 text-white px-2 py-0.5 rounded-full animate-pulse shrink-0">V5-ROBUST</span>
         </h1>
         <p className="text-[20px] font-normal text-app-text-muted leading-relaxed">
           {labels.subtitle}
@@ -203,7 +205,20 @@ export function HelperDashboard({ task, recipes, lang, onNavigate, onConfirmStep
               <span className="bg-app-tag-blue text-[#444444] rounded-[14px] px-4 py-1 text-[20px] font-normal">
                 {labels.todayMeal}
               </span>
-              <UtensilsCrossed className="w-10 h-10 text-app-orange" strokeWidth={1.5} />
+              <div className="flex items-center gap-2">
+                <UtensilsCrossed className="w-10 h-10 text-app-orange" strokeWidth={1.5} />
+                <button
+                  onClick={() => {
+                    if (confirm(lang === 'en' ? 'Are you sure you want to delete this task? This cannot be undone.' : 'Yakin ingin menghapus tugas ini? Tindakan ini tidak dapat dibatalkan.')) {
+                      onDeleteTask(task!.taskID);
+                    }
+                  }}
+                  title="Delete task permanently"
+                  className="w-10 h-10 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg flex items-center justify-center cursor-pointer active:scale-90 border-2 border-white transition-all"
+                >
+                  <span className="text-[20px]">🗑️</span>
+                </button>
+              </div>
             </div>
 
             {/* Dish Title (34px Bold) */}
@@ -240,11 +255,13 @@ export function HelperDashboard({ task, recipes, lang, onNavigate, onConfirmStep
           {/* START PREPARATION Main Orange Button (88px Height, 28px text) */}
           <button
             onClick={handleStartPreparation}
-            disabled={isPrepping || task.taskStatus === 'pre_cook_completed'}
-            className={`w-full h-[88px] transition-all rounded-[14px] flex items-center justify-center gap-3.5 shadow-sm text-[28px] font-bold text-[#444444] cursor-pointer disabled:opacity-80 ${task.taskStatus === 'pre_cook_completed' ? 'bg-gray-200' : 'bg-app-orange hover:bg-orange-400 active:scale-[0.98]'}`}
+            disabled={isPrepping || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked'}
+            className={`w-full h-[88px] transition-all rounded-[14px] flex items-center justify-center gap-3.5 shadow-sm text-[28px] font-bold text-[#444444] cursor-pointer disabled:opacity-80 ${(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked') ? 'bg-gray-200' : 'bg-app-orange hover:bg-orange-400 active:scale-[0.98]'}`}
           >
-            {task.taskStatus === 'pre_cook_completed' ? (
+            {(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked') ? (
               <span>{lang === 'en' ? 'WAITING FOR APPROVAL' : 'MENUNGGU PERSETUJUAN'}</span>
+            ) : task.taskStatus === 'dish_approved' || task.taskStatus === 'rated' ? (
+              <span className="text-green-700">{lang === 'en' ? 'TASK COMPLETED' : 'TUGAS SELESAI'}</span>
             ) : (
               <>
                 <span>▶</span>

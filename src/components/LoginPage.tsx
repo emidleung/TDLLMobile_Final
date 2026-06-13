@@ -415,7 +415,7 @@ export function LoginPage({ onLogin, onBack, lang, onSetLang, initialRole }: Log
           
           {/* Brand Logo matching original style */}
           <span className="font-sans font-bold text-[28px] text-[#FF9D54]">
-            Belajar
+            Belaja
           </span>
         </div>
 

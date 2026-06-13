@@ -134,17 +134,15 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
         width: '100%',
         height: '100%',
         backgroundColor: 'white',
-        borderRadius: '16px',
-        border: '2px solid #e5e7eb', // Added an obvious border
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        // Removed border and radius to hit the edges of the 480px container
         overflow: 'hidden'
       }}>
         
         {/* Header / Tabs - Use 'flexShrink: 0' to keep them from getting squished */}
         <div style={{ flexShrink: 0 }}>
           {/* HEADER */}
-          <div style={{ padding: "16px 20px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f3f4f6" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "700", color: "#1f2937", fontSize: "18px" }}>
+          <div style={{ padding: "12px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f3f4f6" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: "700", color: "#1f2937", fontSize: "17px" }}>
               <div style={{ width: "10px", height: "10px", backgroundColor: "#10b981", borderRadius: "50%" }}></div>
               Live Chat
             </div>
@@ -156,8 +154,8 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
             </div>
           </div>
 
-          {/* TABS */}
-          <div style={{ display: "flex", padding: "16px", gap: "12px" }}>
+          {/* TABS - Added margin-top to move it a bit below as requested */}
+          <div style={{ display: "flex", padding: "12px", gap: "10px", marginTop: "8px" }}>
             <button 
               onClick={() => { setActiveTab('chat'); setSelectedChat(null); }} 
               style={{ 
@@ -177,30 +175,7 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
                 transition: 'all 0.2s'
               }}
             >
-              💬 Chat
-              {chatList.reduce((sum, c) => sum + c.unread, 0) > 0 && (
-                <div style={{ 
-                  position: 'absolute', 
-                  top: '-6px', 
-                  right: '-6px', 
-                  backgroundColor: '#ef4444', 
-                  color: 'white', 
-                  fontSize: '10px', 
-                  fontWeight: 'bold', 
-                  minWidth: '20px', 
-                  height: '20px', 
-                  borderRadius: '50%', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  padding: '0 4px', 
-                  border: '2px solid white', 
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                  zIndex: 10
-                }}>
-                  {chatList.reduce((sum, c) => sum + c.unread, 0)}
-                </div>
-              )}
+              💬 Chat {chatList.reduce((sum, c) => sum + c.unread, 0) > 0 ? `(${chatList.reduce((sum, c) => sum + c.unread, 0)})` : ''}
             </button>
             <button 
               onClick={() => setActiveTab('settings')} 
@@ -221,30 +196,7 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
                 transition: 'all 0.2s'
               }}
             >
-              ⚙️ Settings
-              {pendingInvCount > 0 && (
-                <div style={{ 
-                  position: 'absolute', 
-                  top: '-6px', 
-                  right: '-6px', 
-                  backgroundColor: '#ef4444', 
-                  color: 'white', 
-                  fontSize: '10px', 
-                  fontWeight: 'bold', 
-                  minWidth: '20px', 
-                  height: '20px', 
-                  borderRadius: '50%', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  padding: '0 4px', 
-                  border: '2px solid white', 
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                  zIndex: 10
-                }}>
-                  {pendingInvCount}
-                </div>
-              )}
+              ⚙️ Settings {pendingInvCount > 0 ? `(${pendingInvCount})` : ''}
             </button>
           </div>
         </div>

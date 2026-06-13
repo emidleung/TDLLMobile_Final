@@ -28,6 +28,7 @@ import { LoginPage } from './components/LoginPage';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { RECIPES } from './recipesData';
 
 export default function App() {
   const [role, setRole] = useState<Role | null>(null);
@@ -97,7 +98,7 @@ export default function App() {
   }, [isLoggedIn, role]);
 
   // Application Data stores
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>(RECIPES);
   const [healthProfiles, setHealthProfiles] = useState<FamilyMember[]>([]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [allTasks, setAllTasks] = useState<Task[]>([]);
@@ -130,8 +131,12 @@ export default function App() {
   const loadDatabaseState = () => {
     // 1. Fetch catalog
     fetch(`/api/recipes?t=${Date.now()}`)
-      .then(res => handleJsonResponse(res, []))
-      .then(setRecipes)
+      .then(res => handleJsonResponse(res, null))
+      .then(fetchedRecipes => {
+        if (fetchedRecipes && Array.isArray(fetchedRecipes) && fetchedRecipes.length > 0) {
+          setRecipes(fetchedRecipes);
+        }
+      })
       .catch((e) => console.warn('fetch error (recipes)', e));
 
     // 2. Fetch profiles
@@ -196,9 +201,9 @@ export default function App() {
 
   // Load favorites and likes from local storage on mount
   useEffect(() => {
-    const savedFavs = localStorage.getItem('kitchencare_custom_favorites');
-    const savedLikes = localStorage.getItem('kitchencare_likes_v3');
-    const savedRemarks = localStorage.getItem('kitchencare_recipe_remarks');
+    const savedFavs = localStorage.getItem('belaja_custom_favorites');
+    const savedLikes = localStorage.getItem('belaja_likes_v3');
+    const savedRemarks = localStorage.getItem('belaja_recipe_remarks');
     if (savedFavs) setCustomFavorites(JSON.parse(savedFavs));
     if (savedLikes) setLikedRecipeIds(JSON.parse(savedLikes));
     if (savedRemarks) setRecipeRemarks(JSON.parse(savedRemarks));
@@ -207,7 +212,7 @@ export default function App() {
   const handleToggleLike = (recipeId: string) => {
     setLikedRecipeIds(prev => {
       const next = prev.includes(recipeId) ? prev.filter(id => id !== recipeId) : [...prev, recipeId];
-      localStorage.setItem('kitchencare_likes_v3', JSON.stringify(next));
+      localStorage.setItem('belaja_likes_v3', JSON.stringify(next));
       return next;
     });
   };
@@ -215,7 +220,7 @@ export default function App() {
   const handleAddCustomFavorite = (newFav: any) => {
     setCustomFavorites(prev => {
       const next = [...prev, newFav];
-      localStorage.setItem('kitchencare_custom_favorites', JSON.stringify(next));
+      localStorage.setItem('belaja_custom_favorites', JSON.stringify(next));
       return next;
     });
     // Also like it automatically
@@ -225,7 +230,7 @@ export default function App() {
   const handleDeleteCustomFavorite = (favId: string) => {
     setCustomFavorites(prev => {
       const next = prev.filter(f => f.id !== favId);
-      localStorage.setItem('kitchencare_custom_favorites', JSON.stringify(next));
+      localStorage.setItem('belaja_custom_favorites', JSON.stringify(next));
       return next;
     });
     // Also remove from liked if it was there
@@ -236,7 +241,7 @@ export default function App() {
   const handleUpdateRemark = (recipeId: string, remark: string) => {
     setRecipeRemarks(prev => {
       const next = { ...prev, [recipeId]: remark };
-      localStorage.setItem('kitchencare_recipe_remarks', JSON.stringify(next));
+      localStorage.setItem('belaja_recipe_remarks', JSON.stringify(next));
       return next;
     });
   };
@@ -372,6 +377,15 @@ export default function App() {
       .catch(console.error);
   };
 
+  const handleDeleteTask = (taskId: string) => {
+    fetch(`/api/tasks/${taskId}`, {
+      method: 'DELETE'
+    })
+      .then(res => handleJsonResponse(res, null))
+      .then(() => loadDatabaseState())
+      .catch(console.error);
+  };
+
   // Dual-scope chat message deliveries
   const handleSendMessage = (text: string, overrideTaskID?: string) => {
     if (!role && !currentUserId) return;
@@ -460,7 +474,7 @@ export default function App() {
     setCurrentUserId(null);
     setCurrentView('dashboard');
     // Clear any persistent flags if needed
-    localStorage.removeItem('kitchencare_last_user');
+    localStorage.removeItem('belaja_last_user');
   };
 
   // Toggles the preferred language through standard sequence
@@ -554,6 +568,7 @@ export default function App() {
                 <span className="text-[22px] font-bold text-[#444444] leading-none tracking-tight">
                   Belaja
                 </span>
+                <span className="text-[10px] bg-red-500 text-white px-1 rounded animate-pulse">V-DELETE-ACTIVE</span>
               </div>
             </div>
 
@@ -575,7 +590,7 @@ export default function App() {
         )}
 
         {/* Dynamic Body Wrapper with 32px safe side borders and 28px gaps */}
-        <div className={`flex-1 overflow-y-auto px-8 pt-7 flex flex-col ${(role && isLoggedIn) ? 'pb-[140px]' : 'pb-7'}`}>
+        <div className={`flex-1 overflow-y-auto ${currentView === 'chat' ? 'px-0' : 'px-4'} pt-4 flex flex-col ${(role && isLoggedIn) ? 'pb-[110px]' : 'pb-7'}`}>
           {!role ? (
             <LaunchPage
               onSelectRole={handleSelectRole}
@@ -615,6 +630,7 @@ export default function App() {
                   lang={lang}
                   onNavigate={setCurrentView}
                   onResetTask={handleResetTask}
+                  onDeleteTask={handleDeleteTask}
                   userFullName={userFullName}
                   connectedPartnerId={connectedPartnerId}
                   partnerFullName={partnerFullName}
@@ -638,6 +654,7 @@ export default function App() {
                   onConfirmStep={handleConfirmStep}
                   userFullName={userFullName}
                   onRefreshData={loadDatabaseState}
+                  onDeleteTask={handleDeleteTask}
                 />
               )}
 
@@ -723,7 +740,7 @@ export default function App() {
 
         {/* Global Bottom Tab Bar Navigator Section (Always visible when role is logged in) */}
         {role && isLoggedIn && (
-          <nav ref={navRef} className="absolute bottom-6 left-6 right-6 h-[76px] rounded-[22px] border border-[#E2DDD5] bg-white/90 backdrop-blur-md px-4 shrink-0 flex items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] select-none z-40">
+          <nav ref={navRef} className="absolute bottom-3 left-6 right-6 h-[76px] rounded-[22px] border border-[#E2DDD5] bg-white/90 backdrop-blur-md px-4 shrink-0 flex items-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] select-none z-40">
             <div className="grid grid-cols-4 w-full h-full items-center">
               
               {/* Tab 1: Today */}

@@ -416,10 +416,10 @@ export function LaunchPage({ onSelectRole, lang, onSelectLang }: LaunchPageProps
 
       {step === 'lang' && (
         <div className="w-full flex flex-col items-center">
-          {/* Header text with orange highlighting for "Belajar" */}
+          {/* Header text with orange highlighting for "Belaja" */}
           <div className="text-center w-full mb-3" id="splash-welcome-title">
             <h2 className="text-[28px] font-bold text-[#1E293B] tracking-tight">
-              Welcome to <span className="text-[#FF9D54]">Belajar</span>
+              Welcome to <span className="text-[#FF9D54]">Belaja</span>
             </h2>
             <p className="font-sans font-normal text-[16px] text-[#475569] mt-3 leading-[19.25px] px-4">
               {translations.connectSubtitle[lang]}

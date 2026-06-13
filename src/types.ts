@@ -67,6 +67,8 @@ export type TaskStatus =
   | 'cooking_ongoing'
   | 'completed'
   | 'ai_checked'
+  | 'dish_approved'
+  | 'dish_rejected'
   | 'rated';
 
 export interface Task {

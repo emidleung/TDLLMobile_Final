@@ -142,15 +142,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
     <div style={{ display: "flex", flexDirection: "column", height: "100%", backgroundColor: "#fff" }}>
       
       {/* Sub-Header: "Conversation: name" and "Back to Chats" */}
-      <div style={{ padding: "16px", backgroundColor: "#f3f4f6", display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e5e7eb" }}>
-        <span style={{ fontWeight: "bold", color: "#374151" }}>Conversation: {partnerName}</span>
+      <div style={{ padding: "10px 16px", backgroundColor: "#f3f4f6", display: "flex", justifyContent: "space-between", borderBottom: "1px solid #e5e7eb" }}>
+        <span style={{ fontWeight: "bold", color: "#374151", fontSize: "14px" }}>Conversation: {partnerName}</span>
         <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", fontWeight: "bold", color: "#4b5563" }}>
           ⬅ Back to Chats
         </button>
       </div>
 
       {/* MESSAGES AREA */}
-      <div style={{ flex: 1, padding: "20px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "16px" }}>
+      <div style={{ flex: 1, padding: "12px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "12px" }}>
         
         {/* DEFAULT VIEW */}
         <>

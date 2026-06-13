@@ -1,4 +1,4 @@
-# KitchenCare (Hekki)
+# Belaja
 
 This is a premium AI-powered kitchen management app designed for Employers and Helpers.
 

@@ -25,10 +25,11 @@ import {
   Volume2,
   ArrowRight,
   ArrowLeft,
-  Trash2,
+  Trash,
   PenLine
 } from 'lucide-react';
 import { Task, Language, Recipe, FamilyMember } from '../types';
+import { RECIPES } from '../recipesData';
 
 interface EmployerDashboardProps {
   task: Task | null;
@@ -38,6 +39,7 @@ interface EmployerDashboardProps {
   lang: Language;
   onNavigate: (view: string) => void;
   onResetTask: (taskId: string) => void;
+  onDeleteTask: (taskId: string) => void;
   userFullName?: string | null;
   connectedPartnerId?: string | null;
   partnerFullName?: string;
@@ -75,6 +77,7 @@ export function EmployerDashboard({
   lang,
   onNavigate,
   onResetTask,
+  onDeleteTask,
   userFullName,
   connectedPartnerId,
   partnerFullName = 'Your Helper',
@@ -199,7 +202,7 @@ export function EmployerDashboard({
   useEffect(() => {
     // We now use props for favorites and likes
     // But we still want to ensure initial likes for the mockup if none exist
-    if (likedIds.length === 0 && !localStorage.getItem('kitchencare_likes_v3')) {
+    if (likedIds.length === 0 && !localStorage.getItem('belaja_likes_v3')) {
       const initialLikes = ['tomato-egg-stir-fry', 'cantonese-steamed-fish', 'garlic-bok-choy'];
       initialLikes.forEach(id => onToggleLike(id));
     }
@@ -208,7 +211,7 @@ export function EmployerDashboard({
   // Save favorites helper
   const saveFavsToDisk = (updatedFavs: FavRecipe[]) => {
     setFavorites(updatedFavs);
-    localStorage.setItem('kitchencare_favorites_v3', JSON.stringify(updatedFavs));
+    localStorage.setItem('belaja_favorites_v3', JSON.stringify(updatedFavs));
   };
 
   // Toggle dynamic liked icon state
@@ -338,6 +341,8 @@ export function EmployerDashboard({
     switch (status) {
       case 'completed':
       case 'ai_checked':
+      case 'dish_approved':
+      case 'dish_rejected':
       case 'rated':
         return {
           container: 'bg-[#F1F1F1] text-gray-500 border border-gray-300',
@@ -405,8 +410,9 @@ export function EmployerDashboard({
       
       {/* 1. Header Greeting Banner Segment */}
       <section className="flex flex-col gap-2 mt-2">
-        <h1 className="text-[34px] md:text-[38px] font-bold text-app-text-title leading-tight tracking-tight font-display">
+        <h1 className="text-[38px] md:text-[40px] font-bold text-app-text-title leading-tight tracking-tight flex items-baseline gap-2">
           {greeting.title}
+          <span className="text-[12px] bg-red-600 text-white px-2 py-0.5 rounded-full animate-pulse shrink-0">V5-ROBUST</span>
         </h1>
         <p className="text-[20px] font-normal text-app-text-muted leading-relaxed">
           {greeting.subtitle}
@@ -439,16 +445,26 @@ export function EmployerDashboard({
         
         {/* Module Header Title & Status */}
         <div className="flex justify-between items-center">
-          <span className="text-[18px] font-bold text-app-text-title uppercase tracking-wider">
+          <span className="text-[18px] font-bold text-app-text-title uppercase tracking-wider flex items-center gap-2">
             Active Task
+            <span className="text-[10px] bg-red-500 text-white px-1 rounded animate-pulse normal-case">V4-RUBBISH-HERE</span>
           </span>
           {task && (
-            <div className="flex items-center gap-1.5">
-              <span className={`py-1 px-3 rounded-[14px] text-[14px] font-bold flex items-center gap-1 ${getStatusBadgeStyles(task.taskStatus).container}`}>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" strokeWidth={2.5} />
-                <span>{getStatusBadgeStyles(task.taskStatus).label}</span>
-              </span>
-              
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* EMERGENCY MARKER V4 */}
+              <button
+                onClick={() => {
+                  if (confirm(lang === 'en' ? 'Are you sure you want to delete this task? This cannot be undone.' : 'Yakin ingin menghapus tugas ini? Tindakan ini tidak dapat dibatalkan.')) {
+                    onDeleteTask(task.taskID);
+                  }
+                }}
+                title="Delete task permanently"
+                className="w-12 h-12 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-2xl flex items-center justify-center cursor-pointer active:scale-95 border-2 border-white transition-all z-50"
+                id="btn-delete-task-v4"
+              >
+                <span className="text-[24px]">🗑️</span>
+              </button>
+
               <button
                 onClick={() => onResetTask(task.taskID)}
                 title="Reset or re-assign meal roadmap"
@@ -457,6 +473,11 @@ export function EmployerDashboard({
               >
                 <RotateCcw className="w-4 h-4 text-app-text-muted" />
               </button>
+
+              <span className={`py-1 px-3 rounded-[14px] text-[14px] font-bold flex items-center gap-1 ${getStatusBadgeStyles(task.taskStatus).container}`}>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" strokeWidth={2.5} />
+                <span>{getStatusBadgeStyles(task.taskStatus).label}</span>
+              </span>
             </div>
           )}
         </div>
@@ -583,7 +604,7 @@ export function EmployerDashboard({
                 <div className="flex flex-col gap-3 w-full">
                   <div className="bg-[#98E89C]/20 border border-[#98E89C] rounded-[10px] p-2 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-green-700" />
-                    <span className="text-sm font-bold text-green-800">Final Plating Ready for Review</span>
+                    <span className="text-sm font-bold text-green-800">Action Required: Review Final Dish</span>
                   </div>
                   {task.cookImageUrl && (
                     <div className="flex flex-col gap-1">
@@ -600,29 +621,50 @@ export function EmployerDashboard({
                       />
                     </div>
                   )}
-                  <div className="flex flex-col gap-2">
+                  <div className="flex gap-2">
                     <button
-                      onClick={() => onNavigate('feedback-settings')}
-                      className="w-full py-2 px-3 bg-[#98E89C] border border-app-border font-bold text-[#444444] rounded-[10px] shadow-sm flex items-center justify-center gap-1.5 cursor-pointer hover:opacity-90 transition-all"
+                      onClick={() => {
+                        fetch(`/api/tasks/${task.taskID}/review-dish`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ isApproved: true })
+                        }).then(() => onRefreshData());
+                      }}
+                      className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <CheckSquare className="w-4 h-4" />
-                      <span>{lang === 'en' ? 'Evaluate Dish & Feedback' : 'Evaluasi Hidangan & Umpan Balik'}</span>
+                      <span>Approve (OK)</span>
                     </button>
                     <button
                       onClick={() => {
                         if (confirm('Are you sure you want to reject this dish? The helper will need to redo it.')) {
-                          fetch(`/api/tasks/${task.taskID}/reject-dish`, {
+                          fetch(`/api/tasks/${task.taskID}/review-dish`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' }
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ isApproved: false })
                           }).then(() => onRefreshData());
                         }
                       }}
-                      className="w-full py-2 px-3 bg-red-50 border border-red-200 text-red-600 font-bold rounded-[10px] shadow-sm flex items-center justify-center gap-1.5 cursor-pointer hover:bg-red-100"
+                      className="flex-1 py-2 px-3 bg-gray-200 font-bold text-gray-700 rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer border border-gray-300"
                     >
                       <X className="w-4 h-4" />
-                      <span>Reject Dish (Restart Task)</span>
+                      <span>Reject (Redo)</span>
                     </button>
                   </div>
+                </div>
+              ) : task.taskStatus === 'dish_approved' ? (
+                <div className="flex flex-col gap-3 w-full">
+                  <div className="bg-green-50 border border-green-200 rounded-[10px] p-2 flex items-center gap-2">
+                    <CheckSquare className="w-4 h-4 text-green-700" />
+                    <span className="text-sm font-bold text-green-800">Dish Approved! Please provide feedback.</span>
+                  </div>
+                  <button
+                    onClick={() => onNavigate('feedback-settings')}
+                    className="w-full py-2 px-3 bg-[#98E89C] border border-app-border font-bold text-[#444444] rounded-[10px] shadow-sm flex items-center justify-center gap-1.5 cursor-pointer hover:opacity-90 transition-all"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>{lang === 'en' ? 'Evaluate & Give Stars' : 'Evaluasi & Beri Bintang'}</span>
+                  </button>
                 </div>
               ) : null}
             </div>
@@ -1051,8 +1093,13 @@ export function EmployerDashboard({
 
               <div className="flex flex-col gap-4">
                 {(() => {
-                  const matchedRecipe = recipes.find(r => r.recipeID === activeDetailRecipe.id);
-                  if (!matchedRecipe) return <p className="text-center py-8 text-gray-400">Recipe details not found.</p>;
+                  let matchedRecipe = recipes.find(r => r.recipeID === activeDetailRecipe.id);
+                  // ROBUST FALLBACK: Search in hardcoded RECIPES if prop is empty
+                  if (!matchedRecipe) {
+                    matchedRecipe = RECIPES.find(r => r.recipeID === activeDetailRecipe.id);
+                  }
+                  
+                  if (!matchedRecipe) return <p className="text-center py-8 text-gray-400">Recipe details not found (ID: {activeDetailRecipe.id})</p>;
                   
                   const steps = modalActiveTab === 'prep' ? matchedRecipe.preCookSteps : 
                                 modalActiveTab === 'cook' ? matchedRecipe.cookSteps : 
