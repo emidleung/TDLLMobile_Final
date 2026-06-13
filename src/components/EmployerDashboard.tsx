@@ -26,7 +26,8 @@ import {
   ArrowRight,
   ArrowLeft,
   Trash,
-  PenLine
+  PenLine,
+  Trash2
 } from 'lucide-react';
 import { Task, Language, Recipe, FamilyMember } from '../types';
 import { RECIPES } from '../recipesData';
@@ -476,10 +477,10 @@ export function EmployerDashboard({
                   }
                 }}
                 title="Delete task permanently"
-                className="w-12 h-12 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-2xl flex items-center justify-center cursor-pointer active:scale-95 border-2 border-white transition-all z-50"
+                className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-600 rounded-full transition-all cursor-pointer active:scale-95"
                 id="btn-delete-task-v4"
               >
-                <span className="text-[24px]">🗑️</span>
+                <Trash2 className="w-5 h-5" />
               </button>
 
               <button

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChefHat, ShoppingBasket, Lock, Unlock, UtensilsCrossed, ArrowRight, ShieldAlert, Trash } from 'lucide-react';
+import { ChefHat, ShoppingBasket, Lock, Unlock, UtensilsCrossed, ArrowRight, ShieldAlert, Trash, Trash2 } from 'lucide-react';
 import { Task, Language, Recipe } from '../types';
 import { RECIPES } from '../recipesData';
 
@@ -227,9 +227,9 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
                     }
                   }}
                   title="Delete task permanently"
-                  className="w-10 h-10 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg flex items-center justify-center cursor-pointer active:scale-90 border-2 border-white transition-all"
+                  className="p-2 hover:bg-red-50 text-gray-400 hover:text-red-600 rounded-full transition-all cursor-pointer active:scale-90"
                 >
-                  <span className="text-[20px]">🗑️</span>
+                  <Trash2 className="w-5 h-5" />
                 </button>
               </div>
             </div>

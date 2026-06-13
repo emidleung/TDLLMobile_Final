@@ -459,10 +459,6 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
         )}
       </div>
 
-      {/* MASSIVE spacer to force it down */}
-      <div className="h-64 bg-red-100 flex items-center justify-center text-red-500 font-bold">
-        SPACE ENFORCER (h-64)
-      </div>
 
       <div className="px-4 mb-20">
         {/* Global Return to Dashboard Button */}
@@ -472,7 +468,6 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
         >
           <ArrowLeft className="w-6 h-6" />
           {lang === 'en' ? 'Return to Dashboard' : lang === 'id' ? 'Kembali ke Beranda' : 'Bumalik sa Dashboard'}
-          <span className="bg-white text-pink-500 px-2 py-0.5 rounded text-[10px] ml-2">V3-PINK-LOWER</span>
         </button>
       </div>
 
