@@ -30,14 +30,20 @@ export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmploy
       
       try {
         const report = await onSubmitAICheck(base64);
-        setAiReport(report);
-        if (report && report.aiResult === 'pass') {
-          confetti({
-            particleCount: 150,
-            spread: 100,
-            origin: { y: 0.6 },
-            colors: ['#2E7D32', '#965020', '#F3A562']
-          });
+        if (report) {
+          const formattedReport = {
+            aiResult: report.rating === 'Pass' ? 'pass' as const : 'minor_defect' as const,
+            feedback: report.explanation
+          };
+          setAiReport(formattedReport);
+          if (formattedReport.aiResult === 'pass') {
+            confetti({
+              particleCount: 150,
+              spread: 100,
+              origin: { y: 0.6 },
+              colors: ['#2E7D32', '#965020', '#F3A562']
+            });
+          }
         }
       } catch (err) {
         console.error(err);
@@ -54,7 +60,12 @@ export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmploy
     setAiReport(null);
     try {
       const report = await onSubmitAICheck(presetUrl);
-      setAiReport(report);
+      if (report) {
+        setAiReport({
+          aiResult: report.rating === 'Pass' ? 'pass' as const : 'minor_defect' as const,
+          feedback: report.explanation
+        });
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -202,7 +213,7 @@ export function ResultUploadPage({ task, lang, onSubmitAICheck, onSubmitToEmploy
             onSubmitToEmployer();
             onNavigate('dashboard');
           }}
-          disabled={!aiReport || aiReport.aiResult !== 'pass'}
+          disabled={!aiReport || isUploading}
           className="w-full max-w-md h-[56px] bg-[#965020] text-white font-headline-sm rounded-xl py-3.5 font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
         >
           <Send className="w-5 h-5" />
