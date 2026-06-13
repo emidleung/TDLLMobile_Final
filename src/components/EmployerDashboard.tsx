@@ -670,20 +670,6 @@ export function EmployerDashboard({
                     </button>
                   </div>
                 </div>
-              ) : task.taskStatus === 'dish_approved' ? (
-                <div className="flex flex-col gap-3 w-full">
-                  <div className="bg-green-50 border border-green-200 rounded-[10px] p-2 flex items-center gap-2">
-                    <CheckSquare className="w-4 h-4 text-green-700" />
-                    <span className="text-sm font-bold text-green-800">Dish Approved! Please provide feedback.</span>
-                  </div>
-                  <button
-                    onClick={() => onNavigate('feedback-settings')}
-                    className="w-full py-2 px-3 bg-[#98E89C] border border-app-border font-bold text-[#444444] rounded-[10px] shadow-sm flex items-center justify-center gap-1.5 cursor-pointer hover:opacity-90 transition-all"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    <span>{lang === 'en' ? 'Evaluate & Give Stars' : 'Evaluasi & Beri Bintang'}</span>
-                  </button>
-                </div>
               ) : null}
             </div>
           </div>

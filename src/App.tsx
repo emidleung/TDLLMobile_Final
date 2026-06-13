@@ -559,7 +559,7 @@ export default function App() {
   const handleReviewDish = async (taskId: string, isApproved: boolean) => {
     try {
       if (isApproved) {
-        await updateDoc(doc(db, "tasks", taskId), { taskStatus: 'dish_approved' });
+        await updateDoc(doc(db, "tasks", taskId), { taskStatus: 'rated' });
       } else {
         await updateDoc(doc(db, "tasks", taskId), { 
           taskStatus: 'prep_rejected',

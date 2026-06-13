@@ -276,14 +276,25 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
 
           {/* START PREPARATION Main Orange Button (88px Height, 28px text) */}
           <button
-            onClick={handleStartPreparation}
+            onClick={() => {
+              if (task.taskStatus === 'preparing') {
+                onNavigate('task-execution');
+              } else if (task.taskStatus === 'prep_approved' || task.taskStatus === 'cooking_ongoing') {
+                onNavigate('task-execution');
+              } else if (task.taskStatus === 'rated') {
+                if (onDeleteTask) onDeleteTask(task.taskID);
+              }
+            }}
             disabled={isPrepping || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed'}
             className={`w-full h-[88px] transition-all rounded-[14px] flex items-center justify-center gap-3.5 shadow-sm text-[28px] font-bold text-[#444444] cursor-pointer disabled:opacity-80 ${(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? 'bg-gray-200' : 'bg-app-orange hover:bg-orange-400 active:scale-[0.98]'}`}
           >
             {(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? (
               <span>{lang === 'en' ? 'WAITING FOR APPROVAL' : 'MENUNGGU PERSETUJUAN'}</span>
-            ) : task.taskStatus === 'dish_approved' || task.taskStatus === 'rated' ? (
-              <span className="text-green-700">{lang === 'en' ? 'TASK COMPLETED' : 'TUGAS SELESAI'}</span>
+            ) : task.taskStatus === 'rated' ? (
+              <span className="flex items-center gap-2">
+                <CheckCircle className="w-8 h-8" />
+                <span>{lang === 'en' ? 'TASK COMPLETE (Click to remove)' : 'TUGAS SELESAI (Klik untuk hapus)'}</span>
+              </span>
             ) : (
               <>
                 <span>▶</span>
