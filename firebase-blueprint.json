@@ -1,0 +1,144 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Private Profile",
+      "description": "Details about registered Employers and Helpers, mapped via their 8-Digit ID",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The unique email of this user"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "User's complete name limit to 100 characters"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "employer",
+            "helper"
+          ],
+          "description": "Role of user: employer or helper"
+        },
+        "primaryLanguage": {
+          "type": "string",
+          "description": "Pre-selected communication language"
+        },
+        "dietaryRestrictions": {
+          "type": "array",
+          "description": "List of user restrictions"
+        },
+        "firebaseUid": {
+          "type": "string",
+          "description": "The firebase auth account uid mapping key"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Profile registration timestamp"
+        }
+      },
+      "required": [
+        "email",
+        "fullName",
+        "role",
+        "primaryLanguage",
+        "firebaseUid",
+        "createdAt"
+      ]
+    },
+    "ProfileData": {
+      "title": "Profile Avatar Media",
+      "description": "Media data preserving base64 asset source of user profile icons",
+      "type": "object",
+      "properties": {
+        "base64Image": {
+          "type": "string",
+          "description": "The base64 encoded string of user avatar asset"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Media change timestamp"
+        }
+      },
+      "required": [
+        "base64Image",
+        "updatedAt"
+      ]
+    },
+    "Connection": {
+      "title": "User Connection Hub",
+      "description": "Active chatting room link established between two users",
+      "type": "object",
+      "properties": {
+        "participants": {
+          "type": "array",
+          "description": "List of 8-digit user IDs involved in this connection room"
+        },
+        "status": {
+          "type": "string",
+          "description": "The status of the connection room"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The creation timestamp in firestore"
+        }
+      },
+      "required": [
+        "participants",
+        "status",
+        "createdAt"
+      ]
+    },
+    "ConnectionMessage": {
+      "title": "Connection Chat Message",
+      "description": "Real-time message record preserved inside a specific connection room",
+      "type": "object",
+      "properties": {
+        "senderId": {
+          "type": "string",
+          "description": "The 8-digit user ID of the sender"
+        },
+        "message": {
+          "type": "string",
+          "description": "The raw text of the sent chat message"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when this message record was logged"
+        }
+      },
+      "required": [
+        "senderId",
+        "message",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User private profile mapped via custom ID"
+    },
+    "/users/{userId}/profile_data/{docId}": {
+      "schema": "ProfileData",
+      "description": "Sub-collection preserving customized user profile icon in Base64 format"
+    },
+    "/connections/{connectionId}": {
+      "schema": "Connection",
+      "description": "Chat connection between two partners"
+    },
+    "/connections/{connectionId}/messages/{messageId}": {
+      "schema": "ConnectionMessage",
+      "description": "Individual chat message list for a connection room"
+    },
+    "/chats/{chatId}/messages/{messageId}": {
+      "schema": "ConnectionMessage",
+      "description": "Individual chat message list for a connection room using user custom path"
+    }
+  }
+}

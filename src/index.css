@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #fbf9f8;
+  --color-on-secondary-fixed: #00210d;
+  --color-surface-bright: #fbf9f8;
+  --color-on-tertiary-fixed: #001e2c;
+  --color-on-secondary: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-primary-fixed-variant: #6e3900;
+  --color-background: #fbf9f8;
+  --color-on-background: #1b1c1c;
+  --color-tertiary-fixed-dim: #91cef2;
+  --color-primary: #8d4f12;
+  --color-surface-container-high: #eae8e7;
+  --color-secondary-fixed: #a8f4b9;
+  --color-on-primary-container: #733c00;
+  --color-tertiary-container: #85c2e5;
+  --color-inverse-on-surface: #f3f0f0;
+  --color-primary-fixed: #ffdcc3;
+  --color-on-secondary-container: #287243;
+  --color-error: #ba1a1a;
+  --color-on-surface-variant: #534439;
+  --color-surface-tint: #8d4f12;
+  --color-primary-container: #f9a865;
+  --color-outline-variant: #d8c2b4;
+  --color-on-surface: #1b1c1c;
+  --color-inverse-primary: #ffb77e;
+  --color-on-tertiary: #ffffff;
+  --color-surface-dim: #dcd9d9;
+  --color-tertiary: #206584;
+  --color-secondary-container: #a8f4b9;
+  --color-on-tertiary-container: #00506d;
+  --color-surface-container-low: #f6f3f2;
+  --color-on-primary: #ffffff;
+  --color-secondary-fixed-dim: #8dd79e;
+  --color-surface-variant: #e4e2e1;
+  --color-on-error: #ffffff;
+  --color-inverse-surface: #303030;
+  --color-on-tertiary-fixed-variant: #004c68;
+  --color-primary-fixed-dim: #ffb77e;
+  --color-tertiary-fixed: #c3e8ff;
+  --color-on-secondary-fixed-variant: #005228;
+  --color-surface-container-highest: #e4e2e1;
+  --color-on-primary-fixed: #2f1500;
+  --color-outline: #857467;
+  --color-secondary: #216b3d;
+  --color-on-error-container: #93000a;
+  --color-error-container: #ffdad6;
+  --color-surface-container: #f0eded;
+
+  /* Newly Spec Colors */
+  --color-top-nav-bg: #98E89C;
+  --color-app-bg-warm: #FCF9F2;
+  --color-app-orange: #FF9F55;
+  --color-app-text-title: #444444;
+  --color-app-text-muted: #666666;
+  --color-app-tag-blue: #82BCED;
+  --color-app-tag-warn: #FFDDDD;
+  --color-app-tag-norm: #EEEEEE;
+  --color-app-border: #E2DDD5;
+
+  /* Custom typography classes mapping */
+  --font-sans: "Be Vietnam Pro", sans-serif;
+  --font-display: "Plus Jakarta Sans", sans-serif;
+}
+
+@layer utilities {
+  .font-step-number {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 48px;
+    line-height: 48px;
+    font-weight: 800;
+  }
+  .font-display-lg-mobile {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 700;
+  }
+  .font-label-lg {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .font-display-lg {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 32px;
+    line-height: 40px;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  .font-body-md {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+  .font-body-lg {
+    font-family: "Be Vietnam Pro", sans-serif;
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 400;
+  }
+  .font-headline-sm {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 600;
+  }
+  .font-headline-md {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+  }
+
+  /* GSAP Batch Layout */
+  .recipe-batch-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    width: 100%;
+    max-width: 1000px;
+    margin: 1.5rem auto;
+    padding: 0 0.75rem 1rem 0.75rem;
+  }
+
+  .recipe-batch-item {
+    width: 100%;
+    opacity: 0;
+    will-change: transform, opacity;
+    transform: translateY(50px) scale(0.95);
+  }
+
+  @media (max-width: 480px) {
+    .recipe-batch-container {
+      gap: 1.5rem;
+      padding: 0 0.5rem 4rem 0.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .recipe-batch-item {
+      width: calc(50% - 0.75rem);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .recipe-batch-item {
+      width: 100%;
+    }
+  }
+
+  .animate-bounce-once {
+    animation: bounce-once 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes bounce-once {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+}

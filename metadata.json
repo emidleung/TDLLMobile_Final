@@ -1,0 +1,6 @@
+{
+  "name": "Belaja",
+  "description": "A smart home kitchen cooking assistant app for Hong Kong employers and domestic helpers featuring lock-step cooking, translation, and AI plating check.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
