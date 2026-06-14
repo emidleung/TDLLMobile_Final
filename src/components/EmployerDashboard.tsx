@@ -721,12 +721,26 @@ export function EmployerDashboard({
                   </div>
                   <div className="flex flex-col flex-1">
                     <div className="flex justify-between items-start mb-1">
-                      <h3 className="text-[16px] font-bold text-gray-600 leading-tight line-clamp-1">
+                      <h3 className="text-[16px] font-bold text-gray-600 leading-tight line-clamp-1 pr-2">
                         {fRecipe.title[lang] || fRecipe.title['en']}
                       </h3>
-                      <span className="bg-[#E2DDD5] text-[#444444] py-0.5 px-2 rounded-md text-[11px] font-bold shrink-0 shadow-sm border border-[#D5CDC4]">
-                        Finished
-                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="bg-[#E2DDD5] text-[#444444] py-0.5 px-2 rounded-md text-[11px] font-bold shadow-sm border border-[#D5CDC4]">
+                          Finished
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm(lang === 'en' ? 'Are you sure you want to delete this finished task?' : 'Yakin ingin menghapus tugas yang sudah selesai ini?')) {
+                              onDeleteTask(finishedTask.taskID);
+                            }
+                          }}
+                          className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors shrink-0"
+                          title="Delete finished task"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                     <p className="text-[14px] text-gray-500">
                       {fRecipe.subtitle?.[lang] || fRecipe.subtitle?.['en'] || fRecipe.description?.[lang] || fRecipe.description?.['en']}
