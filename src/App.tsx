@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
 import {
   ChefHat,
   Home,
@@ -128,6 +129,18 @@ export default function App() {
       nav.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, [isLoggedIn, role]);
+
+  const viewContainerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    if (viewContainerRef.current && isLoggedIn) {
+      // Small fade/slide transition when currentView changes
+      gsap.fromTo(viewContainerRef.current, 
+        { opacity: 0, x: 10 }, 
+        { opacity: 1, x: 0, duration: 0.3, ease: 'power2.out' }
+      );
+    }
+  }, { dependencies: [currentView, isLoggedIn], scope: viewContainerRef });
 
   // Application Data stores
   const [recipes, setRecipes] = useState<Recipe[]>(RECIPES);
@@ -918,7 +931,7 @@ Respond ONLY with a valid JSON object:
         )}
 
         {/* Dynamic Body Wrapper with 32px safe side borders and 28px gaps */}
-        <div className={`flex-1 overflow-y-auto ${currentView === 'chat' ? 'px-0' : 'px-4'} pt-4 flex flex-col ${(role && isLoggedIn) ? 'pb-[110px]' : 'pb-7'}`}>
+        <div ref={viewContainerRef} className={`flex-1 overflow-y-auto ${currentView === 'chat' ? 'px-0' : 'px-4'} pt-4 flex flex-col ${(role && isLoggedIn) ? 'pb-[110px]' : 'pb-7'}`}>
           {!role ? (
             <LaunchPage
               onSelectRole={handleSelectRole}

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
 import {
   ChefHat,
   PlusCircle,
@@ -205,6 +207,28 @@ export function EmployerDashboard({
     setIsPlayingAudio(true);
     window.speechSynthesis.speak(utterance);
   };
+
+  const badgeRef = useRef<HTMLSpanElement>(null);
+
+  useGSAP(() => {
+    if (task && (task.taskStatus === 'completed' || task.taskStatus === 'dish_approved' || task.taskStatus === 'rated' || task.taskStatus === 'prep_approved' || task.taskStatus === 'pre_cook_completed')) {
+      gsap.fromTo(badgeRef.current, 
+        { scale: 1 }, 
+        { scale: 1.2, duration: 0.2, yoyo: true, repeat: 1, ease: 'back.out(2)' }
+      );
+    }
+  }, { dependencies: [task?.taskStatus], scope: badgeRef });
+
+  useGSAP(() => {
+    gsap.to('.action-pulse', {
+      scale: 1.03,
+      boxShadow: '0px 0px 12px rgba(249, 115, 22, 0.6)',
+      duration: 0.8,
+      repeat: -1,
+      yoyo: true,
+      ease: 'power1.inOut'
+    });
+  });
 
   // Initialize and load default state from screenshot
   useEffect(() => {
@@ -477,7 +501,7 @@ export function EmployerDashboard({
                 <RotateCcw className="w-4 h-4 text-app-text-muted" />
               </button>
 
-              <span className={`py-1 px-3 rounded-[14px] text-[14px] font-bold flex items-center gap-1 ${getStatusBadgeStyles(task.taskStatus).container}`}>
+              <span ref={badgeRef} className={`py-1 px-3 rounded-[14px] text-[14px] font-bold flex items-center gap-1 ${getStatusBadgeStyles(task.taskStatus).container}`}>
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" strokeWidth={2.5} />
                 <span>{getStatusBadgeStyles(task.taskStatus).label}</span>
               </span>
@@ -605,7 +629,7 @@ export function EmployerDashboard({
                           onNavigate('feedback-settings');
                         }
                       }}
-                      className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="action-pulse flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <CheckSquare className="w-4 h-4" />
                       <span>Approve Dish</span>
@@ -636,7 +660,7 @@ export function EmployerDashboard({
                           onReviewPrep(task.taskID, true);
                         }
                       }}
-                      className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="action-pulse flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <CheckSquare className="w-4 h-4" />
                       <span>Approve Prep</span>
