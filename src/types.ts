@@ -118,10 +118,13 @@ export interface AIResult {
 }
 
 export interface Review {
+  id?: string;
   taskID: string;
   starRate: number;
   comment: string;
   role?: string;
   taskTitle?: string;
   createTime: string;
+  reply?: string;
+  isEdited?: boolean;
 }

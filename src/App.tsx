@@ -720,6 +720,22 @@ Respond ONLY with a valid JSON object:
     }
   };
 
+  const handleDeleteReview = async (reviewId: string) => {
+    try {
+      await deleteDoc(doc(db, "reviews", reviewId));
+    } catch (err) {
+      console.error("Delete review failed:", err);
+    }
+  };
+
+  const handleUpdateReview = async (reviewId: string, updates: Partial<Review>) => {
+    try {
+      await updateDoc(doc(db, "reviews", reviewId), updates);
+    } catch (err) {
+      console.error("Update review failed:", err);
+    }
+  };
+
   const handleMarkChatAsRead = async (taskId: string) => {
     if (!role) return;
     
@@ -1053,6 +1069,8 @@ Respond ONLY with a valid JSON object:
                   latestTaskTitle={latestTaskTitle}
                   role={role}
                   onLogout={logout}
+                  onDeleteReview={handleDeleteReview}
+                  onUpdateReview={handleUpdateReview}
                 />
               )}
             </>

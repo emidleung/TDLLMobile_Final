@@ -10,6 +10,8 @@ interface FeedbackSettingsPageProps {
   latestTaskTitle: string | null;
   role: Role | null;
   onLogout?: () => void;
+  onDeleteReview?: (id: string) => void;
+  onUpdateReview?: (id: string, updates: Partial<Review>) => void;
 }
 
 export function FeedbackSettingsPage({
@@ -19,12 +21,21 @@ export function FeedbackSettingsPage({
   reviews,
   latestTaskTitle,
   role,
-  onLogout
+  onLogout,
+  onDeleteReview,
+  onUpdateReview
 }: FeedbackSettingsPageProps) {
   const [starRate, setStarRate] = useState<number>(5);
   const [comment, setComment] = useState<string>('');
   const [successToast, setSuccessToast] = useState<string>('');
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+
+  // States for edit and reply functionalities
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [editCommentText, setEditCommentText] = useState<string>('');
+  
+  const [replyingReviewId, setReplyingReviewId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState<string>('');
 
 
   const handleReviewSubmit = (e: React.FormEvent) => {
@@ -218,7 +229,128 @@ export function FeedbackSettingsPage({
                     </span>
                   </div>
                 </div>
-                <p className="text-[20px] italic text-[#444444] mt-2">"{rev.comment}"</p>
+
+                {/* Comment Section */}
+                {editingReviewId === rev.id ? (
+                  <div className="flex flex-col gap-2 mt-2">
+                    <textarea 
+                      className="w-full border border-gray-300 rounded p-2 text-sm text-gray-700 bg-white"
+                      value={editCommentText}
+                      onChange={(e) => setEditCommentText(e.target.value)}
+                      rows={2}
+                    />
+                    <div className="flex gap-2 justify-end">
+                      <button 
+                        onClick={() => { setEditingReviewId(null); setEditCommentText(''); }}
+                        className="px-3 py-1 text-xs font-bold text-gray-500 bg-gray-100 rounded"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        onClick={() => {
+                          if (rev.id && onUpdateReview) {
+                            onUpdateReview(rev.id, { comment: editCommentText, isEdited: true });
+                          }
+                          setEditingReviewId(null);
+                          setEditCommentText('');
+                        }}
+                        className="px-3 py-1 text-xs font-bold text-white bg-blue-500 rounded"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[20px] italic text-[#444444] mt-2">
+                    "{rev.comment}"
+                    {rev.isEdited && <span className="text-[12px] text-gray-400 not-italic ml-2">(edited)</span>}
+                  </p>
+                )}
+
+                {/* Reply Section */}
+                {(rev.reply || replyingReviewId === rev.id) && (
+                  <div className="mt-2 pl-4 border-l-2 border-gray-300">
+                    {replyingReviewId === rev.id ? (
+                      <div className="flex flex-col gap-2">
+                        <textarea 
+                          className="w-full border border-gray-300 rounded p-2 text-sm text-gray-700 bg-white"
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          placeholder="Write a reply..."
+                          rows={2}
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <button 
+                            onClick={() => { setReplyingReviewId(null); setReplyText(''); }}
+                            className="px-3 py-1 text-xs font-bold text-gray-500 bg-gray-100 rounded"
+                          >
+                            Cancel
+                          </button>
+                          <button 
+                            onClick={() => {
+                              if (rev.id && onUpdateReview) {
+                                onUpdateReview(rev.id, { reply: replyText });
+                              }
+                              setReplyingReviewId(null);
+                              setReplyText('');
+                            }}
+                            className="px-3 py-1 text-xs font-bold text-white bg-green-500 rounded"
+                          >
+                            Save Reply
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-[16px] text-gray-600 bg-gray-50 p-2 rounded">
+                        <span className="font-bold text-gray-500 text-[14px] block mb-1">Reply:</span>
+                        {rev.reply}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Actions: Edit, Reply, Delete */}
+                <div className="flex justify-end gap-3 mt-1 pt-2 border-t border-gray-200">
+                  {/* Employer can edit their own reviews. Helper can edit their own reviews. */}
+                  {(role === rev.role && rev.id) && (
+                    <button 
+                      onClick={() => {
+                        setEditingReviewId(rev.id!);
+                        setEditCommentText(rev.comment);
+                      }}
+                      className="text-[12px] font-bold text-blue-600 hover:underline"
+                    >
+                      Edit
+                    </button>
+                  )}
+
+                  {/* Helper can reply to employer's review. Helper can also add to their own self-eval (as a reply/addendum). */}
+                  {(role === 'helper' && rev.id && !rev.reply && replyingReviewId !== rev.id) && (
+                    <button 
+                      onClick={() => {
+                        setReplyingReviewId(rev.id!);
+                        setReplyText('');
+                      }}
+                      className="text-[12px] font-bold text-green-600 hover:underline"
+                    >
+                      {rev.role === 'employer' ? 'Reply' : 'Add Note'}
+                    </button>
+                  )}
+
+                  {/* Anyone can clear their view, or clear completely. The prompt implies both can clear it. */}
+                  {rev.id && onDeleteReview && (
+                    <button 
+                      onClick={() => {
+                        if (confirm(lang === 'en' ? 'Are you sure you want to delete this evaluation?' : 'Yakin ingin menghapus ulasan ini?')) {
+                          onDeleteReview(rev.id!);
+                        }
+                      }}
+                      className="text-[12px] font-bold text-red-500 hover:underline"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
             )})
           ) : (
