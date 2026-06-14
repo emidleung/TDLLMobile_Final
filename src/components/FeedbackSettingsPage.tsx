@@ -200,9 +200,15 @@ export function FeedbackSettingsPage({
         </h3>
         
         <div className="flex flex-col gap-4">
-          {reviews.length > 0 ? (
-            reviews.map((rev, idx) => {
-              const dt = new Date(rev.createTime);
+          {(() => {
+            const visibleReviews = reviews.filter(r => {
+              if (role === 'employer' && r.deletedByEmployer) return false;
+              if (role === 'helper' && r.deletedByHelper) return false;
+              return true;
+            });
+            return visibleReviews.length > 0 ? (
+              visibleReviews.map((rev, idx) => {
+                const dt = new Date(rev.createTime);
               const validDate = !isNaN(dt.getTime());
               const isEmployerReview = rev.role === 'employer';
               return (
@@ -347,7 +353,7 @@ export function FeedbackSettingsPage({
                       }}
                       className="text-[12px] font-bold text-red-500 hover:underline"
                     >
-                      Clear
+                      Delete
                     </button>
                   )}
                 </div>
@@ -357,7 +363,8 @@ export function FeedbackSettingsPage({
             <span className="text-[18px] text-app-text-muted italic">
               No historical scores registered yet.
             </span>
-          )}
+          )
+          })()}
         </div>
       </section>
 

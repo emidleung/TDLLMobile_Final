@@ -127,4 +127,6 @@ export interface Review {
   createTime: string;
   reply?: string;
   isEdited?: boolean;
+  deletedByEmployer?: boolean;
+  deletedByHelper?: boolean;
 }

@@ -722,7 +722,13 @@ Respond ONLY with a valid JSON object:
 
   const handleDeleteReview = async (reviewId: string) => {
     try {
-      await deleteDoc(doc(db, "reviews", reviewId));
+      if (role === 'employer') {
+        await updateDoc(doc(db, "reviews", reviewId), { deletedByEmployer: true });
+      } else if (role === 'helper') {
+        await updateDoc(doc(db, "reviews", reviewId), { deletedByHelper: true });
+      } else {
+        await deleteDoc(doc(db, "reviews", reviewId));
+      }
     } catch (err) {
       console.error("Delete review failed:", err);
     }
