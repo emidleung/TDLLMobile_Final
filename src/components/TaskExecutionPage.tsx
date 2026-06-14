@@ -460,7 +460,7 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
       </div>
 
       {stepSuccessMessage && (
-        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 bg-[#1E293B] text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 animate-bounce">
+        <div className="fixed bottom-40 left-1/2 -translate-x-1/2 bg-[#1E293B] text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-50 animate-bounce">
           <Sparkles className="w-5 h-5 text-[#F3A562]" />
           <span className="font-bold text-sm whitespace-nowrap">{stepSuccessMessage}</span>
         </div>
