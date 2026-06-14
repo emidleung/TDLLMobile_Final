@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Star, Settings, Languages, LogOut, CheckCircle } from 'lucide-react';
 import { Language, Review, Role } from '../types';
+import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 interface FeedbackSettingsPageProps {
   lang: Language;
@@ -37,6 +39,17 @@ export function FeedbackSettingsPage({
   const [replyingReviewId, setReplyingReviewId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState<string>('');
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.from('.review-card', {
+      y: 40,
+      opacity: 0,
+      duration: 0.6,
+      stagger: 0.1,
+      ease: 'power3.out',
+    });
+  }, { scope: containerRef });
 
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -199,7 +212,7 @@ export function FeedbackSettingsPage({
              : (role === 'employer' ? 'Riwayat Skor Evaluasi' : 'Riwayat Skor Evaluasi Diri')}
         </h3>
         
-        <div className="flex flex-col gap-4">
+        <div ref={containerRef} className="flex flex-col gap-4">
           {(() => {
             const visibleReviews = reviews.filter(r => {
               if (role === 'employer' && r.deletedByEmployer) return false;
@@ -212,7 +225,7 @@ export function FeedbackSettingsPage({
               const validDate = !isNaN(dt.getTime());
               const isEmployerReview = rev.role === 'employer';
               return (
-              <div key={idx} className="bg-[#FCF9F2] p-4 border border-app-border rounded-[14px] flex flex-col gap-2">
+              <div key={idx} className="review-card bg-[#FCF9F2] p-4 border border-app-border rounded-[14px] flex flex-col gap-2">
                 <div className="flex justify-between items-start">
                   <div className="flex flex-col gap-1">
                     <span className="text-[18px] font-bold text-[#444444]">{rev.taskTitle}</span>
