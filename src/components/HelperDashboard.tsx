@@ -215,8 +215,8 @@ export function HelperDashboard({ task, allTasks = [], recipes: propRecipes, lan
       </section>
 
       {/* Rejection Alert */}
-      {task && task.taskStatus === 'prep_rejected' && (
-        <div className="bg-red-50 border border-red-200 rounded-[14px] p-4 flex flex-col gap-2 animate-bounce">
+      {task && (task.taskStatus === 'prep_rejected' || task.taskStatus === 'dish_rejected') && (
+        <div className="bg-red-50 border border-red-200 rounded-[14px] p-4 flex flex-col gap-2">
           <div className="flex items-center gap-2 text-red-600 font-bold">
             <ShieldAlert className="w-5 h-5" />
             <span>{lang === 'en' ? 'Task Rejected' : 'Tugas Ditolak'}</span>
@@ -293,7 +293,7 @@ export function HelperDashboard({ task, allTasks = [], recipes: propRecipes, lan
           {/* START PREPARATION Main Orange Button (88px Height, 28px text) */}
           <button
             onClick={() => {
-              if (task.taskStatus === 'preparing') {
+              if (task.taskStatus === 'preparing' || task.taskStatus === 'prep_rejected' || task.taskStatus === 'dish_rejected') {
                 onNavigate('task-execution');
               } else if (task.taskStatus === 'prep_approved' || task.taskStatus === 'cooking_ongoing') {
                 onNavigate('task-execution');
