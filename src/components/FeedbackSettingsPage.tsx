@@ -198,12 +198,7 @@ export function FeedbackSettingsPage({
               <div key={idx} className="bg-[#FCF9F2] p-4 border border-app-border rounded-[14px] flex flex-col gap-2">
                 <div className="flex justify-between items-start">
                   <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[18px] font-bold text-[#444444]">{rev.taskTitle}</span>
-                      <span className={`whitespace-nowrap px-2 py-0.5 rounded text-[12px] font-bold ${isEmployerReview ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
-                        {isEmployerReview ? 'Employer Eval' : 'Self-Eval'}
-                      </span>
-                    </div>
+                    <span className="text-[18px] font-bold text-[#444444]">{rev.taskTitle}</span>
                     <div className="flex text-app-orange gap-0.5">
                       {Array.from({ length: rev.starRate }).map((_, i) => (
                         <Star key={i} className="w-4 h-4 fill-current text-app-orange" />
@@ -213,9 +208,14 @@ export function FeedbackSettingsPage({
                       ))}
                     </div>
                   </div>
-                  <div className="flex flex-col items-end text-[14px] text-app-text-muted">
-                    <span>{validDate ? dt.toLocaleDateString() : ''}</span>
-                    <span>{validDate ? dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+                  <div className="flex flex-col items-end gap-1 text-[14px] text-app-text-muted">
+                    <div className="flex flex-col items-end leading-tight">
+                      <span>{validDate ? dt.toLocaleDateString() : ''}</span>
+                      <span>{validDate ? dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+                    </div>
+                    <span className={`whitespace-nowrap px-2 py-0.5 rounded text-[12px] font-bold ${isEmployerReview ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                      {isEmployerReview ? 'Employer Eval' : 'Self-Eval'}
+                    </span>
                   </div>
                 </div>
                 <p className="text-[20px] italic text-[#444444] mt-2">"{rev.comment}"</p>
