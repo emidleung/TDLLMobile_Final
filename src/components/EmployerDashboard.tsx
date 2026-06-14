@@ -647,7 +647,7 @@ export function EmployerDashboard({
                     </button>
                   </div>
                 </div>
-              ) : task.taskStatus === 'pre_cook_completed' || (task.preCookFinishRate === 100 && task.cookFinishRate === 0 && !task.prepImageUrl) || (!!(task as any).prepImageUrl && task.cookFinishRate === 0) ? (
+              ) : task.taskStatus === 'pre_cook_completed' || (task.preCookFinishRate === 100 && task.cookFinishRate === 0 && !task.prepImageUrl && task.taskStatus !== 'prep_approved') || (!!(task as any).prepImageUrl && task.cookFinishRate === 0 && !['prep_approved', 'completed', 'ai_checked', 'dish_approved', 'rated'].includes(task.taskStatus)) ? (
                 <div className="flex flex-col gap-3">
                   <div className="flex gap-2 items-center bg-orange-50 p-2 rounded-lg text-app-orange border border-orange-200">
                     <ShieldAlert className="w-5 h-5 shrink-0" />
@@ -678,6 +678,14 @@ export function EmployerDashboard({
                     </button>
                   </div>
                 </div>
+              ) : task.taskStatus === 'prep_approved' ? (
+                <button
+                  disabled
+                  className="w-full py-2 px-3 bg-green-50 text-green-600 font-bold rounded-[10px] shadow-sm flex items-center justify-center gap-1.5 border border-green-200"
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  <span>Preparation Approved</span>
+                </button>
               ) : task.taskStatus === 'cooking_ongoing' || task.cookFinishRate > 0 ? (
                 <button
                   onClick={() => {}}
