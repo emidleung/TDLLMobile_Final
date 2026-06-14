@@ -5,6 +5,7 @@ import { RECIPES } from '../recipesData';
 
 interface HelperDashboardProps {
   task: Task | null;
+  allTasks?: Task[];
   recipes: Recipe[];
   lang: Language;
   onNavigate: (view: string) => void;
@@ -104,7 +105,7 @@ function getRecipeDetails(recipeID: string, lang: Language, def: typeof GREETING
   }
 }
 
-export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, onConfirmStep, userFullName, onRefreshData, onDeleteTask }: HelperDashboardProps) {
+export function HelperDashboard({ task, allTasks = [], recipes: propRecipes, lang, onNavigate, onConfirmStep, userFullName, onRefreshData, onDeleteTask }: HelperDashboardProps) {
   // Robustness: fallback to RECIPES constant if prop is empty
   const recipes = propRecipes && propRecipes.length > 0 ? propRecipes : RECIPES;
   const currentRecipe = task ? (recipes.find(r => r.recipeID === task.recipeID) || {
@@ -152,6 +153,21 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
   // Visual local state to track dynamic progress bar changes and Next Step unlocking interaction
   const [localProgress, setLocalProgress] = useState<number>(0);
   const [isPrepping, setIsPrepping] = useState<boolean>(false);
+  const [showAllFinishedTasks, setShowAllFinishedTasks] = useState<boolean>(false);
+
+  const getRecipeImage = (id?: string) => {
+    if (!id) return '';
+    const r = recipes.find(x => x.recipeID === id);
+    if (r?.image) return r.image;
+    if (r?.preCookSteps?.[0]?.image) return r.preCookSteps[0].image;
+    switch (id) {
+      case 'steamed-garlic-chicken': return '/recipes/garlic_soy_chicken.png';
+      case 'tomato-egg-stir-fry': return '/recipes/tomato_egg_main_v4.jpg';
+      case 'cantonese-steamed-fish': return '/recipes/steamed_fish_main_v2.jpg';
+      case 'garlic-bok-choy': return '/recipes/garlic_bok_choy_main.png';
+      default: return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c';
+    }
+  };
 
   // Sync with actual database states on load
   useEffect(() => {
@@ -316,6 +332,87 @@ export function HelperDashboard({ task, recipes: propRecipes, lang, onNavigate, 
             {labels.noTaskDesc}
           </p>
         </div>
+      )}
+
+      {/* Finished Tasks Section */}
+      {allTasks.filter(t => t.taskStatus === 'rated').length > 0 && (
+        <section className="flex flex-col gap-3 mt-4">
+          <div 
+            className="flex justify-between items-center cursor-pointer hover:opacity-80 transition-opacity bg-white p-3 rounded-[14px] border border-app-border shadow-sm"
+            onClick={() => setShowAllFinishedTasks(!showAllFinishedTasks)}
+          >
+            <span className="text-[16px] font-bold text-app-text-title uppercase tracking-wider flex items-center gap-2">
+              {lang === 'en' ? 'Finished Tasks' : 'Tugas Selesai'}
+              <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">
+                {allTasks.filter(t => t.taskStatus === 'rated').length}
+              </span>
+            </span>
+            <div className="flex items-center gap-4">
+              <span 
+                className="text-sm text-red-500 font-bold hover:underline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const finishedTasks = allTasks.filter(t => t.taskStatus === 'rated');
+                  if (finishedTasks.length > 0 && confirm(lang === 'en' ? 'Are you sure you want to clear all finished tasks?' : 'Yakin ingin menghapus semua tugas yang sudah selesai?')) {
+                    finishedTasks.forEach(t => onDeleteTask(t.taskID));
+                  }
+                }}
+              >
+                {lang === 'en' ? 'Clear' : 'Hapus Semua'}
+              </span>
+              <span className="text-sm text-app-orange font-bold">
+                {showAllFinishedTasks ? (lang === 'en' ? 'Collapse' : 'Tutup') : (lang === 'en' ? 'Expand' : 'Buka')}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-3 relative">
+            {allTasks.filter(t => t.taskStatus === 'rated')
+              .slice(0, showAllFinishedTasks ? undefined : 1)
+              .map((finishedTask, index) => {
+              const fRecipe = recipes.find(r => r.recipeID === finishedTask.recipeID);
+              if (!fRecipe) return null;
+              return (
+                <div key={finishedTask.taskID} className="bg-[#F8F9FA] border border-app-border rounded-[14px] p-4 shadow-sm flex items-center gap-4 relative overflow-hidden">
+                  <div className="w-16 h-16 bg-gray-100 rounded-[10px] overflow-hidden border border-app-border shrink-0">
+                    <img
+                      alt={fRecipe.title[lang]}
+                      className="w-full h-full object-cover grayscale-[30%]"
+                      src={getRecipeImage(finishedTask.recipeID)}
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div className="flex flex-col flex-1">
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className="text-[16px] font-bold text-gray-600 leading-tight line-clamp-1 pr-2">
+                        {fRecipe.title[lang] || fRecipe.title['en']}
+                      </h3>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="bg-[#E2DDD5] text-[#444444] py-0.5 px-2 rounded-md text-[11px] font-bold shadow-sm border border-[#D5CDC4]">
+                          {lang === 'en' ? 'Finished' : 'Selesai'}
+                        </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm(lang === 'en' ? 'Are you sure you want to delete this finished task?' : 'Yakin ingin menghapus tugas yang sudah selesai ini?')) {
+                              onDeleteTask(finishedTask.taskID);
+                            }
+                          }}
+                          className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors shrink-0"
+                          title="Delete finished task"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-[14px] text-gray-500">
+                      {fRecipe.subtitle?.[lang] || fRecipe.subtitle?.['en'] || fRecipe.description?.[lang] || fRecipe.description?.['en']}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
     </div>
   );

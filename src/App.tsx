@@ -957,6 +957,7 @@ Respond ONLY with a valid JSON object:
               {currentView === 'dashboard' && role === 'helper' && (
                 <HelperDashboard
                   task={activeTask}
+                  allTasks={allTasks}
                   recipes={recipes}
                   lang={lang}
                   onNavigate={setCurrentView}

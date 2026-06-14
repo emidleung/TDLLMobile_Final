@@ -699,9 +699,23 @@ export function EmployerDashboard({
                 {allTasks.filter(t => t.taskStatus === 'rated').length}
               </span>
             </span>
-            <span className="text-sm text-app-orange font-bold">
-              {showAllFinishedTasks ? 'Collapse' : 'Expand'}
-            </span>
+            <div className="flex items-center gap-4">
+              <span 
+                className="text-sm text-red-500 font-bold hover:underline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const finishedTasks = allTasks.filter(t => t.taskStatus === 'rated');
+                  if (finishedTasks.length > 0 && confirm(lang === 'en' ? 'Are you sure you want to clear all finished tasks?' : 'Yakin ingin menghapus semua tugas yang sudah selesai?')) {
+                    finishedTasks.forEach(t => onDeleteTask(t.taskID));
+                  }
+                }}
+              >
+                {lang === 'en' ? 'Clear' : 'Hapus Semua'}
+              </span>
+              <span className="text-sm text-app-orange font-bold">
+                {showAllFinishedTasks ? 'Collapse' : 'Expand'}
+              </span>
+            </div>
           </div>
           <div className="flex flex-col gap-3 relative">
             {allTasks.filter(t => t.taskStatus === 'rated')
