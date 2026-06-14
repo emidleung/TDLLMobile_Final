@@ -591,56 +591,7 @@ export function EmployerDashboard({
                 </div>
               )}
 
-              {task.taskStatus === 'preparing' ? (
-                <button
-                  onClick={() => {}}
-                  disabled
-                  className="w-full py-2 px-3 bg-gray-100 font-bold text-gray-400 rounded-[10px] shadow-sm flex items-center justify-center gap-1.5"
-                >
-                  <Clock className="w-4 h-4" />
-                  <span>Awaiting Preparation</span>
-                </button>
-              ) : task.taskStatus === 'pre_cook_completed' || (task.preCookFinishRate === 100 && task.cookFinishRate === 0 && !task.prepImageUrl) ? (
-                <div className="flex flex-col gap-3">
-                  <div className="flex gap-2 items-center bg-orange-50 p-2 rounded-lg text-app-orange border border-orange-200">
-                    <ShieldAlert className="w-5 h-5 shrink-0" />
-                    <span className="font-bold text-sm">Action Required: Review Preparation</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        if (onReviewPrep) {
-                          onReviewPrep(task.taskID, true);
-                        }
-                      }}
-                      className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <CheckSquare className="w-4 h-4" />
-                      <span>Approve Prep</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (onReviewPrep) {
-                          onReviewPrep(task.taskID, false);
-                        }
-                      }}
-                      className="flex-1 py-2 px-3 bg-gray-200 font-bold text-gray-700 rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer border border-gray-300"
-                    >
-                      <X className="w-4 h-4" />
-                      <span>Reject</span>
-                    </button>
-                  </div>
-                </div>
-              ) : task.taskStatus === 'cooking_ongoing' ? (
-                <button
-                  onClick={() => {}}
-                  disabled
-                  className="w-full py-2 px-3 bg-gray-100 font-bold text-gray-400 rounded-[10px] shadow-sm flex items-center justify-center gap-1.5"
-                >
-                  <Clock className="w-4 h-4" />
-                  <span>Cooking in Progress</span>
-                </button>
-              ) : task.taskStatus === 'completed' || task.taskStatus === 'ai_checked' ? (
+              {task.taskStatus === 'completed' || task.taskStatus === 'ai_checked' || !!(task as any).cookImageUrl ? (
                 <div className="flex flex-col gap-3">
                   <div className="flex gap-2 items-center bg-green-50 p-2 rounded-lg text-green-700 border border-green-200">
                     <Sparkles className="w-5 h-5 shrink-0" />
@@ -672,7 +623,56 @@ export function EmployerDashboard({
                     </button>
                   </div>
                 </div>
-              ) : null}
+              ) : task.taskStatus === 'pre_cook_completed' || (task.preCookFinishRate === 100 && task.cookFinishRate === 0 && !task.prepImageUrl) || (!!(task as any).prepImageUrl && task.cookFinishRate === 0) ? (
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-2 items-center bg-orange-50 p-2 rounded-lg text-app-orange border border-orange-200">
+                    <ShieldAlert className="w-5 h-5 shrink-0" />
+                    <span className="font-bold text-sm">Action Required: Review Preparation</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        if (onReviewPrep) {
+                          onReviewPrep(task.taskID, true);
+                        }
+                      }}
+                      className="flex-1 py-2 px-3 bg-app-orange font-bold text-[#444444] rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <CheckSquare className="w-4 h-4" />
+                      <span>Approve Prep</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (onReviewPrep) {
+                          onReviewPrep(task.taskID, false);
+                        }
+                      }}
+                      className="flex-1 py-2 px-3 bg-gray-200 font-bold text-gray-700 rounded-[10px] shadow-sm hover:opacity-90 flex items-center justify-center gap-1.5 cursor-pointer border border-gray-300"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Reject</span>
+                    </button>
+                  </div>
+                </div>
+              ) : task.taskStatus === 'cooking_ongoing' || task.cookFinishRate > 0 ? (
+                <button
+                  onClick={() => {}}
+                  disabled
+                  className="w-full py-2 px-3 bg-gray-100 font-bold text-gray-400 rounded-[10px] shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <Clock className="w-4 h-4" />
+                  <span>Cooking in Progress</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {}}
+                  disabled
+                  className="w-full py-2 px-3 bg-gray-100 font-bold text-gray-400 rounded-[10px] shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <Clock className="w-4 h-4" />
+                  <span>Awaiting Preparation</span>
+                </button>
+              )}
             </div>
           </div>
         ) : (
