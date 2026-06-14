@@ -180,6 +180,7 @@ export function EmployerDashboard({
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalImage, setModalImage] = useState('');
+  const [showAllFinishedTasks, setShowAllFinishedTasks] = useState(false);
 
   // Add Custom Favorited Form State
   const [newTitle, setNewTitle] = useState('');
@@ -688,13 +689,24 @@ export function EmployerDashboard({
       {/* 3.5 Finished Tasks Column */}
       {allTasks.filter(t => t.taskStatus === 'rated').length > 0 && (
         <section className="flex flex-col gap-3">
-          <div className="flex justify-between items-center">
-            <span className="text-[16px] font-bold text-app-text-title uppercase tracking-wider">
-              Finished Task
+          <div 
+            className="flex justify-between items-center cursor-pointer hover:opacity-80 transition-opacity bg-white p-3 rounded-[14px] border border-app-border shadow-sm"
+            onClick={() => setShowAllFinishedTasks(!showAllFinishedTasks)}
+          >
+            <span className="text-[16px] font-bold text-app-text-title uppercase tracking-wider flex items-center gap-2">
+              Finished Tasks
+              <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">
+                {allTasks.filter(t => t.taskStatus === 'rated').length}
+              </span>
+            </span>
+            <span className="text-sm text-app-orange font-bold">
+              {showAllFinishedTasks ? 'Collapse' : 'Expand'}
             </span>
           </div>
-          <div className="flex flex-col gap-3">
-            {allTasks.filter(t => t.taskStatus === 'rated').map(finishedTask => {
+          <div className="flex flex-col gap-3 relative">
+            {allTasks.filter(t => t.taskStatus === 'rated')
+              .slice(0, showAllFinishedTasks ? undefined : 1)
+              .map((finishedTask, index) => {
               const fRecipe = recipes.find(r => r.recipeID === finishedTask.recipeID);
               if (!fRecipe) return null;
               return (
