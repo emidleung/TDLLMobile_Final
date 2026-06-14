@@ -430,9 +430,8 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
                       <Sparkles className="w-8 h-8 text-primary" />
                     </div>
                     <h1 className="text-2xl font-bold mb-4">{recipe?.title[lang] || 'Recipe Steps'}</h1>
-                    <p className="text-xs text-gray-400 mb-2">Build v1.0.2 - Parity Synced</p>
                     <p className="text-sm text-on-surface-variant mb-6 max-w-[250px]">
-                      Take a photo of the final plated dish to run the AI presentation check.
+                      {lang === 'en' ? "Take a photo of the final plated dish for employer's approval !" : "Ambil foto hidangan yang sudah disajikan untuk persetujuan majikan !"}
                     </p>
                     <button
                       onClick={() => onNavigate('upload-check')}
