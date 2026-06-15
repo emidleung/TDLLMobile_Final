@@ -179,8 +179,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
                 <div style={{ backgroundColor: isMine ? "#fb923c" : "#e5e7eb", color: isMine ? "#fff" : "#1f2937", padding: "12px 16px", borderRadius: isMine ? "16px 16px 0 16px" : "16px 16px 16px 0", lineHeight: "1.4" }}>
                   {msg.message}
                 </div>
-                <div style={{ alignSelf: isMine ? "flex-end" : "flex-start", fontSize: "10px", color: "#9ca3af", marginTop: "4px" }}>
+                <div style={{ alignSelf: isMine ? "flex-end" : "flex-start", fontSize: "10px", color: "#9ca3af", marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
                   {new Date(msg.createTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {isMine && (
+                    <span style={{ color: msg.isRead ? "#3b82f6" : "#9ca3af", fontSize: "12px", fontWeight: "bold" }}>
+                      {msg.isRead ? "✓✓" : "✓"}
+                    </span>
+                  )}
                 </div>
               </div>
             );

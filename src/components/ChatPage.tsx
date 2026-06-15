@@ -47,7 +47,7 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
 
   const dynamicChats = connections.map(c => {
     const partnerID = c.employerID === currentUserId ? c.helperID : c.employerID;
-    const chatId = `chat_${partnerID}`;
+    const chatId = `chat_${c.connectionID || c.employerID + '_' + c.helperID}`;
     const partnerChats = chats.filter(chat => chat.taskID === chatId);
     const lastMsg = partnerChats.length > 0 ? partnerChats[partnerChats.length - 1].message : 'Tap to start chatting...';
     const unreadInChat = partnerChats.filter(chat => !chat.isRead && chat.senderRole !== role).length;

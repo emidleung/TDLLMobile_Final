@@ -870,9 +870,8 @@ Respond ONLY with a valid JSON object:
     return role === 'employer' ? employerAvatar : helperAvatar;
   };
 
-  const totalNotifications = 
-    chats.filter(c => !c.isRead && c.senderRole !== role).length +
-    invitations.filter(inv => inv.receiverID === currentUserId && inv.status === 'pending').length;
+  const unreadChatCount = chats.filter(c => !c.isRead && c.senderRole !== role).length;
+  const pendingInvCount = invitations.filter(inv => inv.receiverID === currentUserId && inv.status === 'pending').length;
 
   return (
     <main className="min-h-screen bg-[#ECE9E2] text-[#444444] font-sans flex flex-col items-center justify-start py-0 md:py-6">
@@ -1152,7 +1151,7 @@ Respond ONLY with a valid JSON object:
                     <div className="relative">
                       <MessageSquare className="w-5 h-5 shrink-0 text-[#444444]" strokeWidth={2.5} />
                     </div>
-                    <span>Chat</span>
+                    <span>Chat {unreadChatCount > 0 ? `(${unreadChatCount})` : ''}</span>
                   </button>
                 ) : (
                   <button
@@ -1162,7 +1161,7 @@ Respond ONLY with a valid JSON object:
                     <div className="relative">
                       <MessageSquare className="w-5 h-5 mb-0.5 shrink-0" strokeWidth={1.5} />
                     </div>
-                    <span>Chat</span>
+                    <span>Chat {unreadChatCount > 0 ? `(${unreadChatCount})` : ''}</span>
                   </button>
                 )}
               </div>
@@ -1175,7 +1174,7 @@ Respond ONLY with a valid JSON object:
                     className="flex items-center justify-center gap-2 px-3 py-2 bg-app-orange text-[#444444] rounded-[14px] font-bold text-[14px] transition-all cursor-pointer shadow-sm animate-fadeIn"
                   >
                     <Settings className="w-5 h-5 shrink-0 text-[#444444]" strokeWidth={2.5} />
-                    <span>Settings</span>
+                    <span>Settings {pendingInvCount > 0 ? `(${pendingInvCount})` : ''}</span>
                   </button>
                 ) : (
                   <button
@@ -1183,7 +1182,7 @@ Respond ONLY with a valid JSON object:
                     className="flex flex-col items-center justify-center py-2 text-[#666666] hover:text-[#444444] text-[13px] font-semibold transition-all cursor-pointer"
                   >
                     <Settings className="w-5 h-5 mb-0.5 shrink-0" strokeWidth={1.5} />
-                    <span>Settings</span>
+                    <span>Settings {pendingInvCount > 0 ? `(${pendingInvCount})` : ''}</span>
                   </button>
                 )}
               </div>
