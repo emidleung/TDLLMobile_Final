@@ -686,6 +686,14 @@ export function EmployerDashboard({
                   <CheckSquare className="w-4 h-4" />
                   <span>Preparation Approved</span>
                 </button>
+              ) : task.taskStatus === 'dish_approved' ? (
+                <button
+                  disabled
+                  className="w-full py-2 px-3 bg-green-50 text-green-600 font-bold rounded-[10px] shadow-sm flex items-center justify-center gap-1.5 border border-green-200"
+                >
+                  <CheckSquare className="w-4 h-4" />
+                  <span>Dish Approved</span>
+                </button>
               ) : task.taskStatus === 'cooking_ongoing' || task.cookFinishRate > 0 ? (
                 <button
                   onClick={() => {}}

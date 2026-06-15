@@ -590,15 +590,12 @@ export default function App() {
   const handleReviewDish = async (taskId: string, isApproved: boolean) => {
     try {
       if (isApproved) {
-        await updateDoc(doc(db, "tasks", taskId), { taskStatus: 'rated' });
+        await updateDoc(doc(db, "tasks", taskId), { taskStatus: 'dish_approved' });
       } else {
         await updateDoc(doc(db, "tasks", taskId), { 
-          taskStatus: 'prep_rejected',
-          preCookFinishRate: 0,
+          taskStatus: 'dish_rejected',
           cookFinishRate: 0,
-          currentPreStepIndex: 0,
           currentCookStepIndex: 0,
-          prepImageUrl: deleteField() as any,
           cookImageUrl: deleteField() as any
         });
       }
@@ -712,7 +709,7 @@ Respond ONLY with a valid JSON object:
   const handleSubmitReview = async (starRate: number, comment: string) => {
     const targetTask = allTasks.find(t => {
       const hasRated = reviews.some(r => r.taskID === t.taskID && r.role === role);
-      return !hasRated && ['completed', 'ai_checked', 'rated'].includes(t.taskStatus);
+      return !hasRated && ['completed', 'ai_checked', 'dish_approved', 'rated'].includes(t.taskStatus);
     });
     if (!targetTask) return;
 
