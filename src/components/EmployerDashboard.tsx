@@ -1027,7 +1027,7 @@ export function EmployerDashboard({
       {/* MODAL 2: DISH DETAILS AND NUTRITIONAL INFORMATION POPUP */}
       {activeDetailRecipe && (
         <div className="fixed inset-0 bg-[#FCF9F2] z-[60] overflow-y-auto animate-fadeIn">
-          <div className="flex flex-col gap-6 w-full max-w-[480px] mx-auto p-6 pb-12">
+          <div className="flex flex-col gap-6 w-full max-w-[480px] mx-auto p-6 pb-[120px]">
             
             {/* Back navigation button */}
             <button

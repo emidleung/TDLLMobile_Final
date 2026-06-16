@@ -36,9 +36,9 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
 
   const handleConfirmStep = (type: 'pre' | 'cook', stepId: number) => {
     setStepSuccessMessage("Great job! Let's move to the next step.");
+    onConfirmStep(type, stepId, true);
     setTimeout(() => {
       setStepSuccessMessage(null);
-      onConfirmStep(type, stepId, true);
     }, 2000);
   };
 
