@@ -60,38 +60,6 @@ export default function App() {
   const [userFullName, setUserFullName] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [connectedPartnerId, setConnectedPartnerId] = useState<string | null>(null);
-  
-  const confettiFiredRef = useRef<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (activeTask && activeTask.taskStatus === 'completed') {
-      if (!confettiFiredRef.current.has(activeTask.taskID)) {
-        confettiFiredRef.current.add(activeTask.taskID);
-        
-        const duration = 3 * 1000;
-        const animationEnd = Date.now() + duration;
-        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10000 };
-
-        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-        const interval: any = setInterval(function() {
-          const timeLeft = animationEnd - Date.now();
-
-          if (timeLeft <= 0) {
-            return clearInterval(interval);
-          }
-
-          const particleCount = 50 * (timeLeft / duration);
-          confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-          confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-        }, 250);
-        
-        setTimeout(() => {
-          setCurrentView('feedback-settings');
-        }, 1500);
-      }
-    }
-  }, [activeTask?.taskStatus, activeTask?.taskID]);
   const [partnerFullName, setPartnerFullName] = useState<string>('Your Helper');
   const [currentView, setCurrentView] = useState<string>('dashboard');
 
@@ -184,6 +152,37 @@ export default function App() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
+  const confettiFiredRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (activeTask && activeTask.taskStatus === 'completed') {
+      if (!confettiFiredRef.current.has(activeTask.taskID)) {
+        confettiFiredRef.current.add(activeTask.taskID);
+        
+        const duration = 3 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10000 };
+
+        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+        const interval: any = setInterval(function() {
+          const timeLeft = animationEnd - Date.now();
+
+          if (timeLeft <= 0) {
+            return clearInterval(interval);
+          }
+
+          const particleCount = 50 * (timeLeft / duration);
+          confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+          confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+        }, 250);
+        
+        setTimeout(() => {
+          setCurrentView('feedback-settings');
+        }, 1500);
+      }
+    }
+  }, [activeTask?.taskStatus, activeTask?.taskID]);
 
 
 
@@ -1141,7 +1140,7 @@ Respond ONLY with a valid JSON object:
                     id="tab-today-active"
                   >
                     <Calendar className="w-5 h-5 shrink-0 text-[#444444]" strokeWidth={2.5} />
-                    <span>Today</span>
+                    <span>{lang === 'en' ? 'Today' : lang === 'id' ? 'Hari Ini' : 'Ngayon'}</span>
                   </button>
                 ) : (
                   <button
@@ -1150,7 +1149,7 @@ Respond ONLY with a valid JSON object:
                     id="tab-today-inactive"
                   >
                     <Calendar className="w-5 h-5 mb-0.5 shrink-0" strokeWidth={1.5} />
-                    <span>Today</span>
+                    <span>{lang === 'en' ? 'Today' : lang === 'id' ? 'Hari Ini' : 'Ngayon'}</span>
                   </button>
                 )}
               </div>
@@ -1163,7 +1162,7 @@ Respond ONLY with a valid JSON object:
                     className="flex items-center justify-center gap-2 px-3 py-2 bg-app-orange text-[#444444] rounded-[14px] font-bold text-[14px] transition-all cursor-pointer shadow-sm animate-fadeIn"
                   >
                     <BookOpen className="w-5 h-5 shrink-0 text-[#444444]" strokeWidth={2.5} />
-                    <span>Recipes</span>
+                    <span>{lang === 'en' ? 'Recipes' : lang === 'id' ? 'Resep' : 'Mga Resipe'}</span>
                   </button>
                 ) : (
                   <button
@@ -1171,7 +1170,7 @@ Respond ONLY with a valid JSON object:
                     className="flex flex-col items-center justify-center py-2 text-[#666666] hover:text-[#444444] text-[13px] font-semibold transition-all cursor-pointer"
                   >
                     <BookOpen className="w-5 h-5 mb-0.5 shrink-0" strokeWidth={1.5} />
-                    <span>Recipes</span>
+                    <span>{lang === 'en' ? 'Recipes' : lang === 'id' ? 'Resep' : 'Mga Resipe'}</span>
                   </button>
                 )}
               </div>
@@ -1191,7 +1190,7 @@ Respond ONLY with a valid JSON object:
                         </div>
                       )}
                     </div>
-                    <span>Chat</span>
+                    <span>{lang === 'en' ? 'Chat' : lang === 'id' ? 'Obrolan' : 'Chat'}</span>
                   </button>
                 ) : (
                   <button
@@ -1206,7 +1205,7 @@ Respond ONLY with a valid JSON object:
                         </div>
                       )}
                     </div>
-                    <span>Chat</span>
+                    <span>{lang === 'en' ? 'Chat' : lang === 'id' ? 'Obrolan' : 'Chat'}</span>
                   </button>
                 )}
               </div>
@@ -1226,7 +1225,7 @@ Respond ONLY with a valid JSON object:
                         </div>
                       )}
                     </div>
-                    <span>Settings</span>
+                    <span>{lang === 'en' ? 'Settings' : lang === 'id' ? 'Pengaturan' : 'Mga Setting'}</span>
                   </button>
                 ) : (
                   <button
@@ -1241,7 +1240,7 @@ Respond ONLY with a valid JSON object:
                         </div>
                       )}
                     </div>
-                    <span>Settings</span>
+                    <span>{lang === 'en' ? 'Settings' : lang === 'id' ? 'Pengaturan' : 'Mga Setting'}</span>
                   </button>
                 )}
               </div>
