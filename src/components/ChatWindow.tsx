@@ -149,7 +149,15 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
       alert("Warning: The file/recording should not exceed 1MB.");
       return;
     }
-    // Proceed with Firebase upload logic here...
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (onSendMessage && reader.result) {
+          onSendMessage(reader.result as string, chatId);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -176,8 +184,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
                 onClick={() => handleMessageClick(msg)}
                 style={{ display: 'flex', flexDirection: 'column', alignSelf: isMine ? 'flex-end' : 'flex-start', maxWidth: '80%', cursor: 'pointer' }}
               >
-                <div style={{ backgroundColor: isMine ? "#fb923c" : "#e5e7eb", color: isMine ? "#fff" : "#1f2937", padding: "12px 16px", borderRadius: isMine ? "16px 16px 0 16px" : "16px 16px 16px 0", lineHeight: "1.4" }}>
-                  {msg.message}
+                <div style={{ backgroundColor: isMine ? "#fb923c" : "#e5e7eb", color: isMine ? "#fff" : "#1f2937", padding: "12px 16px", borderRadius: isMine ? "16px 16px 0 16px" : "16px 16px 16px 0", lineHeight: "1.4", overflowWrap: "break-word", wordBreak: "break-word" }}>
+                  {msg.message.startsWith('data:image/') ? (
+                    <img src={msg.message} alt="Shared photo" style={{ maxWidth: '100%', borderRadius: '8px' }} />
+                  ) : (
+                    msg.message
+                  )}
                 </div>
                 <div style={{ alignSelf: isMine ? "flex-end" : "flex-start", fontSize: "10px", color: "#9ca3af", marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
                   {new Date(msg.createTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
