@@ -870,7 +870,8 @@ Respond ONLY with a valid JSON object:
     return role === 'employer' ? employerAvatar : helperAvatar;
   };
 
-  const unreadChatCount = chats.filter(c => !c.isRead && c.senderRole !== role).length;
+  const validChatIds = connections.map(c => `chat_${c.connectionID || c.employerID + '_' + c.helperID}`);
+  const unreadChatCount = chats.filter(c => !c.isRead && c.senderRole !== role && validChatIds.includes(c.taskID)).length;
   const pendingInvCount = invitations.filter(inv => inv.receiverID === currentUserId && inv.status === 'pending').length;
 
   return (
