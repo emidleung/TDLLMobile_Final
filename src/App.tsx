@@ -1150,8 +1150,13 @@ Respond ONLY with a valid JSON object:
                   >
                     <div className="relative">
                       <MessageSquare className="w-5 h-5 shrink-0 text-[#444444]" strokeWidth={2.5} />
+                      {unreadChatCount > 0 && (
+                        <div className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] font-bold px-1 py-0 rounded-full flex items-center justify-center min-w-[16px] h-[16px]">
+                          {unreadChatCount}
+                        </div>
+                      )}
                     </div>
-                    <span>Chat {unreadChatCount > 0 ? `(${unreadChatCount})` : ''}</span>
+                    <span>Chat</span>
                   </button>
                 ) : (
                   <button
@@ -1160,8 +1165,13 @@ Respond ONLY with a valid JSON object:
                   >
                     <div className="relative">
                       <MessageSquare className="w-5 h-5 mb-0.5 shrink-0" strokeWidth={1.5} />
+                      {unreadChatCount > 0 && (
+                        <div className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] font-bold px-1 py-0 rounded-full flex items-center justify-center min-w-[16px] h-[16px]">
+                          {unreadChatCount}
+                        </div>
+                      )}
                     </div>
-                    <span>Chat {unreadChatCount > 0 ? `(${unreadChatCount})` : ''}</span>
+                    <span>Chat</span>
                   </button>
                 )}
               </div>
@@ -1173,16 +1183,30 @@ Respond ONLY with a valid JSON object:
                     onClick={() => handleTabClick('settings')}
                     className="flex items-center justify-center gap-2 px-3 py-2 bg-app-orange text-[#444444] rounded-[14px] font-bold text-[14px] transition-all cursor-pointer shadow-sm animate-fadeIn"
                   >
-                    <Settings className="w-5 h-5 shrink-0 text-[#444444]" strokeWidth={2.5} />
-                    <span>Settings {pendingInvCount > 0 ? `(${pendingInvCount})` : ''}</span>
+                    <div className="relative">
+                      <Settings className="w-5 h-5 shrink-0 text-[#444444]" strokeWidth={2.5} />
+                      {pendingInvCount > 0 && (
+                        <div className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] font-bold px-1 py-0 rounded-full flex items-center justify-center min-w-[16px] h-[16px]">
+                          {pendingInvCount}
+                        </div>
+                      )}
+                    </div>
+                    <span>Settings</span>
                   </button>
                 ) : (
                   <button
                     onClick={() => handleTabClick('settings')}
                     className="flex flex-col items-center justify-center py-2 text-[#666666] hover:text-[#444444] text-[13px] font-semibold transition-all cursor-pointer"
                   >
-                    <Settings className="w-5 h-5 mb-0.5 shrink-0" strokeWidth={1.5} />
-                    <span>Settings {pendingInvCount > 0 ? `(${pendingInvCount})` : ''}</span>
+                    <div className="relative">
+                      <Settings className="w-5 h-5 mb-0.5 shrink-0" strokeWidth={1.5} />
+                      {pendingInvCount > 0 && (
+                        <div className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] font-bold px-1 py-0 rounded-full flex items-center justify-center min-w-[16px] h-[16px]">
+                          {pendingInvCount}
+                        </div>
+                      )}
+                    </div>
+                    <span>Settings</span>
                   </button>
                 )}
               </div>
