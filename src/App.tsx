@@ -155,7 +155,7 @@ export default function App() {
   const confettiFiredRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    if (activeTask && activeTask.taskStatus === 'completed') {
+    if (activeTask && activeTask.taskStatus === 'dish_approved') {
       if (!confettiFiredRef.current.has(activeTask.taskID)) {
         confettiFiredRef.current.add(activeTask.taskID);
         
