@@ -850,7 +850,7 @@ Respond ONLY with a valid JSON object:
 
   const taskToRate = allTasks.find(t => {
     const hasRated = reviews.some(r => r.taskID === t.taskID && r.role === role);
-    return !hasRated && ['completed', 'ai_checked', 'rated'].includes(t.taskStatus);
+    return !hasRated && ['completed', 'ai_checked', 'dish_approved', 'rated'].includes(t.taskStatus);
   });
   const taskToRateRecipe = taskToRate ? (recipes.find(r => r.recipeID === taskToRate.recipeID) || {
     title: { en: 'Cooking Task', id: 'Tugas Memasak', tg: 'Cooking Task' }
