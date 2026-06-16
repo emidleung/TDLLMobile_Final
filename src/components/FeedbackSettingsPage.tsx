@@ -30,7 +30,7 @@ export function FeedbackSettingsPage({
   const [starRate, setStarRate] = useState<number>(5);
   const [comment, setComment] = useState<string>('');
   const [successToast, setSuccessToast] = useState<string>('');
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+
 
   // States for edit and reply functionalities
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
@@ -166,43 +166,6 @@ export function FeedbackSettingsPage({
         </div>
       )}
 
-      {/* System Settings Configurations */}
-      <section className="bg-white border border-app-border rounded-[14px] p-[28px] flex flex-col gap-5 shadow-sm">
-        <div>
-          <h3 className="text-[24px] font-bold text-app-text-title flex items-center gap-2">
-            <Settings className="w-5 h-5 text-app-orange" />
-            <span>Accessibility Preferences</span>
-          </h3>
-          <p className="text-[18px] font-normal text-app-text-muted mt-1 leading-snug">
-            Manage vocal read-aloud options, languages toggles, and senior readability modes.
-          </p>
-        </div>
-
-        {/* Dynamic List Switches */}
-        <div className="flex flex-col gap-4 pt-3 border-t border-app-border">
-          
-          {/* Sounds Switch */}
-          <div className="flex items-center justify-between p-4 bg-[#FCF9F2] rounded-[14px] border border-app-border">
-            <div className="flex flex-col gap-0.5 max-w-[240px]">
-              <span className="text-[20px] font-bold text-app-text-title">Vocal Audio Guide</span>
-              <p className="text-[16px] text-app-text-muted">Play loud audio-vocal directions for foreign helper.</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`w-12 h-7 rounded-full transition-colors relative cursor-pointer ${
-                soundEnabled ? 'bg-app-orange' : 'bg-gray-300'
-              }`}
-            >
-              <div className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-all ${
-                soundEnabled ? 'left-6' : 'left-1'
-              }`} />
-            </button>
-          </div>
-
-
-        </div>
-      </section>
 
       {/* Historical feedback reviews scores */}
       <section className="bg-white border border-app-border rounded-[14px] p-[28px] flex flex-col gap-4 shadow-sm">
