@@ -757,10 +757,11 @@ Respond ONLY with a valid JSON object:
     
     // 1. Update Firestore (Real-time)
     try {
-      const q = query(collection(db, "chats"), where("taskID", "==", taskId), where("isRead", "==", false));
+      const q = query(collection(db, "chats"), where("taskID", "==", taskId));
       const snapshot = await getDocs(q);
       snapshot.forEach(async (d) => {
-        if (d.data().senderRole !== role) {
+        const data = d.data();
+        if (data.senderRole !== role && data.isRead === false) {
           await updateDoc(doc(db, "chats", d.id), { isRead: true });
         }
       });
