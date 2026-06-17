@@ -563,13 +563,15 @@ export default function App() {
     const recipe = recipes.find(r => r.recipeID === activeTask.recipeID) || RECIPES.find(r => r.recipeID === activeTask.recipeID);
     
     if (type === 'pre') {
-      const totalSteps = (recipe?.preCookSteps?.length || 0) + (activeTask.customPreSteps?.length || 0);
+      const standardPreSteps = (activeTask.adjustedPreSteps && activeTask.adjustedPreSteps.length > 0) ? activeTask.adjustedPreSteps : (recipe?.preCookSteps || []);
+      const totalSteps = standardPreSteps.length + (activeTask.customPreSteps?.length || 0);
       const rate = Math.round(((stepID + 1) / totalSteps) * 100);
       updateData.preCookFinishRate = Math.min(100, rate);
       updateData.currentPreStepIndex = stepID + 1;
       if (rate >= 100) updateData.taskStatus = 'pre_cook_completed';
     } else {
-      const totalSteps = recipe?.cookSteps?.length || 0;
+      const standardCookSteps = (activeTask.adjustedCookSteps && activeTask.adjustedCookSteps.length > 0) ? activeTask.adjustedCookSteps : (recipe?.cookSteps || []);
+      const totalSteps = standardCookSteps.length;
       const rate = Math.round(((stepID + 1) / totalSteps) * 100);
       updateData.cookFinishRate = Math.min(100, rate);
       updateData.currentCookStepIndex = stepID + 1;

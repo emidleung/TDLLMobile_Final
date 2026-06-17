@@ -185,7 +185,7 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
                     onClick={() => setShowOverview(false)}
                     className="w-full py-4 bg-[#965020] text-white text-[16px] font-bold rounded-xl shadow-md hover:bg-[#7a4018] flex items-center justify-center gap-2 transition-all cursor-pointer"
                   >
-                    Complete Preparation <ArrowRight className="w-5 h-5" />
+                    {lang === 'en' ? 'Start Preparation' : lang === 'id' ? 'Mulai Persiapan' : 'Magsimula ng Paghahanda'} <ArrowRight className="w-5 h-5" />
                   </button>
                 </div>
               </div>
