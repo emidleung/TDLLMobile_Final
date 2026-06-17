@@ -293,7 +293,7 @@ export function HelperDashboard({ task, allTasks = [], recipes: propRecipes, lan
           {/* START PREPARATION Main Orange Button (88px Height, 28px text) */}
           <button
             onClick={() => {
-              if (task.taskStatus === 'preparing' || task.taskStatus === 'prep_rejected' || task.taskStatus === 'dish_rejected') {
+              if (task.taskStatus === 'preparing' || task.taskStatus === 'prep_rejected' || task.taskStatus === 'dish_rejected' || (task.taskStatus === 'pre_cook_completed' && !task.prepImageUrl)) {
                 onNavigate('task-execution');
               } else if (task.taskStatus === 'prep_approved' || task.taskStatus === 'cooking_ongoing') {
                 onNavigate('task-execution');
@@ -301,11 +301,16 @@ export function HelperDashboard({ task, allTasks = [], recipes: propRecipes, lan
                 if (onDeleteTask) onDeleteTask(task.taskID);
               }
             }}
-            disabled={isPrepping || task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed'}
-            className={`w-full h-[88px] transition-all rounded-[14px] flex items-center justify-center gap-3.5 shadow-sm text-[16px] font-bold text-[#444444] cursor-pointer disabled:opacity-80 ${(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? 'bg-gray-200' : 'bg-app-orange hover:bg-orange-400 active:scale-[0.98]'}`}
+            disabled={isPrepping || (task.taskStatus === 'pre_cook_completed' && !!task.prepImageUrl) || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed'}
+            className={`w-full h-[88px] transition-all rounded-[14px] flex items-center justify-center gap-3.5 shadow-sm text-[16px] font-bold text-[#444444] cursor-pointer disabled:opacity-80 ${((task.taskStatus === 'pre_cook_completed' && !!task.prepImageUrl) || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? 'bg-gray-200' : 'bg-app-orange hover:bg-orange-400 active:scale-[0.98]'}`}
           >
-            {(task.taskStatus === 'pre_cook_completed' || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? (
+            {((task.taskStatus === 'pre_cook_completed' && !!task.prepImageUrl) || task.taskStatus === 'ai_checked' || task.taskStatus === 'completed') ? (
               <span>{lang === 'en' ? 'WAITING FOR APPROVAL' : 'MENUNGGU PERSETUJUAN'}</span>
+            ) : (task.taskStatus === 'pre_cook_completed' && !task.prepImageUrl) ? (
+              <span className="flex items-center gap-2">
+                <CloudUpload className="w-6 h-6" />
+                <span>{lang === 'en' ? 'UPLOAD PREP PHOTO' : 'UNGGAH FOTO PERSIAPAN'}</span>
+              </span>
             ) : task.taskStatus === 'rated' ? (
               <span className="flex items-center gap-2">
                 <CheckCircle className="w-8 h-8" />

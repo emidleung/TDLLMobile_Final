@@ -647,7 +647,7 @@ export function EmployerDashboard({
                     </button>
                   </div>
                 </div>
-              ) : task.taskStatus === 'pre_cook_completed' || (task.preCookFinishRate === 100 && task.cookFinishRate === 0 && !task.prepImageUrl && task.taskStatus !== 'prep_approved') || (!!(task as any).prepImageUrl && task.cookFinishRate === 0 && !['prep_approved', 'completed', 'ai_checked', 'dish_approved', 'rated'].includes(task.taskStatus)) ? (
+              ) : (task.taskStatus === 'pre_cook_completed' && !!(task as any).prepImageUrl) || (task.preCookFinishRate === 100 && task.cookFinishRate === 0 && !!(task as any).prepImageUrl && task.taskStatus !== 'prep_approved') || (!!(task as any).prepImageUrl && task.cookFinishRate === 0 && !['prep_approved', 'completed', 'ai_checked', 'dish_approved', 'rated'].includes(task.taskStatus)) ? (
                 <div className="flex flex-col gap-3">
                   <div className="flex gap-2 items-center bg-orange-50 p-2 rounded-lg text-app-orange border border-orange-200">
                     <ShieldAlert className="w-5 h-5 shrink-0" />
