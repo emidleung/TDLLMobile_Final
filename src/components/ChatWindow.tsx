@@ -12,9 +12,10 @@ interface ChatWindowProps {
   onSendMessage?: (msg: string, overrideTaskID?: string) => void;
   onMarkAsRead?: () => void;
   onDeleteMessage?: (chatId: string) => void;
+  lang?: string;
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onBack, translationEnabled, currentUserId, role, chats, onSendMessage, onMarkAsRead, onDeleteMessage }) => {
+export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onBack, translationEnabled, currentUserId, role, chats, onSendMessage, onMarkAsRead, onDeleteMessage, lang }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [hasRecordedAudio, setHasRecordedAudio] = useState(false);
@@ -29,12 +30,47 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
     }
   }, [chatId, chats?.length, onMarkAsRead]);
 
+  const getTranslatedMessage = (text: string) => {
+    if (!translationEnabled || !lang || lang === 'en') return text;
+    
+    const lowerMsg = text.toLowerCase();
+    const dictionary: Record<string, Record<string, string>> = {
+      'id': { 
+        'hello': 'Halo', 
+        'please sanitize the cutting board first.': 'Tolong bersihkan talenan terlebih dahulu.', 
+        'reduce the oil and salt...': 'Kurangi minyak dan garam...',
+        'type a message here.....': 'Ketik pesan di sini.....',
+        'recording audio...': 'Merekam audio...',
+        'audio ready to send': 'Audio siap dikirim',
+        'send': 'Kirim'
+      },
+      'tg': { 
+        'hello': 'Kamusta', 
+        'please sanitize the cutting board first.': 'Pakilinis muna ang sangkalan.', 
+        'reduce the oil and salt...': 'Bawasan ang mantika at asin...',
+        'type a message here.....': 'Mag-type ng mensahe dito.....',
+        'recording audio...': 'Nagre-record ng audio...',
+        'audio ready to send': 'Handa nang ipadala ang audio',
+        'send': 'Ipadala'
+      }
+    };
+    
+    if (dictionary[lang] && dictionary[lang][lowerMsg]) {
+      return dictionary[lang][lowerMsg];
+    }
+    
+    const langName = lang === 'id' ? 'Bahasa Indonesia' : lang === 'tg' ? 'Tagalog' : lang;
+    return `[Auto-translated to ${langName}]: ${text}`;
+  };
+
   const handleSendText = () => {
     if (inputText.trim() && onSendMessage) {
-      onSendMessage(inputText.trim(), chatId);
+      const finalMessage = getTranslatedMessage(inputText.trim());
+      onSendMessage(finalMessage, chatId);
       setInputText('');
     }
   };
+
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -224,16 +260,16 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
       {/* Quick Replies */}
       <div style={{ padding: "8px 16px", display: "flex", gap: "8px", overflowX: "auto", backgroundColor: "#fff" }}>
         <button 
-          onClick={() => onSendMessage && onSendMessage(translationEnabled ? "Tolong bersihkan talenan terlebih dahulu." : "Please sanitize the cutting board first.", chatId)}
+          onClick={() => onSendMessage && onSendMessage(getTranslatedMessage("Please sanitize the cutting board first."), chatId)}
           style={{ padding: "8px 16px", border: "1px solid #d1d5db", borderRadius: "20px", backgroundColor: "#fff", fontSize: "12px", whiteSpace: "nowrap", cursor: "pointer", fontWeight: "600", color: "#374151" }}
         >
-          {translationEnabled ? "Tolong bersihkan talenan terlebih dahulu." : "Please sanitize the cutting board first."}
+          {getTranslatedMessage("Please sanitize the cutting board first.")}
         </button>
         <button 
-          onClick={() => onSendMessage && onSendMessage(translationEnabled ? "Kurangi minyak dan garam..." : "Reduce the oil and salt...", chatId)}
+          onClick={() => onSendMessage && onSendMessage(getTranslatedMessage("Reduce the oil and salt..."), chatId)}
           style={{ padding: "8px 16px", border: "1px solid #d1d5db", borderRadius: "20px", backgroundColor: "#fff", fontSize: "12px", whiteSpace: "nowrap", cursor: "pointer", fontWeight: "600", color: "#374151" }}
         >
-          {translationEnabled ? "Kurangi minyak dan garam..." : "Reduce the oil and salt..."}
+          {getTranslatedMessage("Reduce the oil and salt...")}
         </button>
       </div>
 
@@ -248,7 +284,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
         </span>
         {isRecording || hasRecordedAudio ? (
           <div style={{ flex: 1, padding: "12px 16px", borderRadius: "24px", border: "1px solid #ef4444", color: "#ef4444", fontWeight: "bold", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#fee2e2" }}>
-            <span>{isRecording ? (translationEnabled ? "Merekam audio..." : "Recording audio...") : (translationEnabled ? "Audio siap dikirim" : "Audio ready to send")}</span>
+            <span>{isRecording ? getTranslatedMessage("Recording audio...") : getTranslatedMessage("Audio ready to send")}</span>
             <span>{formatTime(recordingTime)}</span>
           </div>
         ) : (
@@ -257,12 +293,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSendText(); }}
-            placeholder={translationEnabled ? "Ketik pesan di sini....." : "Type a message here....."} 
+            placeholder={getTranslatedMessage("Type a message here.....")} 
             style={{ flex: 1, padding: "12px 16px", borderRadius: "24px", border: "1px solid #d1d5db", outline: "none" }} 
           />
         )}
         <button onClick={hasRecordedAudio ? handleSendAudio : handleSendText} style={{ backgroundColor: "#fb923c", color: "#fff", border: "none", padding: "12px 20px", borderRadius: "24px", fontWeight: "bold", cursor: "pointer", opacity: isRecording ? 0.5 : 1 }} disabled={isRecording}>
-          {translationEnabled ? "Kirim" : "Send"}
+          {getTranslatedMessage("Send")}
         </button>
       </div>
       

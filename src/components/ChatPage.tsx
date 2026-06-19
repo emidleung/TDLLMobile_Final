@@ -368,6 +368,7 @@ export function ChatPage({ role, currentUserId, connectedPartnerId, invitations 
               onSendMessage={onSendMessage}
               onMarkAsRead={() => onMarkChatAsRead && onMarkChatAsRead(selectedChat.id)}
               onDeleteMessage={onDeleteChatMessage}
+              lang={lang}
             />
           )}
 
