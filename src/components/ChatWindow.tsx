@@ -33,10 +33,21 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
   const getTranslatedMessage = (text: string) => {
     if (!translationEnabled || !lang || lang === 'en') return text;
     
-    const lowerMsg = text.toLowerCase();
+    // Remove auto-translated prefix if it exists to translate the core message
+    let coreText = text;
+    if (coreText.startsWith('[Auto-translated to')) {
+      const parts = coreText.split(']: ');
+      if (parts.length > 1) {
+        coreText = parts.slice(1).join(']: ');
+      }
+    }
+    
+    const lowerMsg = coreText.toLowerCase().trim();
     const dictionary: Record<string, Record<string, string>> = {
       'id': { 
         'hello': 'Halo', 
+        'how are you ?': 'Apa kabar ?',
+        'how are you?': 'Apa kabar?',
         'please sanitize the cutting board first.': 'Tolong bersihkan talenan terlebih dahulu.', 
         'reduce the oil and salt...': 'Kurangi minyak dan garam...',
         'type a message here.....': 'Ketik pesan di sini.....',
@@ -46,6 +57,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
       },
       'tg': { 
         'hello': 'Kamusta', 
+        'how are you ?': 'Kamusta ka ?',
+        'how are you?': 'Kamusta ka?',
         'please sanitize the cutting board first.': 'Pakilinis muna ang sangkalan.', 
         'reduce the oil and salt...': 'Bawasan ang mantika at asin...',
         'type a message here.....': 'Mag-type ng mensahe dito.....',
@@ -60,7 +73,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
     }
     
     const langName = lang === 'id' ? 'Bahasa Indonesia' : lang === 'tg' ? 'Tagalog' : lang;
-    return `[Auto-translated to ${langName}]: ${text}`;
+    return `[Auto-translated to ${langName}]: ${coreText}`;
   };
 
   const handleSendText = () => {
@@ -224,7 +237,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
                   {msg.message.startsWith('data:image/') ? (
                     <img src={msg.message} alt="Shared photo" style={{ maxWidth: '100%', borderRadius: '8px' }} />
                   ) : (
-                    msg.message
+                    (!isMine && translationEnabled) ? getTranslatedMessage(msg.message) : msg.message
                   )}
                 </div>
                 <div style={{ alignSelf: isMine ? "flex-end" : "flex-start", fontSize: "10px", color: "#9ca3af", marginTop: "4px", display: "flex", alignItems: "center", gap: "4px" }}>
