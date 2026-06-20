@@ -31,7 +31,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
   }, [chatId, chats?.length, onMarkAsRead]);
 
   const getTranslatedMessage = (text: string) => {
-    if (!translationEnabled || !lang || lang === 'en') return text;
+    if (!translationEnabled || !lang) return text;
     
     // Remove auto-translated prefix if it exists to translate the core message
     let coreText = text;
@@ -53,7 +53,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
         'type a message here.....': 'Ketik pesan di sini.....',
         'recording audio...': 'Merekam audio...',
         'audio ready to send': 'Audio siap dikirim',
-        'send': 'Kirim'
+        'send': 'Kirim',
+        'need to prepare lunch?': 'Perlu menyiapkan makan siang?',
+        'let me know if you need anything.': 'Beri tahu saya jika Anda membutuhkan sesuatu.'
       },
       'tg': { 
         'hello': 'Kamusta', 
@@ -64,15 +66,50 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
         'type a message here.....': 'Mag-type ng mensahe dito.....',
         'recording audio...': 'Nagre-record ng audio...',
         'audio ready to send': 'Handa nang ipadala ang audio',
-        'send': 'Ipadala'
+        'send': 'Ipadala',
+        'need to prepare lunch?': 'Kailangan bang maghanda ng tanghalian?',
+        'let me know if you need anything.': 'Ipaalam sa akin kung kailangan mo ng kahit ano.'
+      },
+      'en': {
+        // From Indonesian
+        'halo': 'Hello',
+        'apa kabar ?': 'How are you ?',
+        'apa kabar?': 'How are you?',
+        'tolong bersihkan talenan terlebih dahulu.': 'Please sanitize the cutting board first.',
+        'kurangi minyak dan garam...': 'Reduce the oil and salt...',
+        'ketik pesan di sini.....': 'Type a message here.....',
+        'merekam audio...': 'Recording audio...',
+        'audio siap dikirim': 'Audio ready to send',
+        'kirim': 'Send',
+        'perlu menyiapkan makan siang?': 'Need to prepare lunch?',
+        'beri tahu saya jika anda membutuhkan sesuatu.': 'Let me know if you need anything.',
+        // From Tagalog
+        'kamusta': 'Hello',
+        'kamusta ka ?': 'How are you ?',
+        'kamusta ka?': 'How are you?',
+        'pakilinis muna ang sangkalan.': 'Please sanitize the cutting board first.',
+        'bawasan ang mantika at asin...': 'Reduce the oil and salt...',
+        'mag-type ng mensahe dito.....': 'Type a message here.....',
+        'nagre-record ng audio...': 'Recording audio...',
+        'handa nang ipadala ang audio': 'Audio ready to send',
+        'ipadala': 'Send',
+        'kailangan bang maghanda ng tanghalian?': 'Need to prepare lunch?',
+        'ipaalam sa akin kung kailangan mo ng kahit ano.': 'Let me know if you need anything.'
       }
     };
     
     if (dictionary[lang] && dictionary[lang][lowerMsg]) {
+      // If we translate TO english, we still don't need the [Auto-translated] prefix for the English employer
+      // actually, the user might want to know it was auto translated. Let's return just the text for UI cleanliness,
+      // or append it. Based on the mockup, we should probably just show the translated text.
       return dictionary[lang][lowerMsg];
     }
     
-    const langName = lang === 'id' ? 'Bahasa Indonesia' : lang === 'tg' ? 'Tagalog' : lang;
+    if (lang === 'en') {
+      return coreText;
+    }
+    
+    const langName = lang === 'id' ? 'Bahasa Indonesia' : lang === 'tg' ? 'Tagalog' : 'English';
     return `[Auto-translated to ${langName}]: ${coreText}`;
   };
 
