@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { Role, Language } from '../types';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
+import MagicBento from './MagicBento';
 
 interface LaunchPageProps {
   onSelectRole: (role: Role) => void;
@@ -426,60 +427,55 @@ export function LaunchPage({ onSelectRole, lang, onSelectLang }: LaunchPageProps
             </p>
           </div>
 
-          {/* Language Selection Buttons strictly designed to match screenshot */}
-          <div className="w-full flex flex-col gap-4.5 mt-6 px-2">
-            
-            {/* 1. English Card (Dark Mode styled) */}
-            <button
-              onClick={() => handleButtonClick('lang', 'en', '#bg-btn-en')}
-              className="w-full h-[64px] rounded-full bg-[#232734] border border-[#232734] hover:opacity-95 shadow-md flex items-center justify-between px-4 cursor-pointer focus:outline-none transition-all duration-200"
-              id="bg-btn-en"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#F3A562] flex items-center justify-center shrink-0">
-                  <span className="font-sans font-bold text-[14px] text-[#232734]">EN</span>
-                </div>
-                <span className="font-sans font-semibold text-[17px] text-white">
-                  English
-                </span>
-              </div>
-              <ArrowRight className="w-5 h-5 text-white mr-2" strokeWidth={2.5} />
-            </button>
-
-            {/* 2. Bahasa Indonesia Card (White/Light Mode styled) */}
-            <button
-              onClick={() => handleButtonClick('lang', 'id', '#bg-btn-id')}
-              className="w-full h-[64px] rounded-full bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] shadow-sm flex items-center justify-between px-4 cursor-pointer focus:outline-none transition-all duration-200"
-              id="bg-btn-id"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#F3A562] flex items-center justify-center shrink-0">
-                  <span className="font-sans font-bold text-[14px] text-[#232734]">ID</span>
-                </div>
-                <span className="font-sans font-semibold text-[17px] text-[#232734]">
-                  Bahasa Indonesia
-                </span>
-              </div>
-              <ArrowRight className="w-5 h-5 text-[#64748B] mr-2" strokeWidth={2} />
-            </button>
-
-            {/* 3. Tagalog Card (White/Light Mode styled) */}
-            <button
-              onClick={() => handleButtonClick('lang', 'tg', '#bg-btn-tg')}
-              className="w-full h-[64px] rounded-full bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] shadow-sm flex items-center justify-between px-4 cursor-pointer focus:outline-none transition-all duration-200"
-              id="bg-btn-tg"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#F3A562] flex items-center justify-center shrink-0">
-                  <span className="font-sans font-bold text-[14px] text-[#232734]">PH</span>
-                </div>
-                <span className="font-sans font-semibold text-[17px] text-[#232734]">
-                  Tagalog
-                </span>
-              </div>
-              <ArrowRight className="w-5 h-5 text-[#64748B] mr-2" strokeWidth={2} />
-            </button>
-
+          {/* Language Selection Buttons using MagicBento for enhanced visual effects */}
+          <div className="w-full mt-6">
+            <MagicBento 
+              textAutoHide={true}
+              enableStars={false}
+              enableSpotlight={true}
+              enableBorderGlow={true}
+              enableTilt={false}
+              enableMagnetism={false}
+              clickEffect={true}
+              spotlightRadius={400}
+              particleCount={12}
+              glowColor="132, 0, 255"
+              disableAnimations={false}
+              className="!grid-cols-1 !gap-4.5 !p-0"
+              cardData={[
+                {
+                  id: 'bg-btn-en',
+                  color: '#232734',
+                  title: 'English',
+                  description: 'Select English language',
+                  label: 'EN',
+                  onClick: () => handleButtonClick('lang', 'en', '#bg-btn-en'),
+                  icon: <ArrowRight className="w-5 h-5 text-white mr-2" strokeWidth={2.5} />
+                },
+                {
+                  id: 'bg-btn-id',
+                  color: '#FFFFFF',
+                  title: 'Bahasa Indonesia',
+                  description: 'Pilih bahasa Indonesia',
+                  label: 'ID',
+                  onClick: () => handleButtonClick('lang', 'id', '#bg-btn-id'),
+                  icon: <ArrowRight className="w-5 h-5 text-[#64748B] mr-2" strokeWidth={2} />
+                },
+                {
+                  id: 'bg-btn-tg',
+                  color: '#FFFFFF',
+                  title: 'Tagalog',
+                  description: 'Pumili ng wikang Tagalog',
+                  label: 'PH',
+                  onClick: () => handleButtonClick('lang', 'tg', '#bg-btn-tg'),
+                  icon: <ArrowRight className="w-5 h-5 text-[#64748B] mr-2" strokeWidth={2} />
+                }
+              ].map(card => ({
+                ...card,
+                // Add conditional text colors for the cards based on background
+                className: card.color === '#FFFFFF' ? 'magic-bento-card--light' : ''
+              }))}
+            />
           </div>
         </div>
       )}
@@ -495,53 +491,54 @@ export function LaunchPage({ onSelectRole, lang, onSelectLang }: LaunchPageProps
               {translations.roleSubtitle[lang]}
             </p>
           </div>
-
-          {/* Role Cards in identical style for consistency */}
-          <div className="w-full flex flex-col gap-4.5 mt-6 px-2">
-            
-            {/* 1. Employer Option (Mrs. Chen) - Styled in luxurious dark mode style */}
-            <button
-              onClick={() => handleButtonClick('role', 'employer', '#role-btn-employer')}
-              className="w-full h-[64px] rounded-full bg-[#232734] border border-[#232734] hover:opacity-95 shadow-md flex items-center justify-between px-4 cursor-pointer focus:outline-none transition-all duration-200"
-              id="role-btn-employer"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#F3A562] flex items-center justify-center shrink-0">
-                  <span className="font-sans font-bold text-[13px] text-[#232734]">USER</span>
-                </div>
-                <span className="font-sans font-semibold text-[17px] text-white">
-                  {translations.employerTitle[lang]}
-                </span>
-              </div>
-              <ArrowRight className="w-5 h-5 text-white mr-2" strokeWidth={2.5} />
-            </button>
-
-            {/* 2. Domestic Helper Option (Maria) - Styled in light mode style */}
-            <button
-              onClick={() => handleButtonClick('role', 'helper', '#role-btn-helper')}
-              className="w-full h-[64px] rounded-full bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] shadow-sm flex items-center justify-between px-4 cursor-pointer focus:outline-none transition-all duration-200"
-              id="role-btn-helper"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-[#F3A562] flex items-center justify-center shrink-0">
-                  <span className="font-sans font-bold text-[13px] text-[#232734]">USER</span>
-                </div>
-                <span className="font-sans font-semibold text-[17px] text-[#232734]">
-                  {translations.helperTitle[lang]}
-                </span>
-              </div>
-              <ArrowRight className="w-5 h-5 text-[#64748B] mr-2" strokeWidth={2} />
-            </button>
-
-            {/* Back Button to return to step 1 */}
-            <button
-              onClick={() => setStep('lang')}
-              className="mt-6 text-[14px] font-bold text-[#E28743] hover:underline focus:outline-none cursor-pointer"
-            >
-              {translations.backText[lang]}
-            </button>
-
+          {/* Role Selection Buttons using MagicBento */}
+          <div className="w-full mt-6">
+            <MagicBento 
+              textAutoHide={true}
+              enableStars={false}
+              enableSpotlight={true}
+              enableBorderGlow={true}
+              enableTilt={false}
+              enableMagnetism={false}
+              clickEffect={true}
+              spotlightRadius={400}
+              particleCount={12}
+              glowColor="132, 0, 255"
+              disableAnimations={false}
+              className="!grid-cols-1 !gap-4.5 !p-0"
+              cardData={[
+                {
+                  id: 'role-btn-employer',
+                  color: '#232734',
+                  title: translations.employerTitle[lang],
+                  description: 'Login as an employer',
+                  label: 'USER',
+                  onClick: () => handleButtonClick('role', 'employer', '#role-btn-employer'),
+                  icon: <ArrowRight className="w-5 h-5 text-white mr-2" strokeWidth={2.5} />
+                },
+                {
+                  id: 'role-btn-helper',
+                  color: '#FFFFFF',
+                  title: translations.helperTitle[lang],
+                  description: 'Login as a helper',
+                  label: 'USER',
+                  onClick: () => handleButtonClick('role', 'helper', '#role-btn-helper'),
+                  icon: <ArrowRight className="w-5 h-5 text-[#64748B] mr-2" strokeWidth={2} />
+                }
+              ].map(card => ({
+                ...card,
+                className: card.color === '#FFFFFF' ? 'magic-bento-card--light' : ''
+              }))}
+            />
           </div>
+
+          {/* Back Button to return to step 1 */}
+          <button
+            onClick={() => setStep('lang')}
+            className="mt-6 text-[14px] font-bold text-[#E28743] hover:underline focus:outline-none cursor-pointer"
+          >
+            {translations.backText[lang]}
+          </button>
         </div>
       )}
 
