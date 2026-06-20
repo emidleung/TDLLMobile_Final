@@ -194,8 +194,8 @@ export function LaunchPage({ onSelectRole, lang, onSelectLang }: LaunchPageProps
   // Interactive glow effect helper
   const triggerGlow = (selector: string) => {
     gsap.to(selector, {
-      boxShadow: "0 0 25px 8px rgba(243, 165, 98, 0.6)",
-      borderColor: "rgba(243, 165, 98, 0.8)",
+      boxShadow: "0 0 25px 8px rgba(249, 168, 101, 0.6)",
+      borderColor: "rgba(249, 168, 101, 0.8)",
       duration: 0.4,
       yoyo: true,
       repeat: 1,
@@ -439,7 +439,7 @@ export function LaunchPage({ onSelectRole, lang, onSelectLang }: LaunchPageProps
               clickEffect={true}
               spotlightRadius={400}
               particleCount={12}
-              glowColor="132, 0, 255"
+              glowColor="249, 168, 101"
               disableAnimations={false}
               className="!grid-cols-1 !gap-4.5 !p-0"
               cardData={[
@@ -503,7 +503,7 @@ export function LaunchPage({ onSelectRole, lang, onSelectLang }: LaunchPageProps
               clickEffect={true}
               spotlightRadius={400}
               particleCount={12}
-              glowColor="132, 0, 255"
+              glowColor="249, 168, 101"
               disableAnimations={false}
               className="!grid-cols-1 !gap-4.5 !p-0"
               cardData={[
