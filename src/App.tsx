@@ -261,18 +261,17 @@ export default function App() {
   useEffect(() => {
     const q = query(collection(db, "chats"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const firestoreChats: ChatMessage[] = [];
+      const firestoreMsgs: ChatMessage[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
-        firestoreChats.push({
+        firestoreMsgs.push({
           id: doc.id,
           ...data,
-          createTime: data.createTime instanceof Timestamp ? data.createTime.toDate().toISOString() : (data.createTime || new Date().toISOString())
+          createTime: data.createTime?.toDate ? data.createTime.toDate().toISOString() : (data.createTime || new Date().toISOString())
         } as ChatMessage);
       });
-      // Sort in client to handle pending timestamps correctly
-      firestoreChats.sort((a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime());
-      setChats(firestoreChats);
+      firestoreMsgs.sort((a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime());
+      setChats(firestoreMsgs);
     }, (error) => console.warn("Firestore Chat Listener failed:", error));
 
     return () => unsubscribe();
@@ -1088,7 +1087,7 @@ Respond ONLY with a valid JSON object:
 
               {(currentView === 'chat' || currentView === 'chat-settings') && (
                 <ChatPage
-                  chats={chats}
+                  chats={chats.filter(c => allTasks.some(t => t.taskID === c.taskID))}
                   role={role!}
                   lang={lang}
                   onSendMessage={handleSendMessage}
@@ -1109,14 +1108,16 @@ Respond ONLY with a valid JSON object:
                   lang={lang}
                   onSetLang={handleSelectLang}
                   onSubmitReview={handleSubmitReview}
-                  reviews={reviews.map(r => {
-                    const task = allTasks.find(t => t.taskID === r.taskID);
-                    const recipe = task ? recipes.find(rec => rec.recipeID === task.recipeID) || RECIPES.find(rec => rec.recipeID === task.recipeID) : null;
-                    return {
-                      ...r,
-                      taskTitle: r.taskTitle || (recipe ? recipe.title[lang] : 'Cooking Task')
-                    };
-                  })}
+                  reviews={reviews
+                    .filter(r => allTasks.some(t => t.taskID === r.taskID))
+                    .map(r => {
+                      const task = allTasks.find(t => t.taskID === r.taskID);
+                      const recipe = task ? recipes.find(rec => rec.recipeID === task.recipeID) || RECIPES.find(rec => rec.recipeID === task.recipeID) : null;
+                      return {
+                        ...r,
+                        taskTitle: r.taskTitle || (recipe ? recipe.title[lang] : 'Cooking Task')
+                      };
+                    })}
                   latestTaskTitle={latestTaskTitle}
                   role={role}
                   onLogout={logout}
