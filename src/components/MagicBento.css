@@ -51,7 +51,25 @@
 
 .magic-bento-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.magic-bento-card--light:hover {
+  background: #232734 !important;
+  border-color: #2F293A !important;
+}
+
+.magic-bento-card--light:hover .magic-bento-card__title,
+.magic-bento-card--light:hover .magic-bento-card__description {
+  color: white !important;
+}
+
+.magic-bento-card--light:hover .magic-bento-card__icon svg {
+  stroke: white !important;
+}
+
+.magic-bento-card--light:hover .magic-bento-card__icon {
+  color: white !important;
 }
 
 .magic-bento-card__wrapper {
