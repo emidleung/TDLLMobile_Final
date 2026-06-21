@@ -443,15 +443,15 @@ export function LaunchPage({ onSelectRole, lang, onSelectLang }: LaunchPageProps
               disableAnimations={false}
               className="!grid-cols-1 !gap-4.5 !p-0"
               cardData={[
-                {
-                  id: 'bg-btn-en',
-                  color: '#232734',
-                  title: 'English',
-                  description: 'Select English language',
-                  label: 'EN',
-                  onClick: () => handleButtonClick('lang', 'en', '#bg-btn-en'),
-                  icon: <ArrowRight className="w-5 h-5 text-white mr-2" strokeWidth={2.5} />
-                },
+                  {
+                    id: 'bg-btn-en',
+                    color: '#FFFFFF',
+                    title: 'English',
+                    description: 'Select English language',
+                    label: 'EN',
+                    onClick: () => handleButtonClick('lang', 'en', '#bg-btn-en'),
+                    icon: <ArrowRight className="w-5 h-5 text-[#64748B] mr-2" strokeWidth={2} />
+                  },
                 {
                   id: 'bg-btn-id',
                   color: '#FFFFFF',
@@ -507,15 +507,15 @@ export function LaunchPage({ onSelectRole, lang, onSelectLang }: LaunchPageProps
               disableAnimations={false}
               className="!grid-cols-1 !gap-4.5 !p-0"
               cardData={[
-                {
-                  id: 'role-btn-employer',
-                  color: '#232734',
-                  title: translations.employerTitle[lang],
-                  description: 'Login as an employer',
-                  label: 'USER',
-                  onClick: () => handleButtonClick('role', 'employer', '#role-btn-employer'),
-                  icon: <ArrowRight className="w-5 h-5 text-white mr-2" strokeWidth={2.5} />
-                },
+                  {
+                    id: 'role-btn-employer',
+                    color: '#FFFFFF',
+                    title: translations.employerTitle[lang],
+                    description: 'Login as an employer',
+                    label: 'USER',
+                    onClick: () => handleButtonClick('role', 'employer', '#role-btn-employer'),
+                    icon: <ArrowRight className="w-5 h-5 text-[#64748B] mr-2" strokeWidth={2} />
+                  },
                 {
                   id: 'role-btn-helper',
                   color: '#FFFFFF',
