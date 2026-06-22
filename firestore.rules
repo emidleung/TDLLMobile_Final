@@ -2,10 +2,11 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Only allow these two specific Firebase UIDs for sensitive data
+    // Allow specific UIDs (including common typos)
     function isAuthorized() {
       return request.auth != null && (
         request.auth.uid == '3FIf4jUvTuYen4obvEyYlp5BFmt2' || 
+        request.auth.uid == '3Flf4jUvTuYen4obvEyYlp5BFmt2' || 
         request.auth.uid == 'yuAocDq0IlTRWbbyZNLxgi0LiHx1'
       );
     }

@@ -289,9 +289,6 @@ export function EmployerDashboard({
 
   // Direct Assign Button inside Details Pop-Up
   const handleQuickAssign = (recipeId: string) => {
-    alert("System: Quick assign button clicked! ID: " + recipeId);
-    console.log("handleQuickAssign triggered for recipe:", recipeId);
-    
     if (!recipeId) {
       alert("Error: Recipe ID is missing!");
       return;
@@ -307,11 +304,10 @@ export function EmployerDashboard({
       return;
     }
 
-    alert(lang === 'en' ? "Assigning task..." : "Memberikan tugas...");
+    // Close modal after initiating publish
     setActiveDetailRecipe(null);
 
     if (onPublishTask) {
-      console.log("Calling onPublishTask...");
       onPublishTask(recipeId, []);
     } else {
       console.error("onPublishTask prop is missing!");

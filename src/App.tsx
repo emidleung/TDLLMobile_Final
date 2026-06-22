@@ -521,7 +521,6 @@ export default function App() {
 
   // Publish task
   const handlePublishTask = async (recipeID: string, customSteps: string[]) => {
-    alert("System: Starting task assignment...");
     console.log("handlePublishTask started for recipe:", recipeID);
     // Move cleanup to after or run in background to avoid blocking the UI feedback
     // Run cleanup in background to keep UI responsive
@@ -916,9 +915,6 @@ Respond ONLY with a valid JSON object:
 
   return (
     <main className="min-h-screen bg-app-bg flex justify-center items-start md:items-center font-sans overflow-x-hidden p-0 m-0">
-      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.8)', color: 'white', zIndex: 9999, fontSize: '10px', padding: '4px', textAlign: 'center', pointerEvents: 'none' }}>
-        DEBUG: User {currentUserId || 'None'} | Partner {connectedPartnerId || 'None'} | View {currentView} | Role {role || 'None'}
-      </div>
       <div className="flex-1 w-full max-w-[480px] mx-auto bg-[#FCF9F2] relative overflow-hidden flex flex-col min-h-screen md:min-h-[840px] md:rounded-[24px] md:my-2 shadow-2xl border border-[#E2DDD5]">
         
         {/* Top Header Navigation (Dynamic color base depending on role) */}
