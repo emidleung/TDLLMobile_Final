@@ -69,10 +69,10 @@ export default function App() {
 
   // Trigger one-time seeding for trial experience
   useEffect(() => {
-    const hasSeeded = localStorage.getItem('hekki_db_seeded_v1');
+    const hasSeeded = localStorage.getItem('hekki_db_seeded_v2');
     if (!hasSeeded) {
       seedDatabase().then(() => {
-        localStorage.setItem('hekki_db_seeded_v1', 'true');
+        localStorage.setItem('hekki_db_seeded_v2', 'true');
         loadDatabaseState();
       });
     }
@@ -521,15 +521,12 @@ export default function App() {
 
   // Publish task
   const handlePublishTask = async (recipeID: string, customSteps: string[]) => {
-    // Prevent queuing: delete ALL existing unrated tasks so they don't pop up later
+    alert("System: Starting task assignment...");
+    console.log("handlePublishTask started for recipe:", recipeID);
+    // Move cleanup to after or run in background to avoid blocking the UI feedback
+    // Run cleanup in background to keep UI responsive
     const oldUnratedTasks = allTasks.filter(t => t.taskStatus !== 'rated');
-    for (const oldTask of oldUnratedTasks) {
-      try {
-        await deleteDoc(doc(db, "tasks", oldTask.taskID));
-      } catch (err) {
-        console.warn("Failed to delete old unrated task:", err);
-      }
-    }
+    Promise.all(oldUnratedTasks.map(t => deleteDoc(doc(db, "tasks", t.taskID)).catch(() => {})));
 
     const newTask = {
       recipeID,
@@ -547,9 +544,18 @@ export default function App() {
     try {
       const docRef = await addDoc(collection(db, "tasks"), newTask);
       setActiveTask({ taskID: docRef.id, ...newTask, createTime: new Date().toISOString() } as Task);
+      
+      const successMsg = lang === 'en' 
+        ? `Task assigned to ${partnerFullName || 'your helper'}!` 
+        : lang === 'id' 
+        ? `Tugas diberikan kepada ${partnerFullName || 'asisten Anda'}!` 
+        : `Na-assign na ang task kay ${partnerFullName || 'iyong helper'}!`;
+      alert(successMsg);
+      
       setCurrentView('dashboard');
-    } catch (err) {
+    } catch (err: any) {
       console.warn("Firestore publish task failed:", err);
+      alert("Failed to assign task: " + (err.message || "Unknown error"));
     }
   };
 
@@ -909,10 +915,11 @@ Respond ONLY with a valid JSON object:
   const pendingInvCount = invitations.filter(inv => inv.receiverID === currentUserId && inv.status === 'pending').length;
 
   return (
-    <main className="min-h-screen bg-[#ECE9E2] text-[#444444] font-sans flex flex-col items-center justify-start py-0 md:py-6">
-      
-      {/* Mobile Frame Container Framework */}
-      <div className="w-full max-w-[480px] bg-[#FCF9F2] min-h-screen md:min-h-[840px] md:rounded-[24px] md:my-2 shadow-2xl flex flex-col relative border border-[#E2DDD5] overflow-hidden">
+    <main className="min-h-screen bg-app-bg flex justify-center items-start md:items-center font-sans overflow-x-hidden p-0 m-0">
+      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.8)', color: 'white', zIndex: 9999, fontSize: '10px', padding: '4px', textAlign: 'center', pointerEvents: 'none' }}>
+        DEBUG: User {currentUserId || 'None'} | Partner {connectedPartnerId || 'None'} | View {currentView} | Role {role || 'None'}
+      </div>
+      <div className="flex-1 w-full max-w-[480px] mx-auto bg-[#FCF9F2] relative overflow-hidden flex flex-col min-h-screen md:min-h-[840px] md:rounded-[24px] md:my-2 shadow-2xl border border-[#E2DDD5]">
         
         {/* Top Header Navigation (Dynamic color base depending on role) */}
         {role && isLoggedIn && (

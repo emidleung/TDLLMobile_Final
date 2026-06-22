@@ -289,6 +289,14 @@ export function EmployerDashboard({
 
   // Direct Assign Button inside Details Pop-Up
   const handleQuickAssign = (recipeId: string) => {
+    alert("System: Quick assign button clicked! ID: " + recipeId);
+    console.log("handleQuickAssign triggered for recipe:", recipeId);
+    
+    if (!recipeId) {
+      alert("Error: Recipe ID is missing!");
+      return;
+    }
+
     if (!connectedPartnerId) {
       const msg = lang === 'en' 
         ? "You haven't connected to a helper yet. Please go to Account -> Connections to invite your helper before assigning dishes." 
@@ -299,11 +307,19 @@ export function EmployerDashboard({
       return;
     }
 
+    alert(lang === 'en' ? "Assigning task..." : "Memberikan tugas...");
     setActiveDetailRecipe(null);
 
     if (onPublishTask) {
+      console.log("Calling onPublishTask...");
       onPublishTask(recipeId, []);
+    } else {
+      console.error("onPublishTask prop is missing!");
+      alert("System error: onPublishTask is missing.");
     }
+    
+    // Close modal after initiating publish
+    setActiveDetailRecipe(null);
   };
 
   // Determine current greeting and translation according to hour bounds
@@ -1244,7 +1260,11 @@ export function EmployerDashboard({
 
             {/* Quick Assign Action Button */}
             <button
-              onClick={() => handleQuickAssign(activeDetailRecipe.id)}
+              onClick={() => {
+                const rid = activeDetailRecipe.recipeID || activeDetailRecipe.id;
+                console.log("Button clicked, identified ID:", rid);
+                handleQuickAssign(rid);
+              }}
               className="w-full py-5 bg-[#965020] text-white text-[14px] font-black rounded-[24px] shadow-xl hover:bg-[#804218] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer mt-4"
             >
               <ChefHat className="w-6 h-6" />

@@ -135,7 +135,11 @@ export function RecipePlanner({ recipes, healthProfiles, lang, onPublishTask, pa
   const allergyList = healthProfiles.map(m => m.allergy?.trim()).filter(a => a && a.toLowerCase() !== 'none');
 
   const handlePublish = () => {
-    if (!selectedRecipeId) return;
+    alert("System: Recipe Planner Publish button clicked!");
+    if (!selectedRecipeId) {
+      alert("No recipe selected!");
+      return;
+    }
     const lines = customInput
       .split('\n')
       .map(l => l.trim())

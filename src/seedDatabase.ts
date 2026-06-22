@@ -4,7 +4,8 @@ import { doc, writeBatch } from 'firebase/firestore';
 const initialUsers = [
   { userID: 'employer-1', role: 'employer', fullName: 'User', email: 'employer@mock.com', languagePreference: 'en', createTime: new Date().toISOString() },
   { userID: 'helper-1', role: 'helper', fullName: 'Helper', email: 'helper@mock.com', languagePreference: 'en', createTime: new Date().toISOString() },
-  { userID: '66924319', role: 'employer', fullName: 'Emidio', email: 'hello@example.com', languagePreference: 'en', createTime: new Date().toISOString() }
+  { userID: '66924319', role: 'employer', fullName: 'Emidio', email: 'hello@example.com', languagePreference: 'en', createTime: new Date().toISOString(), firebaseUid: '3FIf4jUvTuYen4obvEyYlp5BFmt2' },
+  { userID: '13345678', role: 'helper', fullName: 'Helper User', email: 'helper@example.com', languagePreference: 'en', createTime: new Date().toISOString(), firebaseUid: 'yuAocDq0IlTRWbbyZNLxgi0LiHx1' }
 ];
 
 const familyMembers = [
@@ -13,7 +14,8 @@ const familyMembers = [
 ];
 
 const initialConnections = [
-  { connectionID: 'conn-1', employerID: 'employer-1', helperID: 'helper-1', createTime: new Date().toISOString() }
+  { connectionID: 'conn-1', employerID: 'employer-1', helperID: 'helper-1', createTime: new Date().toISOString() },
+  { connectionID: 'conn-real', employerID: '66924319', helperID: '13345678', createTime: new Date().toISOString() }
 ];
 
 export const seedDatabase = async () => {
