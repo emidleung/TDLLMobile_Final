@@ -1090,7 +1090,7 @@ Respond ONLY with a valid JSON object:
 
               {(currentView === 'chat' || currentView === 'chat-settings') && (
                 <ChatPage
-                  chats={chats.filter(c => allTasks.some(t => t.taskID === c.taskID))}
+                  chats={chats.filter(c => c.taskID.startsWith('chat_') || allTasks.some(t => t.taskID === c.taskID))}
                   role={role!}
                   lang={lang}
                   onSendMessage={handleSendMessage}

@@ -344,7 +344,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') handleSendText(); }}
             placeholder={getTranslatedMessage("Type a message here.....")} 
-            style={{ flex: 1, padding: "12px 16px", borderRadius: "24px", border: "1px solid #d1d5db", outline: "none" }} 
+            style={{ flex: 1, padding: "12px 16px", borderRadius: "24px", border: "1px solid #d1d5db", outline: "none", color: "#000000" }} 
           />
         )}
         <button onClick={hasRecordedAudio ? handleSendAudio : handleSendText} style={{ backgroundColor: "#fb923c", color: "#fff", border: "none", padding: "12px 20px", borderRadius: "24px", fontWeight: "bold", cursor: "pointer", opacity: isRecording ? 0.5 : 1 }} disabled={isRecording}>
