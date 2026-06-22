@@ -262,7 +262,7 @@ export function ChatPage({ role, lang, currentUserId, connectedPartnerId, invita
                   🔗 Pair with a Partner
                 </div>
                 <div style={{ display: "flex", gap: "8px" }}>
-                  <input type="text" placeholder="Enter partner's 8-Digit ID" value={partnerInput} onChange={(e) => setPartnerInput(e.target.value)} style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #d1d5db" }} />
+                  <input type="text" placeholder="Enter partner's 8-Digit ID" value={partnerInput} onChange={(e) => setPartnerInput(e.target.value)} style={{ flex: 1, padding: "10px", borderRadius: "8px", border: "1px solid #d1d5db", color: "#000000" }} />
                   <button onClick={handleSendInvitation} style={{ backgroundColor: "#ff9f43", color: "#fff", border: "none", padding: "10px 16px", borderRadius: "8px", fontWeight: "bold", cursor: "pointer" }}>Connect</button>
                 </div>
               </div>
