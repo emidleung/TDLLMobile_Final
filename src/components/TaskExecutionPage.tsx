@@ -429,8 +429,8 @@ export function TaskExecutionPage({ task, recipe: propRecipe, lang, onConfirmSte
                     <div className="w-16 h-16 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center mb-4">
                       <Sparkles className="w-8 h-8 text-primary" />
                     </div>
-                    <h1 className="text-2xl font-bold mb-4">{recipe?.title[lang] || 'Recipe Steps'}</h1>
-                    <p className="text-sm text-on-surface-variant mb-6 max-w-[250px]">
+                    <h1 className="text-2xl font-bold mb-4 text-[#333333]">{recipe?.title[lang] || 'Recipe Steps'}</h1>
+                    <p className="text-sm text-on-surface-variant mb-6 max-w-[250px] text-center">
                       {lang === 'en' ? "Take a photo of the final plated dish for employer's approval !" : "Ambil foto hidangan yang sudah disajikan untuk persetujuan majikan !"}
                     </p>
                     <button
