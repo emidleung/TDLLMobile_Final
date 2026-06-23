@@ -47,7 +47,8 @@ export function ChatPage({ role, lang, currentUserId, connectedPartnerId, invita
 
   const rawDynamicChats = connections.map(c => {
     const partnerID = c.employerID === currentUserId ? c.helperID : c.employerID;
-    const chatId = `chat_${c.employerID}_${c.helperID}`;
+    const sortedIds = [c.employerID, c.helperID].sort();
+    const chatId = `chat_${sortedIds[0]}_${sortedIds[1]}`;
     const partnerChats = chats.filter(chat => chat.taskID === chatId);
     const lastMsg = partnerChats.length > 0 ? partnerChats[partnerChats.length - 1].message : 'Tap to start chatting...';
     const unreadInChat = partnerChats.filter(chat => !chat.isRead && chat.senderRole !== role).length;
@@ -130,9 +131,10 @@ export function ChatPage({ role, lang, currentUserId, connectedPartnerId, invita
   const handleAcceptInvitation = async (inv: Invitation, roleOfSender: 'employer' | 'helper') => {
     try {
       // 1. Create connection FIRST (Source of truth)
+      // roleOfSender is actually the role of the person clicking "Accept" (the receiver of the invitation)
       await addDoc(collection(db, "connections"), {
-        employerID: roleOfSender === 'employer' ? inv.senderID : inv.receiverID,
-        helperID: roleOfSender === 'helper' ? inv.senderID : inv.receiverID,
+        employerID: roleOfSender === 'employer' ? inv.receiverID : inv.senderID,
+        helperID: roleOfSender === 'helper' ? inv.receiverID : inv.senderID,
         createTime: serverTimestamp()
       });
 

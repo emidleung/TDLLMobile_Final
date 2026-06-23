@@ -115,8 +115,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ chatId, partnerName, onB
 
   const handleSendText = () => {
     if (inputText.trim() && onSendMessage) {
-      const finalMessage = getTranslatedMessage(inputText.trim());
-      onSendMessage(finalMessage, chatId);
+      onSendMessage(inputText.trim(), chatId);
       setInputText('');
     }
   };
