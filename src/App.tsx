@@ -331,7 +331,7 @@ export default function App() {
       const firestoreTasks: Task[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
-        if (data.employerID === currentUserId || data.helperID === currentUserId || !currentUserId) {
+        if (data.employerID === currentUserId || data.helperID === currentUserId) {
           const adjustment = adjustRecipeForHealth(data.recipeID, healthProfiles);
           firestoreTasks.push({
             taskID: doc.id,
@@ -435,35 +435,11 @@ export default function App() {
   };
 
   // Monitor Auth State for persistence
+  // Disabled auto-login as per user request to force explicit login
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user && !isLoggedIn) {
-        console.log("Found existing auth session:", user.uid);
-        
-        // Attempt to find user by their Firebase UID in Firestore first
-        const q = query(collection(db, "users"), where("firebaseUid", "==", user.uid));
-        const qSnap = await getDocs(q).catch(() => null);
-        if (qSnap && !qSnap.empty) {
-          const uDoc = qSnap.docs[0];
-          const userData = uDoc.data();
-          setUserFullName(userData.fullName);
-          setRole(userData.role);
-          setCurrentUserId(uDoc.id); // This is the 8-digit ID
-          setIsLoggedIn(true);
-        } else if (currentUserId) {
-          // Fallback to searching by currentUserId (8-digit ID)
-          const docRef = doc(db, "users", currentUserId);
-          const docSnap = await getDoc(docRef).catch(() => null);
-          if (docSnap && docSnap.exists()) {
-            const userData = docSnap.data();
-            setUserFullName(userData.fullName);
-            setRole(userData.role);
-            setIsLoggedIn(true);
-          }
-        }
-      }
-    });
-    return () => unsubscribe();
+    // We intentionally do not automatically log the user in to address the 
+    // "automatically logging into the app" issue. The user will be required 
+    // to explicitly enter their ID to login.
   }, [isLoggedIn, currentUserId]);
 
   useEffect(() => {

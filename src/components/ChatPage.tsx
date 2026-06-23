@@ -45,9 +45,9 @@ export function ChatPage({ role, lang, currentUserId, connectedPartnerId, invita
 
   const pendingInvCount = invitations.filter(inv => inv.receiverID === currentUserId && inv.status === 'pending').length;
 
-  const dynamicChats = connections.map(c => {
+  const rawDynamicChats = connections.map(c => {
     const partnerID = c.employerID === currentUserId ? c.helperID : c.employerID;
-    const chatId = `chat_${c.connectionID || c.employerID + '_' + c.helperID}`;
+    const chatId = `chat_${c.employerID}_${c.helperID}`;
     const partnerChats = chats.filter(chat => chat.taskID === chatId);
     const lastMsg = partnerChats.length > 0 ? partnerChats[partnerChats.length - 1].message : 'Tap to start chatting...';
     const unreadInChat = partnerChats.filter(chat => !chat.isRead && chat.senderRole !== role).length;
@@ -59,9 +59,13 @@ export function ChatPage({ role, lang, currentUserId, connectedPartnerId, invita
       time: partnerChats.length > 0 ? new Date(partnerChats[partnerChats.length - 1].createTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date(c.createTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       unread: unreadInChat,
       initial: partnerID ? partnerID[0].toUpperCase() : 'U',
-      color: '#fed7aa'
+      color: '#fed7aa',
+      connectionID: c.connectionID
     };
   });
+
+  // Deduplicate chats by ID to prevent multiple connections from showing duplicates
+  const dynamicChats = Array.from(new Map(rawDynamicChats.map(item => [item.id, item])).values());
 
   const chatList = [
     ...dynamicChats
