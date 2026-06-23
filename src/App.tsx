@@ -569,7 +569,15 @@ export default function App() {
   // Reset task back to preparing
   const handleResetTask = async (taskId: string) => {
     try {
-      await updateDoc(doc(db, "tasks", taskId), { taskStatus: 'preparing', preCookFinishRate: 0, currentPreStepIndex: 0 });
+      await updateDoc(doc(db, "tasks", taskId), { 
+        taskStatus: 'preparing', 
+        preCookFinishRate: 0, 
+        currentPreStepIndex: 0,
+        cookFinishRate: 0,
+        currentCookStepIndex: 0,
+        prepImageUrl: deleteField() as any,
+        cookImageUrl: deleteField() as any
+      });
     } catch (err) {
       console.warn("Firestore reset task failed:", err);
     }
